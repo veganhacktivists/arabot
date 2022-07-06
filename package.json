@@ -1,0 +1,25 @@
+{
+  "name": "arabot",
+  "version": "0.0.1",
+  "description": "A Discord bot for Animal Rights Advocates",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Animal-Rights-Advocates-Discord/arabot.ts.git"
+  },
+  "keywords": [
+    "discord",
+    "veganism",
+    "sapphire",
+    "discordjs"
+  ],
+  "author": "Animal Rights Advocates",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/Animal-Rights-Advocates-Discord/arabot.ts/issues"
+  },
+  "homepage": "https://github.com/Animal-Rights-Advocates-Discord/arabot.ts#readme"
+}
