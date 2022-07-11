@@ -30,9 +30,17 @@ const client = new SapphireClient({
   logger: {
     level: LogLevel.Debug,
   },
-  intents:
-  ['GUILDS',
-    'GUILD_MESSAGES'],
+  intents: [
+    'GUILDS',
+    'GUILD_MEMBERS',
+    'GUILD_BANS',
+    'GUILD_EMOJIS_AND_STICKERS',
+    'GUILD_VOICE_STATES',
+    'GUILD_MESSAGES',
+    'GUILD_MESSAGE_REACTIONS',
+    'DIRECT_MESSAGES',
+    'DIRECT_MESSAGE_REACTIONS',
+  ],
 });
 
 // Main function to log in
