@@ -1,0 +1,55 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @db.VarChar(255)
+  level     Int        @default(0)
+  xp        Int        @default(0)
+  balance   Int        @default(0)
+  lastDaily DateTime
+  vegan     Boolean    @default(false)
+  activist  Boolean    @default(false)
+  trusted   Boolean    @default(false)
+  plus      Boolean    @default(false)
+  muted     Boolean    @default(false)
+  Restrict  Restrict[]
+  Ban       Ban[]
+  TempBan   TempBan[]
+}
+
+model Restrict {
+  id        Int       @id @default(autoincrement())
+  user      User      @relation(fields: [userId], references: [id])
+  userId    String
+  startTime DateTime  @default(now())
+  endedTime DateTime?
+  reason    String
+}
+
+model Ban {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  time   DateTime @default(now())
+  active Boolean  @default(true)
+  reason String
+}
+
+model TempBan {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  startTime DateTime @default(now())
+  endedTime DateTime
+  active    Boolean  @default(true)
+  reason    String
+}

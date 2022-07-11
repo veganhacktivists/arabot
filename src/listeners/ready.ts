@@ -20,41 +20,19 @@
     create this file.
 */
 
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { Listener } from '@sapphire/framework';
+import type { Client } from 'discord.js';
 
-require('dotenv').config();
-
-// Setting up the Sapphire client
-const client = new SapphireClient({
-  defaultPrefix: process.env.DEFAULT_PREFIX,
-  logger: {
-    level: LogLevel.Debug,
-  },
-  intents: [
-    'GUILDS',
-    'GUILD_MEMBERS',
-    'GUILD_BANS',
-    'GUILD_EMOJIS_AND_STICKERS',
-    'GUILD_VOICE_STATES',
-    'GUILD_MESSAGES',
-    'GUILD_MESSAGE_REACTIONS',
-    'DIRECT_MESSAGES',
-    'DIRECT_MESSAGE_REACTIONS',
-  ],
-});
-
-// Main function to log in
-const main = async () => {
-  try {
-    const token = process.env.DISCORD_TOKEN;
-    client.logger.info('Logging in');
-    await client.login(token);
-    client.logger.info('Logged in');
-  } catch (error) {
-    client.logger.fatal(error);
-    client.destroy();
-    process.exit(1);
+export class ReadyListener extends Listener {
+  public constructor(context: Listener.Context) {
+    super(context, {
+      once: true,
+      event: 'ready',
+    });
   }
-};
 
-main();
+  public run(client: Client) {
+    const { username, id } = client.user!;
+    this.container.logger.info(`Successfully logged in as ${username} (${id})`);
+  }
+}
