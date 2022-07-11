@@ -105,3 +105,6 @@ dist
 
 # IntelliJ IDEA
 /.idea/
+
+# Prisma migration files
+/prisma/migrations/
