@@ -26,25 +26,58 @@ datasource db {
 }
 
 model User {
-  id        String     @id @db.VarChar(255)
-  level     Int        @default(0)
-  xp        Int        @default(0)
-  balance   Int        @default(0)
-  lastDaily DateTime
-  vegan     Boolean    @default(false)
-  activist  Boolean    @default(false)
-  trusted   Boolean    @default(false)
-  plus      Boolean    @default(false)
-  muted     Boolean    @default(false)
-  Restrict  Restrict[]
-  Ban       Ban[]
-  TempBan   TempBan[]
+  id             String     @id @db.VarChar(255)
+  level          Int        @default(0)
+  xp             Int        @default(0)
+  balance        Int        @default(0)
+  lastDaily      DateTime?
+  vegan          Boolean    @default(false)
+  activist       Boolean    @default(false)
+  plus           Boolean    @default(false)
+  vegCurious     Boolean    @default(false)
+  convinced      Boolean    @default(false)
+  trusted        Boolean    @default(false)
+  muted          Boolean    @default(false)
+  VerifyUser     Verify[]   @relation("user")
+  VerifyVerifier Verify[]   @relation("verifier")
+  SusUser        Sus[]      @relation("user")
+  SusMod         Sus[]      @relation("mod")
+  RestrictUser   Restrict[] @relation("user")
+  RestrictMod    Restrict[] @relation("mod")
+  BanUser        Ban[]      @relation("user")
+  BanMod         Ban[]      @relation("mod")
+  TempBanUser    TempBan[]  @relation("user")
+  TempBanMod     TempBan[]  @relation("mod")
+}
+
+model Verify {
+  id          Int      @id @default(autoincrement())
+  user        User     @relation("user", fields: [userId], references: [id])
+  userId      String
+  verifier    User?    @relation("verifier", fields: [verifierId], references: [id])
+  verifierId  String?
+  time        DateTime @default(now())
+  timedOut    Boolean  @default(false) // If they got kicked out of verification because they timed out
+  vegan       Boolean  @default(false) // If they got verified as a vegan
+  text        Boolean  @default(false) // If they used text verification
+  serverVegan Boolean  @default(false) // People that went vegan on the server
+  notes       String?
+}
+
+model Sus {
+  id     Int    @id @default(autoincrement())
+  user   User   @relation("user", fields: [userId], references: [id])
+  userId String
+  mod    User   @relation("mod", fields: [modId], references: [id])
+  modId  String
 }
 
 model Restrict {
   id        Int       @id @default(autoincrement())
-  user      User      @relation(fields: [userId], references: [id])
+  user      User      @relation("user", fields: [userId], references: [id])
   userId    String
+  mod       User      @relation("mod", fields: [modId], references: [id])
+  modId     String
   startTime DateTime  @default(now())
   endedTime DateTime?
   reason    String
@@ -52,8 +85,10 @@ model Restrict {
 
 model Ban {
   id     Int      @id @default(autoincrement())
-  user   User     @relation(fields: [userId], references: [id])
+  user   User     @relation("user", fields: [userId], references: [id])
   userId String
+  mod    User     @relation("mod", fields: [modId], references: [id])
+  modId  String
   time   DateTime @default(now())
   active Boolean  @default(true)
   reason String
@@ -61,8 +96,10 @@ model Ban {
 
 model TempBan {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation("user", fields: [userId], references: [id])
   userId    String
+  mod       User     @relation("mod", fields: [modId], references: [id])
+  modId     String
   startTime DateTime @default(now())
   endedTime DateTime
   active    Boolean  @default(true)
