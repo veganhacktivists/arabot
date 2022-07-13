@@ -5,6 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "tsc",
+    "cleanBuild": "rm -rf ./dist && tsc",
     "start": "node dist/index.js"
   },
   "repository": {
@@ -25,8 +26,10 @@
   "homepage": "https://github.com/Animal-Rights-Advocates-Discord/arabot.ts#readme",
   "dependencies": {
     "@prisma/client": "^4.0.0",
-    "@sapphire/framework": "^2.5.1",
+    "@sapphire/framework": "^3.0.0-next.87e5cdc.0",
+    "@sapphire/plugin-subcommands": "^2.2.2",
     "@sapphire/ts-config": "^3.3.4",
+    "@sapphire/utilities": "^3.7.0",
     "@types/node": "^18.0.3",
     "discord.js": "^13.8.1",
     "dotenv": "^16.0.1",
