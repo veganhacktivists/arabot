@@ -32,11 +32,11 @@ model User {
   balance        Int        @default(0)
   lastDaily      DateTime?
   vegan          Boolean    @default(false)
+  trusted        Boolean    @default(false)
   activist       Boolean    @default(false)
   plus           Boolean    @default(false)
   vegCurious     Boolean    @default(false)
   convinced      Boolean    @default(false)
-  trusted        Boolean    @default(false)
   muted          Boolean    @default(false)
   VerifyUser     Verify[]   @relation("user")
   VerifyVerifier Verify[]   @relation("verifier")
