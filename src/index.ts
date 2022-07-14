@@ -27,6 +27,7 @@ require('dotenv').config();
 // Setting up the Sapphire client
 const client = new SapphireClient({
   defaultPrefix: process.env.DEFAULT_PREFIX,
+  loadMessageCommandListeners: true,
   logger: {
     level: LogLevel.Debug,
   },
