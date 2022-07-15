@@ -38,23 +38,23 @@ model User {
   vegCurious     Boolean    @default(false)
   convinced      Boolean    @default(false)
   muted          Boolean    @default(false)
-  VerifyUser     Verify[]   @relation("user")
-  VerifyVerifier Verify[]   @relation("verifier")
-  SusUser        Sus[]      @relation("user")
-  SusMod         Sus[]      @relation("mod")
-  RestrictUser   Restrict[] @relation("user")
-  RestrictMod    Restrict[] @relation("mod")
-  BanUser        Ban[]      @relation("user")
-  BanMod         Ban[]      @relation("mod")
-  TempBanUser    TempBan[]  @relation("user")
-  TempBanMod     TempBan[]  @relation("mod")
+  VerifyUser     Verify[]   @relation("verUser")
+  VerifyVerifier Verify[]   @relation("verVerifier")
+  SusUser        Sus[]      @relation("susUser")
+  SusMod         Sus[]      @relation("susMod")
+  RestrictUser   Restrict[] @relation("restUser")
+  RestrictMod    Restrict[] @relation("restMod")
+  BanUser        Ban[]      @relation("banUser")
+  BanMod         Ban[]      @relation("banMod")
+  TempBanUser    TempBan[]  @relation("tbanUser")
+  TempBanMod     TempBan[]  @relation("tbanMod")
 }
 
 model Verify {
   id          Int      @id @default(autoincrement())
-  user        User     @relation("user", fields: [userId], references: [id])
+  user        User     @relation("verUser", fields: [userId], references: [id])
   userId      String
-  verifier    User?    @relation("verifier", fields: [verifierId], references: [id])
+  verifier    User?    @relation("verVerifier", fields: [verifierId], references: [id])
   verifierId  String?
   time        DateTime @default(now())
   timedOut    Boolean  @default(false) // If they got kicked out of verification because they timed out
@@ -66,17 +66,18 @@ model Verify {
 
 model Sus {
   id     Int    @id @default(autoincrement())
-  user   User   @relation("user", fields: [userId], references: [id])
+  user   User   @relation("susUser", fields: [userId], references: [id])
   userId String
-  mod    User   @relation("mod", fields: [modId], references: [id])
+  mod    User   @relation("susMod", fields: [modId], references: [id])
   modId  String
+  note   String
 }
 
 model Restrict {
   id        Int       @id @default(autoincrement())
-  user      User      @relation("user", fields: [userId], references: [id])
+  user      User      @relation("restUser", fields: [userId], references: [id])
   userId    String
-  mod       User      @relation("mod", fields: [modId], references: [id])
+  mod       User      @relation("restMod", fields: [modId], references: [id])
   modId     String
   startTime DateTime  @default(now())
   endedTime DateTime?
@@ -85,9 +86,9 @@ model Restrict {
 
 model Ban {
   id     Int      @id @default(autoincrement())
-  user   User     @relation("user", fields: [userId], references: [id])
+  user   User     @relation("banUser", fields: [userId], references: [id])
   userId String
-  mod    User     @relation("mod", fields: [modId], references: [id])
+  mod    User     @relation("banMod", fields: [modId], references: [id])
   modId  String
   time   DateTime @default(now())
   active Boolean  @default(true)
@@ -96,9 +97,9 @@ model Ban {
 
 model TempBan {
   id        Int      @id @default(autoincrement())
-  user      User     @relation("user", fields: [userId], references: [id])
+  user      User     @relation("tbanUser", fields: [userId], references: [id])
   userId    String
-  mod       User     @relation("mod", fields: [modId], references: [id])
+  mod       User     @relation("tbanMod", fields: [modId], references: [id])
   modId     String
   startTime DateTime @default(now())
   endedTime DateTime
