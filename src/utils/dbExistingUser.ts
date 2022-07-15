@@ -61,13 +61,13 @@ export async function addExistingUser(user: GuildMember) {
   }
 
   // Checks what roles the user has
-  const hasVegan = user.roles.cache.has(IDs.roles.vegan);
-  const hasActivist = user.roles.cache.has(IDs.roles.activist);
-  const hasPlus = user.roles.cache.has(IDs.roles.plus);
-  const hasVegCurious = user.roles.cache.has(IDs.roles.vegCurious);
-  const hasConvinced = user.roles.cache.has(IDs.roles.convinced);
+  const hasVegan = user.roles.cache.has(IDs.roles.vegan.vegan);
+  const hasActivist = user.roles.cache.has(IDs.roles.vegan.activist);
+  const hasPlus = user.roles.cache.has(IDs.roles.vegan.plus);
+  const hasVegCurious = user.roles.cache.has(IDs.roles.nonvegan.vegCurious);
+  const hasConvinced = user.roles.cache.has(IDs.roles.nonvegan.convinced);
   const hasTrusted = user.roles.cache.has(IDs.roles.trusted);
-  const hasMuted = user.roles.cache.has(IDs.roles.trusted);
+  const hasMuted = user.roles.cache.has(IDs.roles.restrictions.muted);
 
   // Create the user in the database
   await prisma.user.create({
@@ -82,4 +82,7 @@ export async function addExistingUser(user: GuildMember) {
       muted: hasMuted,
     },
   });
+
+  // Close the database connection
+  await prisma.$disconnect();
 }
