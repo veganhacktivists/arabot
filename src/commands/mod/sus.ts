@@ -18,7 +18,7 @@
  */
 
 import { Command } from '@sapphire/framework';
-import type { Message, GuildMember } from 'discord.js';
+import type { Message } from 'discord.js';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
 import { PrismaClient } from '@prisma/client';
 
@@ -30,6 +30,38 @@ export class SusCommand extends Command {
     });
   }
 
+  // Registers that this is a slash command
+  public override registerApplicationCommands(registry: Command.Registry) {
+    registry.registerChatInputCommand((builder) => builder
+      .setName(this.name)
+      .setDescription(this.description)
+      .addUserOption((option) =>
+        option.setName('user')
+          .setDescription('User to add the note')
+          .setRequired(true))
+      .addStringOption((option) =>
+        option.setName('note')
+          .setDescription('Note about the user')
+          .setRequired(true)));
+  }
+
+  // Command run
+  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    // Get the arguments
+    const user = interaction.options.getUser('user')!;
+    const mod = interaction.member!.user;
+    const note = interaction.options.getString('note')!;
+
+    // Add the data to the database
+    // TODO check if user is on the database and if not, add them to the database
+    await addToDatabase(user.id, mod.id, note);
+
+    await interaction.reply({
+      content: `${user}: note: ${note}`,
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
   public async messageRun(message: Message) {
     const msg = await message.channel.send('Ping?');
 
@@ -47,19 +79,15 @@ export class SusCommand extends Command {
       await addExistingUser(message.member);
     }
 
-    await addToDatabase(message.member, message.member, 'This is a note :D');
+    await addToDatabase(message.member.id, message.member.id, 'This is a note :D');
 
     return msg.edit(content);
   }
 }
 
-async function addToDatabase(user: GuildMember, mod: GuildMember, message: string) {
+async function addToDatabase(userId: string, modId: string, message: string) {
   // Initialise the database connection
   const prisma = new PrismaClient();
-
-  // Create variables for data input
-  const userId = user.id.toString();
-  const modId = mod.id.toString();
 
   // Add the user to the database
   await prisma.sus.create({
