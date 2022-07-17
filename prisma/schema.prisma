@@ -65,11 +65,13 @@ model Verify {
 }
 
 model Sus {
-  id     Int    @id @default(autoincrement())
-  user   User   @relation("susUser", fields: [userId], references: [id])
+  id     Int      @id @default(autoincrement())
+  user   User     @relation("susUser", fields: [userId], references: [id])
   userId String
-  mod    User   @relation("susMod", fields: [modId], references: [id])
+  mod    User     @relation("susMod", fields: [modId], references: [id])
   modId  String
+  time   DateTime @default(now())
+  active Boolean  @default(true)
   note   String
 }
 

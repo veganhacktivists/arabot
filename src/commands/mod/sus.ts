@@ -17,36 +17,72 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Command } from '@sapphire/framework';
-import type { Message } from 'discord.js';
-import { addExistingUser, userExists } from '../../utils/dbExistingUser';
+import { Command, RegisterBehavior } from '@sapphire/framework';
+import { Message, MessageEmbed } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
+import { addExistingUser, userExists } from '../../utils/dbExistingUser';
 
 export class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
       name: 'sus',
-      description: 'Adds a sus note about a user.',
+      description: 'Notes about users that are sus',
     });
   }
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
-    registry.registerChatInputCommand((builder) => builder
-      .setName(this.name)
-      .setDescription(this.description)
-      .addUserOption((option) =>
-        option.setName('user')
-          .setDescription('User to add the note')
-          .setRequired(true))
-      .addStringOption((option) =>
-        option.setName('note')
-          .setDescription('Note about the user')
-          .setRequired(true)));
+    registry.registerChatInputCommand(
+      (builder) => builder
+        .setName(this.name)
+        .setDescription(this.description)
+      // Subcommand to add a sus note
+        .addSubcommand((command) => command.setName('add')
+          .setDescription('Add a sus note about a user')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to add the note')
+            .setRequired(true))
+          .addStringOption((option) => option.setName('note')
+            .setDescription('Note about the user')
+            .setRequired(true)))
+      // Subcommand to list sus notes
+        .addSubcommand((command) => command.setName('view')
+          .setDescription('View a sus note for a user')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to add the note')
+            .setRequired(true))),
+      {
+        behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
+      },
+    );
   }
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    const subcommand = interaction.options.getSubcommand(true);
+
+    // Checks what subcommand was run
+    switch (subcommand) {
+      case 'add': {
+        return await this.addNote(interaction);
+        break;
+      }
+      case 'view': {
+        return await this.listNote(interaction);
+        break;
+      }
+    }
+
+    // If subcommand is invalid
+    await interaction.reply({
+      content: 'Invalid sub command!',
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
+
+  // Subcommand to add sus note
+  public async addNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user')!;
     const mod = interaction.member!.user;
@@ -62,6 +98,31 @@ export class SusCommand extends Command {
       fetchReply: true,
     });
   }
+
+  public async listNote(interaction: Command.ChatInputInteraction) {
+    const user = interaction.options.getUser('user')!;
+
+    // Gets the sus notes from the database
+    const notes = await findNote(user.id, true);
+    // Gets the username of the mod
+    const modId = notes[notes.length - 1].modId;
+    const mod = interaction.guild!.members.cache.get(modId)!.user.username;
+
+    // Creates the embed to display the sus note
+    const noteEmbed = new MessageEmbed()
+      .setColor('#0099ff')
+      .setTitle(`Sus notes for ${user.username}`)
+      // .setThumbnail(user.avatar!)
+      .addField(`Moderator: ${mod} Date: ${notes[notes.length - 1].time}`, notes[notes.length - 1].note);
+
+    // Sends the notes to the user
+    await interaction.reply({
+      embeds: [noteEmbed],
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
+
   public async messageRun(message: Message) {
     const msg = await message.channel.send('Ping?');
 
@@ -108,4 +169,22 @@ async function addToDatabase(userId: string, modId: string, message: string) {
 
   // Close the database connection
   await prisma.$disconnect();
+}
+
+// Get a list of sus notes from the user
+async function findNote(userId: string, active: boolean) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Query to get the specific user's sus notes
+  const getNote = await prisma.sus.findMany({
+    where: {
+      userId,
+      active,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+  return getNote;
 }
