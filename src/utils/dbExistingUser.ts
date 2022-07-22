@@ -64,6 +64,7 @@ export async function addExistingUser(user: GuildMember) {
   const hasVegan = user.roles.cache.has(IDs.roles.vegan.vegan);
   const hasActivist = user.roles.cache.has(IDs.roles.vegan.activist);
   const hasPlus = user.roles.cache.has(IDs.roles.vegan.plus);
+  const hasNotVegan = user.roles.cache.has(IDs.roles.nonvegan.nonvegan);
   const hasVegCurious = user.roles.cache.has(IDs.roles.nonvegan.vegCurious);
   const hasConvinced = user.roles.cache.has(IDs.roles.nonvegan.convinced);
   const hasTrusted = user.roles.cache.has(IDs.roles.trusted);
@@ -77,6 +78,7 @@ export async function addExistingUser(user: GuildMember) {
       trusted: hasTrusted,
       activist: hasActivist,
       plus: hasPlus,
+      notVegan: hasNotVegan,
       vegCurious: hasVegCurious,
       convinced: hasConvinced,
       muted: hasMuted,

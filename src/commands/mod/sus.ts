@@ -65,11 +65,9 @@ export class SusCommand extends Command {
     switch (subcommand) {
       case 'add': {
         return await this.addNote(interaction);
-        break;
       }
       case 'view': {
         return await this.listNote(interaction);
-        break;
       }
     }
 
@@ -89,6 +87,17 @@ export class SusCommand extends Command {
     const note = interaction.options.getString('note')!;
 
     // Add the data to the database
+
+    // Check if the user exists on the database
+    const userGuildMember = interaction.guild!.members.cache.get(user.id)!;
+    if (!await userExists(userGuildMember)) {
+      await addExistingUser(userGuildMember);
+    }
+    // Check if the mod exists on the database
+    const modGuildMember = interaction.guild!.members.cache.get(mod.id)!;
+    if (!await userExists(modGuildMember)) {
+      await addExistingUser(modGuildMember);
+    }
     // TODO check if user is on the database and if not, add them to the database
     await addToDatabase(user.id, mod.id, note);
 
@@ -112,7 +121,7 @@ export class SusCommand extends Command {
     const noteEmbed = new MessageEmbed()
       .setColor('#0099ff')
       .setTitle(`Sus notes for ${user.username}`)
-      // .setThumbnail(user.avatar!)
+      .setThumbnail(user.avatarURL()!)
       .addField(`Moderator: ${mod} Date: ${notes[notes.length - 1].time}`, notes[notes.length - 1].note);
 
     // Sends the notes to the user
