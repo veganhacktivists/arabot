@@ -37,6 +37,16 @@ const IDs = {
       restricted3: '856582673258774538',
       restricted4: '872472182888992858',
     },
+    staff: {
+      coordinator: '993636242019323904',
+      devCoordinator: '966031741099855973',
+    },
+  },
+  channels: {
+    staff: {
+      coordinators: '989249700353953843',
+      standup: '996009201237233684',
+    },
   },
 };
 

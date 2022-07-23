@@ -17,23 +17,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Command } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { container } from '@sapphire/framework';
+import type { TextChannel } from 'discord.js';
+import { IDs } from '../utils/ids';
 
-export class PingCommand extends Command {
-  public constructor(context: Command.Context) {
-    super(context, {
-      name: 'ping',
-      aliases: ['pong'],
-      description: 'ping pong',
-    });
-  }
+export async function standupRun() {
+  const { client } = container;
 
-  public async messageRun(message: Message) {
-    const msg = await message.channel.send('Ping?');
+  const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
 
-    const content = `Pong from JavaScript! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${msg.createdTimestamp - message.createdTimestamp}ms.`;
-
-    return msg.edit(content);
-  }
+  await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
+                            \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
 }
