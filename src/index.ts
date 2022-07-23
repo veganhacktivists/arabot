@@ -21,6 +21,7 @@
 */
 
 import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { ScheduleManager } from './utils/scheduleManager';
 
 require('dotenv').config();
 
@@ -56,6 +57,9 @@ const main = async () => {
     client.destroy();
     process.exit(1);
   }
+
+  // Scheduled Commands
+  await ScheduleManager();
 };
 
 main();
