@@ -17,23 +17,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Command } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { CronJob } from 'cron';
+import { standupRun } from '../schedules/standup';
 
-export class PingCommand extends Command {
-  public constructor(context: Command.Context) {
-    super(context, {
-      name: 'ping',
-      aliases: ['pong'],
-      description: 'ping pong',
-    });
-  }
+export async function ScheduleManager() {
+  // TODO add a way to automatically add all schedules in the schedules folder
+  // Define Jobs:
+  // Standup
+  const standup = new CronJob(
+    '00 00 12 * * 1',
+    (async () => {
+      await standupRun();
+    }),
+  );
 
-  public async messageRun(message: Message) {
-    const msg = await message.channel.send('Ping?');
-
-    const content = `Pong from JavaScript! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${msg.createdTimestamp - message.createdTimestamp}ms.`;
-
-    return msg.edit(content);
-  }
+  // Start Jobs:
+  standup.start();
 }
