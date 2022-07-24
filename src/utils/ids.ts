@@ -1,3 +1,4 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
     Copyright (C) 2022  Anthony Berg
@@ -40,7 +41,11 @@ const IDs = {
     staff: {
       coordinator: '993636242019323904',
       devCoordinator: '966031741099855973',
+      restricted: '851624392928264222',
+      moderator: '826157475815489598',
+      verifier: '871802735031373856',
     },
+    patron: '765370219207852055',
   },
   channels: {
     staff: {

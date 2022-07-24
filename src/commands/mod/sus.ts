@@ -27,6 +27,7 @@ export class SusCommand extends Command {
     super(context, {
       name: 'sus',
       description: 'Notes about users that are sus',
+      preconditions: ['ModOnly', 'VerifierOnly'],
     });
   }
 
