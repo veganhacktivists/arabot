@@ -27,7 +27,7 @@ export class SusCommand extends Command {
     super(context, {
       name: 'sus',
       description: 'Notes about users that are sus',
-      preconditions: ['ModOnly', 'VerifierOnly'],
+      preconditions: [['ModOnly', 'VerifierOnly']],
     });
   }
 
@@ -83,6 +83,7 @@ export class SusCommand extends Command {
   // Subcommand to add sus note
   public async addNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
+    // TODO exception handling
     const user = interaction.options.getUser('user')!;
     const mod = interaction.member!.user;
     const note = interaction.options.getString('note')!;
@@ -90,6 +91,7 @@ export class SusCommand extends Command {
     // Add the data to the database
 
     // Check if the user exists on the database
+    // TODO exception handling
     const userGuildMember = interaction.guild!.members.cache.get(user.id)!;
     if (!await userExists(userGuildMember)) {
       await addExistingUser(userGuildMember);
@@ -99,7 +101,6 @@ export class SusCommand extends Command {
     if (!await userExists(modGuildMember)) {
       await addExistingUser(modGuildMember);
     }
-    // TODO check if user is on the database and if not, add them to the database
     await addToDatabase(user.id, mod.id, note);
 
     await interaction.reply({
@@ -116,6 +117,7 @@ export class SusCommand extends Command {
     const notes = await findNote(user.id, true);
     // Gets the username of the mod
     const modId = notes[notes.length - 1].modId;
+    // TODO exception handling
     const mod = interaction.guild!.members.cache.get(modId)!.user.username;
 
     // Creates the embed to display the sus note
