@@ -48,6 +48,7 @@ export class HugCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
     // Get the users
+    // TODO exception handling
     const user = interaction.options.getUser('user')!;
     const hugger = interaction.member!.user;
     const huggerGuildMember = interaction.guild!.members.cache.get(hugger.id)!;

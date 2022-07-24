@@ -22,31 +22,31 @@ import type { CommandInteraction, ContextMenuInteraction, Message } from 'discor
 import { IDs } from '../utils/ids';
 import type { GuildMember } from 'discord.js';
 
-export class VerifierOnlyPrecondition extends AllFlowsPrecondition {
+export class PatreonOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
-    return this.checkVerifier(message.member!);
+    return this.checkPatreon(message.member!);
   }
 
   public override async chatInputRun(interaction: CommandInteraction) {
     // for slash command
-    return this.checkVerifier(interaction.member! as GuildMember);
+    return this.checkPatreon(interaction.member! as GuildMember);
   }
 
   public override async contextMenuRun(interaction: ContextMenuInteraction) {
     // for context menu command
-    return this.checkVerifier(interaction.member! as GuildMember);
+    return this.checkPatreon(interaction.member! as GuildMember);
   }
 
-  private async checkVerifier(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.staff.verifier)
+  private async checkPatreon(user: GuildMember) {
+    return user.roles.cache.has(IDs.roles.patron)
       ? this.ok()
-      : this.error({ message: 'Only verifiers can run this command!' });
+      : this.error({ message: 'Only Patreon members can run this command!' });
   }
 }
 
 declare module '@sapphire/framework' {
   interface Preconditions {
-    VerifierOnly: never;
+    PatreonOnly: never;
   }
 }

@@ -20,25 +20,26 @@
 import { AllFlowsPrecondition } from '@sapphire/framework';
 import type { CommandInteraction, ContextMenuInteraction, Message } from 'discord.js';
 import { IDs } from '../utils/ids';
+import type { GuildMember } from 'discord.js';
 
 export class ModOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
-    return this.checkMod(message.author.id);
+    return this.checkMod(message.member!);
   }
 
   public override async chatInputRun(interaction: CommandInteraction) {
     // for slash command
-    return this.checkMod(interaction.user.id);
+    return this.checkMod(interaction.member! as GuildMember);
   }
 
   public override async contextMenuRun(interaction: ContextMenuInteraction) {
     // for context menu command
-    return this.checkMod(interaction.user.id);
+    return this.checkMod(interaction.member! as GuildMember);
   }
 
-  private async checkMod(userId: string) {
-    return userId === IDs.roles.staff.moderator
+  private async checkMod(user: GuildMember) {
+    return user.roles.cache.has(IDs.roles.staff.moderator)
       ? this.ok()
       : this.error({ message: 'Only moderators can run this command!' });
   }
