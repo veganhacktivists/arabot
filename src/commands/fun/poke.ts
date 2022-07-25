@@ -58,7 +58,7 @@ export class PokeCommand extends Command {
     const randomPoke = Poke[Math.floor(Math.random() * Poke.length)];
     const pokeEmbed = new MessageEmbed()
       .setColor('#0099ff')
-      .setTitle(`Kill from ${pokerGuildMember.displayName}`)
+      .setTitle(`Poke from ${pokerGuildMember.displayName}`)
       .setImage(randomPoke);
 
     // Send the poke
