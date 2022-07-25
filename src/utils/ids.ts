@@ -46,6 +46,7 @@ const IDs = {
       verifier: '871802735031373856',
     },
     patron: '765370219207852055',
+    patreon: '993848684640997406',
   },
   channels: {
     staff: {
