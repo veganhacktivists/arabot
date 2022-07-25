@@ -25,11 +25,11 @@ export class PingCommand extends Command {
     super(context, {
       ...options,
       name: 'ping',
-      description: 'ping pong',
+      description: 'Pings the bot',
     });
   }
 
-  // Registers the slash command
+  // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand((builder) => builder
       .setName(this.name)
