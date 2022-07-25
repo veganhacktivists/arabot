@@ -39,7 +39,7 @@ export class PatreonOnlyPrecondition extends AllFlowsPrecondition {
   }
 
   private async checkPatreon(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.patron)
+    return user.roles.cache.has(IDs.roles.patron) || user.roles.cache.has(IDs.roles.patreon)
       ? this.ok()
       : this.error({ message: 'Only Patreon members can run this command!' });
   }
