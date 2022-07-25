@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+
+  node:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+
+volumes:
+  postgres:
+    name: arabot-db

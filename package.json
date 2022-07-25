@@ -6,7 +6,8 @@
   "scripts": {
     "build": "tsc",
     "cleanBuild": "rm -rf ./dist && tsc",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "start:migrate": "prisma migrate deploy && npm run start"
   },
   "repository": {
     "type": "git",
