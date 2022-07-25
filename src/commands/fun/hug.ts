@@ -27,6 +27,7 @@ export class HugCommand extends Command {
       ...options,
       name: 'hug',
       description: 'Hug a user',
+      preconditions: ['PatreonOnly'],
     });
   }
 
