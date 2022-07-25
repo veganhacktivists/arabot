@@ -54,14 +54,14 @@ export class KillCommand extends Command {
     const killer = interaction.member!.user;
     const killerGuildMember = interaction.guild!.members.cache.get(killer.id)!;
 
-    // Creates the embed for the hug
+    // Creates the embed for the kill
     const randomKill = Kill[Math.floor(Math.random() * Kill.length)];
     const killEmbed = new MessageEmbed()
       .setColor('#ff0000')
       .setTitle(`Kill from ${killerGuildMember.displayName}`)
       .setImage(randomKill);
 
-    // Send the hug
+    // Send the kill
     await interaction.reply({ content: `<@${user.id}>`, embeds: [killEmbed], fetchReply: true });
   }
 }
