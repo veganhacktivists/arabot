@@ -9,6 +9,7 @@ export const Hugs = [
   'https://c.tenor.com/16n9S22q870AAAAC/cute-boy.gif',
   'https://c.tenor.com/cdk8SjH32okAAAAC/dog-pig.gif',
   'https://c.tenor.com/9mLPT5v1ah8AAAAd/how-to-introduce-your-cat-to-a-bunny-cat.gif',
+  'https://tenor.com/view/bear-bruh-bearr-bearrrr-gif-22701476', // Thanks to Jonquil (277429709711605761) <3
 ];
 
 export const Kill = [
@@ -35,4 +36,5 @@ export const Poke = [
   'https://c.tenor.com/1-_kiSN980kAAAAC/begging-for-attention-viralhog.gif',
   'https://c.tenor.com/S5hZ9m8lRhkAAAAd/owl-turning-head.gif',
   'https://c.tenor.com/XAXSLU_w_yoAAAAd/boop-crow.gif',
+  'https://c.tenor.com/o9X9XXVCm-MAAAAC/bird-cute.gif', // Thanks to Jonquil (277429709711605761) <3
 ];
