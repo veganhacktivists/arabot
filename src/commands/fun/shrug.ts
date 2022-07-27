@@ -26,7 +26,7 @@ export class ShrugCommand extends Command {
     super(context, {
       ...options,
       name: 'shrug',
-      description: 'Ugh... whatever...',
+      description: 'Ugh... whatever... idk...',
       preconditions: ['CoordinatorOnly'],
     });
   }
@@ -54,7 +54,7 @@ export class ShrugCommand extends Command {
     const randomShrug = Shrug[Math.floor(Math.random() * Shrug.length)];
     const shrugEmbed = new MessageEmbed()
       .setColor('#001980')
-      .setTitle(`${memberGuildMember.displayName} is whatever...`)
+      .setTitle(`${memberGuildMember.displayName} shrugs`)
       .setImage(randomShrug);
 
     // Send the embed
