@@ -54,7 +54,7 @@ export class HappyCommand extends Command {
     const randomHappy = Happy[Math.floor(Math.random() * Happy.length)];
     const happyEmbed = new MessageEmbed()
       .setColor('#40ff00')
-      .setTitle(`Poke from ${memberGuildMember.displayName}`)
+      .setTitle(`${memberGuildMember.displayName} is happy!`)
       .setImage(randomHappy);
 
     // Send the embed
