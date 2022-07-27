@@ -56,3 +56,10 @@ export const Sad = [
   'https://c.tenor.com/rD4KDir7lO0AAAAC/sad-pikachu.gif',
   'https://c.tenor.com/IeiDwBPDrZYAAAAC/peach-cat.gif',
 ];
+
+export const Shrug = [
+  'https://c.tenor.com/Bh2MF64_0JoAAAAC/whatever-shrug.gif',
+  'https://c.tenor.com/jQ-g5x_lPf0AAAAC/friends-joey.gif',
+  'https://c.tenor.com/U06tekgz-OQAAAAC/city-hunter-ryo-saeba.gif',
+  'https://c.tenor.com/mOR-MnUI3QEAAAAC/confused-white-persian-guardian.gif',
+];
