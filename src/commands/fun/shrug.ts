@@ -19,15 +19,15 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { MessageEmbed } from 'discord.js';
-import { Happy } from '../../utils/gifs';
+import { Shrug } from '../../utils/gifs';
 
-export class HappyCommand extends Command {
+export class ShrugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'happy',
-      description: 'Express your happiness',
-      preconditions: [['PatreonOnly', 'CoordinatorOnly']],
+      name: 'shrug',
+      description: 'Ugh... whatever...',
+      preconditions: ['CoordinatorOnly'],
     });
   }
 
@@ -50,14 +50,14 @@ export class HappyCommand extends Command {
     const member = interaction.member!.user;
     const memberGuildMember = interaction.guild!.members.cache.get(member.id)!;
 
-    // Creates the embed for the happy reaction
-    const randomHappy = Happy[Math.floor(Math.random() * Happy.length)];
-    const happyEmbed = new MessageEmbed()
-      .setColor('#40ff00')
-      .setTitle(`${memberGuildMember.displayName} is happy!`)
-      .setImage(randomHappy);
+    // Creates the embed for the shrug reaction
+    const randomShrug = Shrug[Math.floor(Math.random() * Shrug.length)];
+    const shrugEmbed = new MessageEmbed()
+      .setColor('#001980')
+      .setTitle(`${memberGuildMember.displayName} is whatever...`)
+      .setImage(randomShrug);
 
     // Send the embed
-    await interaction.reply({ embeds: [happyEmbed], fetchReply: true });
+    await interaction.reply({ embeds: [shrugEmbed], fetchReply: true });
   }
 }
