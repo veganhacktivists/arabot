@@ -25,7 +25,7 @@ export class N1984Command extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: '1984',
+      name: 'm',
       description: 'this is literally 1984',
       preconditions: ['ModOnly'],
     });
