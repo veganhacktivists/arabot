@@ -27,7 +27,7 @@ export class KillCommand extends Command {
       ...options,
       name: 'kill',
       description: 'Kill a user',
-      preconditions: ['PatreonOnly'],
+      preconditions: [['PatreonOnly', 'CoordinatorOnly']],
     });
   }
 

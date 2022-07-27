@@ -27,7 +27,7 @@ export class PokeCommand extends Command {
       ...options,
       name: 'poke',
       description: 'Poke a user',
-      preconditions: ['PatreonOnly'],
+      preconditions: [['PatreonOnly', 'CoordinatorOnly']],
     });
   }
 
