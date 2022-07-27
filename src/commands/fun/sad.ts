@@ -54,7 +54,7 @@ export class SadCommand extends Command {
     const randomSad = Sad[Math.floor(Math.random() * Sad.length)];
     const sadEmbed = new MessageEmbed()
       .setColor('#001148')
-      .setTitle(`Poke from ${memberGuildMember.displayName}`)
+      .setTitle(`${memberGuildMember.displayName} is sad...`)
       .setImage(randomSad);
 
     // Send the embed
