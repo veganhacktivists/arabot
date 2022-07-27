@@ -63,3 +63,8 @@ export const Shrug = [
   'https://c.tenor.com/U06tekgz-OQAAAAC/city-hunter-ryo-saeba.gif',
   'https://c.tenor.com/mOR-MnUI3QEAAAAC/confused-white-persian-guardian.gif',
 ];
+
+export const N1984 = [
+  'https://c.tenor.com/dcxOO-080OcAAAAd/discord-moderators.gif',
+  'https://c.tenor.com/-cUS-fPIEBsAAAAd/5second-slow-mode-1984.gif',
+];
