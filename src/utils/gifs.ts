@@ -38,3 +38,21 @@ export const Poke = [
   'https://c.tenor.com/XAXSLU_w_yoAAAAd/boop-crow.gif',
   'https://c.tenor.com/o9X9XXVCm-MAAAAC/bird-cute.gif', // Thanks to Jonquil (277429709711605761) <3
 ];
+
+// Thanks Dantas (605924328004911133) for the gifs <3
+export const Happy = [
+  'https://c.tenor.com/_4xCiEhhoZsAAAAd/dog-smile.gif',
+  'https://c.tenor.com/GEP7e6U2uqgAAAAC/spongebob-happy.gif',
+  'https://c.tenor.com/tNhtH9x3WZEAAAAC/swing-dance-swing-your-hips.gif',
+  'https://c.tenor.com/C_Dl5-KCvVoAAAAC/friends-matthew-perry.gif',
+  'https://c.tenor.com/aKFaZBrZFYcAAAAC/excited-spin.gif',
+];
+
+// Thanks Dantas (605924328004911133) for the gifs <3
+export const Sad = [
+  'https://c.tenor.com/6CujUsC1CIkAAAAd/crying-black-guy-meme50fps-interpolated-interpolated.gif',
+  'https://c.tenor.com/RJnvTxShQGIAAAAC/disney-plus-disney.gif',
+  'https://c.tenor.com/_XLEzC52ATQAAAAC/sad-walk.gif',
+  'https://c.tenor.com/rD4KDir7lO0AAAAC/sad-pikachu.gif',
+  'https://c.tenor.com/IeiDwBPDrZYAAAAC/peach-cat.gif',
+];
