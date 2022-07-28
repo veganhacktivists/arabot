@@ -296,7 +296,7 @@ export class SusCommand extends Command {
       .setThumbnail(user.avatarURL()!)
       // TODO add a way to display more than 1 sus note
       .addField(
-        `Sus ID: ${notes[notes.length - 1].id} | Moderator: ${mod} Date: ${notes[notes.length - 1].time}`,
+        `Sus ID: ${notes[notes.length - 1].id} | Moderator: ${mod} Date: <t:${Math.floor(notes[notes.length - 1].time.getTime() / 1000)}>`,
         notes[notes.length - 1].note,
       );
 
