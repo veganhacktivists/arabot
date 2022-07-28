@@ -22,6 +22,50 @@ import { Message, MessageEmbed } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
 
+async function addToDatabase(userId: string, modId: string, message: string) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Add the user to the database
+  await prisma.sus.create({
+    data: {
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      mod: {
+        connect: {
+          id: modId,
+        },
+      },
+      note: message,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+}
+
+// Get a list of sus notes from the user
+async function findNote(userId: string, active: boolean) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Query to get the specific user's sus notes
+  const getNote = await prisma.sus.findMany({
+    where: {
+      userId,
+      active,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+  return getNote;
+}
+
+// Main command
 export class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
@@ -83,42 +127,112 @@ export class SusCommand extends Command {
   // Subcommand to add sus note
   public async addNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
-    // TODO exception handling
-    const user = interaction.options.getUser('user')!;
+    let user = interaction.options.getUser('user');
+    let note = interaction.options.getString('note');
+
+    // Checks if all the variables are of the right type
+    if (user === null || interaction.member === null || note === null) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Remove possibility of null from variables
+    user = user!;
     const mod = interaction.member!.user;
-    const note = interaction.options.getString('note')!;
+    note = note!;
 
     // Add the data to the database
 
     // Check if the user exists on the database
-    // TODO exception handling
-    const userGuildMember = interaction.guild!.members.cache.get(user.id)!;
+    const currentGuild = interaction.guild;
+
+    // Checks if currentGuild is not null
+    if (currentGuild === null) {
+      await interaction.reply({
+        content: 'Error fetching guild!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    const userGuildMember = currentGuild!.members.cache.get(user.id)!;
     if (!await userExists(userGuildMember)) {
       await addExistingUser(userGuildMember);
     }
     // Check if the mod exists on the database
-    const modGuildMember = interaction.guild!.members.cache.get(mod.id)!;
+    const modGuildMember = currentGuild!.members.cache.get(mod.id)!;
     if (!await userExists(modGuildMember)) {
       await addExistingUser(modGuildMember);
     }
     await addToDatabase(user.id, mod.id, note);
 
     await interaction.reply({
-      content: `${user}: note: ${note}`,
+      content: `${user} note: ${note}`,
       ephemeral: true,
       fetchReply: true,
     });
+    return;
   }
 
   public async listNote(interaction: Command.ChatInputInteraction) {
-    const user = interaction.options.getUser('user')!;
+    // Get the arguments
+    let user = interaction.options.getUser('user');
+
+    // Checks if all the variables are of the right type
+    if (user === null) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Remove possibility of null from variables
+    user = user!;
 
     // Gets the sus notes from the database
     const notes = await findNote(user.id, true);
+
+    // Checks if there are no notes on the user
+    if (notes.length === 0) {
+      await interaction.reply({
+        content: `${user} has no sus notes!`,
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
     // Gets the username of the mod
-    const modId = notes[notes.length - 1].modId;
-    // TODO exception handling
-    const mod = interaction.guild!.members.cache.get(modId)!.user.username;
+    const { modId } = notes[notes.length - 1];
+
+    // Checks if variable mod will not be null
+    const currentGuild = interaction.guild;
+    if (currentGuild === null) {
+      await interaction.reply({
+        content: 'Error fetching guild!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+    const modGuildMember = currentGuild!.members.cache.get(modId);
+    if (modGuildMember === null) {
+      await interaction.reply({
+        content: 'Error fetching person who ran the command!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    const mod = modGuildMember!.user.username;
 
     // Creates the embed to display the sus note
     const noteEmbed = new MessageEmbed()
@@ -156,47 +270,4 @@ export class SusCommand extends Command {
 
     return msg.edit(content);
   }
-}
-
-async function addToDatabase(userId: string, modId: string, message: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
-  // Add the user to the database
-  await prisma.sus.create({
-    data: {
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
-      mod: {
-        connect: {
-          id: modId,
-        },
-      },
-      note: message,
-    },
-  });
-
-  // Close the database connection
-  await prisma.$disconnect();
-}
-
-// Get a list of sus notes from the user
-async function findNote(userId: string, active: boolean) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
-  // Query to get the specific user's sus notes
-  const getNote = await prisma.sus.findMany({
-    where: {
-      userId,
-      active,
-    },
-  });
-
-  // Close the database connection
-  await prisma.$disconnect();
-  return getNote;
 }
