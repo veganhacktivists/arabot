@@ -248,26 +248,4 @@ export class SusCommand extends Command {
       fetchReply: true,
     });
   }
-
-  public async messageRun(message: Message) {
-    const msg = await message.channel.send('Ping?');
-
-    const content = `Pong from JavaScript! Bot Latency ${Math.round(this.container.client.ws.ping)}ms. API Latency ${msg.createdTimestamp - message.createdTimestamp}ms.`;
-
-    // Checks if the user exists
-    if (message.member === null) {
-      await message.channel.send('Member not found');
-      return;
-    }
-
-    // Checks if the user is on the database
-    if (!await userExists(message.member)) {
-      // If they are not on the database, add them to the database
-      await addExistingUser(message.member);
-    }
-
-    await addToDatabase(message.member.id, message.member.id, 'This is a note :D');
-
-    return msg.edit(content);
-  }
 }
