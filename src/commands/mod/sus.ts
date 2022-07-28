@@ -141,7 +141,7 @@ export class SusCommand extends Command {
             .setDescription('Sus note ID')
             .setRequired(true)))
         // Subcommand to remove all sus notes
-        .addSubcommand((command) => command.setName('removeAll')
+        .addSubcommand((command) => command.setName('purge')
           .setDescription('Remove all sus notes from a user')
           .addUserOption((option) => option.setName('user')
             .setDescription('User to remove the note from')
@@ -167,7 +167,7 @@ export class SusCommand extends Command {
       case 'remove': {
         return await this.removeNote(interaction);
       }
-      case 'removeAll': {
+      case 'purge': {
         return await this.removeAllNotes(interaction);
       }
     }
