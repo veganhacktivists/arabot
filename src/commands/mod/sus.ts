@@ -167,7 +167,7 @@ export class SusCommand extends Command {
       case 'remove': {
         return await this.removeNote(interaction);
       }
-      case 'removeAll': {
+      case 'purge': {
         return await this.removeAllNotes(interaction);
       }
     }
