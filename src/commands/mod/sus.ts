@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { Message, MessageEmbed } from 'discord.js';
+import { MessageEmbed } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
 
@@ -65,13 +65,51 @@ async function findNote(userId: string, active: boolean) {
   return getNote;
 }
 
+async function deactivateNote(noteId: number) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Query to deactivate the specific sus note
+  await prisma.sus.update({
+    where: {
+      id: noteId,
+    },
+    data: {
+      active: false,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+}
+
+async function deactivateAllNotes(userId: string) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Query to deactivate the specific user's sus notes
+  await prisma.sus.updateMany({
+    where: {
+      userId: {
+        contains: userId,
+      },
+    },
+    data: {
+      active: false,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+}
+
 // Main command
 export class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
       name: 'sus',
       description: 'Notes about users that are sus',
-      preconditions: [['ModOnly', 'VerifierOnly']],
+      preconditions: [['VerifierOnly', 'ModOnly']],
     });
   }
 
@@ -81,7 +119,7 @@ export class SusCommand extends Command {
       (builder) => builder
         .setName(this.name)
         .setDescription(this.description)
-      // Subcommand to add a sus note
+        // Subcommand to add a sus note
         .addSubcommand((command) => command.setName('add')
           .setDescription('Add a sus note about a user')
           .addUserOption((option) => option.setName('user')
@@ -90,11 +128,23 @@ export class SusCommand extends Command {
           .addStringOption((option) => option.setName('note')
             .setDescription('Note about the user')
             .setRequired(true)))
-      // Subcommand to list sus notes
+        // Subcommand to list sus notes
         .addSubcommand((command) => command.setName('view')
           .setDescription('View a sus note for a user')
           .addUserOption((option) => option.setName('user')
-            .setDescription('User to add the note')
+            .setDescription('User to view the note of')
+            .setRequired(true)))
+        // Subcommand to remove a specific sus note
+        .addSubcommand((command) => command.setName('remove')
+          .setDescription('Remove a specific sus note')
+          .addIntegerOption((option) => option.setName('id')
+            .setDescription('Sus note ID')
+            .setRequired(true)))
+        // Subcommand to remove all sus notes
+        .addSubcommand((command) => command.setName('removeAll')
+          .setDescription('Remove all sus notes from a user')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to remove the note from')
             .setRequired(true))),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
@@ -113,6 +163,12 @@ export class SusCommand extends Command {
       }
       case 'view': {
         return await this.listNote(interaction);
+      }
+      case 'remove': {
+        return await this.removeNote(interaction);
+      }
+      case 'removeAll': {
+        return await this.removeAllNotes(interaction);
       }
     }
 
@@ -176,7 +232,6 @@ export class SusCommand extends Command {
       ephemeral: true,
       fetchReply: true,
     });
-    return;
   }
 
   public async listNote(interaction: Command.ChatInputInteraction) {
@@ -239,11 +294,85 @@ export class SusCommand extends Command {
       .setColor('#0099ff')
       .setTitle(`Sus notes for ${user.username}`)
       .setThumbnail(user.avatarURL()!)
-      .addField(`Moderator: ${mod} Date: ${notes[notes.length - 1].time}`, notes[notes.length - 1].note);
+      // TODO add a way to display more than 1 sus note
+      .addField(
+        `Sus ID: ${notes[notes.length - 1].id} | Moderator: ${mod} Date: ${notes[notes.length - 1].time}`,
+        notes[notes.length - 1].note,
+      );
 
     // Sends the notes to the user
     await interaction.reply({
       embeds: [noteEmbed],
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
+
+  public async removeNote(interaction: Command.ChatInputInteraction) {
+    // Get the arguments
+    let noteId = interaction.options.getInteger('id');
+
+    // Checks if all the variables are of the right type
+    if (noteId === null) {
+      await interaction.reply({
+        content: 'Error fetching id from Discord!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Remove possibility of null from variables
+    noteId = noteId!;
+
+    // TODO fetch the note and get mod input if they want to remove that note
+
+    // Remove the sus notes from the database
+    await deactivateNote(noteId);
+    await interaction.reply({
+      content: `Sus note ID ${noteId} has been removed successfully`,
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
+
+  public async removeAllNotes(interaction: Command.ChatInputInteraction) {
+    // Get the arguments
+    let user = interaction.options.getUser('user');
+
+    // Checks if all the variables are of the right type
+    if (user === null) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Remove possibility of null from variables
+    user = user!;
+
+    // Check if the user had sus notes before trying to remove them
+    // Gets the sus notes from the database
+    const notes = await findNote(user.id, true);
+
+    // Checks if there are no notes on the user
+    if (notes.length === 0) {
+      await interaction.reply({
+        content: `${user} had no notes!`,
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // TODO display all notes from user and get mod input if they want to remove all those notes
+
+    // Remove the sus notes from the database
+    await deactivateAllNotes(user.id);
+    await interaction.reply({
+      content: `Sus notes have been removed for ${user} successfully`,
       ephemeral: true,
       fetchReply: true,
     });
