@@ -1,6 +1,6 @@
-# ARA Bot
+<img src="docs/images/logo.png" width="200" height="200" title="ARA Logo" align="right">
 
-<img src="docs/images/logo.png" width="200" height="200" title="ARA Logo">
+# ARA Bot
 
 ARA Bot is a free, open source Discord bot written in TypeScript using Sapphire, designed specifically for the [Animal Rights Advocates Discord server](https://discord.com/invite/animalrights).
 
