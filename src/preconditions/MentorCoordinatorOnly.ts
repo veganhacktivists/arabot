@@ -41,7 +41,7 @@ export class MentorCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   private async checkMentorCoordinator(user: GuildMember) {
     return user.roles.cache.has(IDs.roles.staff.mentorCoordinator)
       ? this.ok()
-      : this.error({ message: 'Only coordinators can run this command!' });
+      : this.error({ message: 'Only mentor coordinators can run this command!' });
   }
 }
 
