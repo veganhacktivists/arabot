@@ -41,6 +41,7 @@ const IDs = {
     staff: {
       coordinator: '993636242019323904',
       devCoordinator: '966031741099855973',
+      mentorCoordinator: '947905630939807785',
       restricted: '851624392928264222',
       moderator: '826157475815489598',
       verifier: '871802735031373856',
