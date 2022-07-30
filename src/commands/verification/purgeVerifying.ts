@@ -27,7 +27,7 @@ export class purgeVerifyingCommand extends Command {
       ...options,
       name: 'purgeverifying',
       description: 'Purges all the users who have the "verify-as-vegan" role',
-      preconditions: ['VerifierCoordinatorOnly'],
+      preconditions: [['DevCoordinatorOnly', 'VerifierCoordinatorOnly']],
     });
   }
 
