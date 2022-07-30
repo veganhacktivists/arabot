@@ -108,8 +108,8 @@ export class purgeVerifyingCommand extends Command {
           || member.roles.cache.has(IDs.roles.vegan.vegan))) {
           await member.roles.remove(IDs.roles.verifyingAsVegan);
           await member.roles.add(IDs.roles.nonvegan.nonvegan);
-          await interaction.editReply(`Processed ${i + 1}/${verVeganLength} users\nEstimate time to completion: ${calcETA(apiTimeout, i, verVeganLength)}`);
         }
+        await interaction.editReply(`Processed ${i + 1}/${verVeganLength} users\nEstimated time to completion: ${calcETA(apiTimeout, i, verVeganLength)}`);
       }, apiTimeout * i);
     }
 
