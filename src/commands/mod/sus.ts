@@ -109,7 +109,7 @@ export class SusCommand extends Command {
     super(context, {
       name: 'sus',
       description: 'Notes about users that are sus',
-      preconditions: [['VerifierOnly', 'ModOnly']],
+      // preconditions: [['VerifierOnly', 'ModOnly']],
     });
   }
 
@@ -292,13 +292,16 @@ export class SusCommand extends Command {
     // Creates the embed to display the sus note
     const noteEmbed = new MessageEmbed()
       .setColor('#0099ff')
-      .setTitle(`Sus notes for ${user.username}`)
-      .setThumbnail(user.avatarURL()!)
-      // TODO add a way to display more than 1 sus note
-      .addField(
-        `Sus ID: ${notes[notes.length - 1].id} | Moderator: ${mod} Date: <t:${Math.floor(notes[notes.length - 1].time.getTime() / 1000)}>`,
-        notes[notes.length - 1].note,
+      .setTitle(`${notes.length} sus notes for ${user.username}`)
+      .setThumbnail(user.avatarURL()!);
+
+    // Add up to 10 of the latest sus notes to the embed
+    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i++) {
+      noteEmbed.addField(
+        `Sus ID: ${notes[i].id} | Moderator: ${mod} Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        notes[i].note,
       );
+    }
 
     // Sends the notes to the user
     await interaction.reply({
