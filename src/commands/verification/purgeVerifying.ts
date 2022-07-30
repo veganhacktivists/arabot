@@ -113,7 +113,7 @@ export class purgeVerifyingCommand extends Command {
         }
       }, apiTimeout * i);
     }
-
+    /* Disabled due to invalid webhook token - most likely expired
     // Set the timeout for the completion
     setTimeout(
       async () => {
@@ -121,5 +121,6 @@ export class purgeVerifyingCommand extends Command {
       },
       apiTimeout * verVeganLength,
     );
+ */
   }
 }
