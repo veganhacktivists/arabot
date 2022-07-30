@@ -42,12 +42,14 @@ const IDs = {
       coordinator: '993636242019323904',
       devCoordinator: '966031741099855973',
       mentorCoordinator: '947905630939807785',
+      verifierCoordinator: '940721280376778822',
       restricted: '851624392928264222',
       moderator: '826157475815489598',
       verifier: '871802735031373856',
     },
     patron: '765370219207852055',
     patreon: '993848684640997406',
+    verifyingAsVegan: '854725899576279060',
   },
   channels: {
     staff: {
