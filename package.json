@@ -11,7 +11,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Animal-Rights-Advocates-Discord/arabot.git"
+    "url": "git+https://github.com/veganhacktivists/arabot.git"
   },
   "keywords": [
     "discord",
@@ -22,9 +22,9 @@
   "author": "Animal Rights Advocates",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/Animal-Rights-Advocates-Discord/arabot/issues"
+    "url": "https://github.com/veganhacktivists/arabot/issues"
   },
-  "homepage": "https://github.com/Animal-Rights-Advocates-Discord/arabot#readme",
+  "homepage": "https://github.com/veganhacktivists/arabot#readme",
   "dependencies": {
     "@prisma/client": "^4.0.0",
     "@sapphire/framework": "^3.0.0-next.87e5cdc.0",
