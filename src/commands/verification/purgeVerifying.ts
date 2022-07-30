@@ -98,6 +98,8 @@ export class purgeVerifyingCommand extends Command {
       return `${minutes}:${(seconds < 10 ? '0' : '') + seconds}`;
     }
 
+    await interaction.editReply(`Processing ${verVeganLength} users...\nEstimated time to completion: ${calcETA(apiTimeout, 0, verVeganLength)}`);
+
     // Goes through every member with the verify-as-vegan role
     for (let i = 0; i < verVeganLength; i++) {
       const member = verVegan[i];
@@ -108,7 +110,6 @@ export class purgeVerifyingCommand extends Command {
           || member.roles.cache.has(IDs.roles.vegan.vegan))) {
           await member.roles.remove(IDs.roles.verifyingAsVegan);
           await member.roles.add(IDs.roles.nonvegan.nonvegan);
-          await interaction.editReply(`Processed ${i + 1}/${verVeganLength} users\nEstimate time to completion: ${calcETA(apiTimeout, i, verVeganLength)}`);
         }
       }, apiTimeout * i);
     }
