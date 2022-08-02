@@ -78,10 +78,8 @@ export class purgeVerifyingCommand extends Command {
 
     // Checks if getVerVegan or getNotVegan is null
     if (getVerVegan === null || getNotVegan === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error getting roles!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -89,6 +87,7 @@ export class purgeVerifyingCommand extends Command {
     // Gets all users that have the verify-as-vegan role
     const verVegan = getVerVegan!.members.map((member) => member);
     const verVeganLength = verVegan.length;
+    let otherRoles = 0;
     const apiTimeout = 2500;
 
     function calcETA(timeout: number, increment: number, endIncrement: number) {
@@ -101,17 +100,19 @@ export class purgeVerifyingCommand extends Command {
     await interaction.editReply(`Processing ${verVeganLength} users...\nEstimated time to completion: ${calcETA(apiTimeout, 0, verVeganLength)}`);
 
     // Goes through every member with the verify-as-vegan role
-    for (let i = 0; i < verVeganLength; i++) {
+    for (let i = 0; i < verVeganLength; i += 1) {
       const member = verVegan[i];
+      if (member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
+        || member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        otherRoles += 1;
+        continue;
+      }
       // Runs command based on apiTimeout so that Discord API does not get spammed and bans the bot
       setTimeout(async () => {
         // Removes the role from the user
-        if (!(member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
-          || member.roles.cache.has(IDs.roles.vegan.vegan))) {
-          await member.roles.remove(IDs.roles.verifyingAsVegan);
-          await member.roles.add(IDs.roles.nonvegan.nonvegan);
-        }
-      }, apiTimeout * i);
+        await member.roles.remove(IDs.roles.verifyingAsVegan);
+        await member.roles.add(IDs.roles.nonvegan.nonvegan);
+      }, apiTimeout * (i - otherRoles));
     }
     /* Disabled due to invalid webhook token - most likely expired
     // Set the timeout for the completion
