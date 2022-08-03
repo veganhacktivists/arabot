@@ -250,7 +250,7 @@ export class SusCommand extends Command {
     await addToDatabase(user.id, mod.id, note);
 
     // Give the user the sus role they don't already have the sus note
-    if (userGuildMember.roles.cache.has(IDs.roles.restrictions.sus)) {
+    if (!userGuildMember.roles.cache.has(IDs.roles.restrictions.sus)) {
       await userGuildMember!.roles.add(IDs.roles.restrictions.sus);
     }
 
