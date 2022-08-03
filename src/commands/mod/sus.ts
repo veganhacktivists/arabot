@@ -15,12 +15,18 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import {
+  MessageEmbed, MessageActionRow, MessageButton, Constants, ButtonInteraction,
+} from 'discord.js';
 import { PrismaClient } from '@prisma/client';
+import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
+import { IDs } from '../../utils/ids';
+
+// TODO add a check when they join the server to give the user the sus role again
 
 async function addToDatabase(userId: string, modId: string, message: string) {
   // Initialise the database connection
@@ -48,7 +54,7 @@ async function addToDatabase(userId: string, modId: string, message: string) {
 }
 
 // Get a list of sus notes from the user
-async function findNote(userId: string, active: boolean) {
+async function findNotes(userId: string, active: boolean) {
   // Initialise the database connection
   const prisma = new PrismaClient();
 
@@ -57,6 +63,23 @@ async function findNote(userId: string, active: boolean) {
     where: {
       userId,
       active,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+  return getNote;
+}
+
+// Get one note from the id
+async function getNote(noteId: number) {
+  // Initialise the database connection
+  const prisma = new PrismaClient();
+
+  // Query to get the specific user's sus notes
+  const getNote = await prisma.sus.findUnique({
+    where: {
+      id: noteId,
     },
   });
 
@@ -216,16 +239,30 @@ export class SusCommand extends Command {
       return;
     }
 
-    const userGuildMember = currentGuild!.members.cache.get(user.id)!;
-    if (!await userExists(userGuildMember)) {
-      await addExistingUser(userGuildMember);
+    // Check if the user exists on the database
+    const userGuildMember = currentGuild!.members.cache.get(user.id);
+    const modGuildMember = currentGuild!.members.cache.get(mod.id);
+    // TODO potentially add a method to add user by Snowflake
+    if (userGuildMember === undefined || modGuildMember === undefined) {
+      await interaction.reply({
+        content: 'Error fetching users!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
     }
-    // Check if the mod exists on the database
-    const modGuildMember = currentGuild!.members.cache.get(mod.id)!;
-    if (!await userExists(modGuildMember)) {
-      await addExistingUser(modGuildMember);
+
+    // Check if user and mod are on the database
+    if (!await userExists(userGuildMember!)) {
+      await addExistingUser(userGuildMember!);
+    }
+    if (!await userExists(modGuildMember!)) {
+      await addExistingUser(modGuildMember!);
     }
     await addToDatabase(user.id, mod.id, note);
+
+    // Give the user the sus role
+    await userGuildMember!.roles.add(IDs.roles.restrictions.sus);
 
     await interaction.reply({
       content: `${user} note: ${note}`,
@@ -237,9 +274,10 @@ export class SusCommand extends Command {
   public async listNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let user = interaction.options.getUser('user');
+    const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null) {
+    if (user === null || guild == null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -252,7 +290,7 @@ export class SusCommand extends Command {
     user = user!;
 
     // Gets the sus notes from the database
-    const notes = await findNote(user.id, true);
+    const notes = await findNotes(user.id, true);
 
     // Checks if there are no notes on the user
     if (notes.length === 0) {
@@ -264,31 +302,6 @@ export class SusCommand extends Command {
       return;
     }
 
-    // Gets the username of the mod
-    const { modId } = notes[notes.length - 1];
-
-    // Checks if variable mod will not be null
-    const currentGuild = interaction.guild;
-    if (currentGuild === null) {
-      await interaction.reply({
-        content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-    const modGuildMember = currentGuild!.members.cache.get(modId);
-    if (modGuildMember === null) {
-      await interaction.reply({
-        content: 'Error fetching person who ran the command!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    const mod = modGuildMember!.user.username;
-
     // Creates the embed to display the sus note
     const noteEmbed = new MessageEmbed()
       .setColor('#0099ff')
@@ -296,9 +309,16 @@ export class SusCommand extends Command {
       .setThumbnail(user.avatarURL()!);
 
     // Add up to 10 of the latest sus notes to the embed
-    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i++) {
+    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+      // Get mod name
+      const modGuildMember = guild!.members.cache.get(notes[i].modId);
+      let mod = notes[i].modId;
+      if (modGuildMember !== undefined) {
+        mod = modGuildMember!.displayName;
+      }
+      // Add sus note to embed
       noteEmbed.addField(
-        `Sus ID: ${notes[i].id} | Moderator: ${mod} Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
         notes[i].note,
       );
     }
@@ -314,9 +334,10 @@ export class SusCommand extends Command {
   public async removeNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let noteId = interaction.options.getInteger('id');
+    const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (noteId === null) {
+    if (noteId === null || guild === null || channel === null || interaction.member === null) {
       await interaction.reply({
         content: 'Error fetching id from Discord!',
         ephemeral: true,
@@ -328,23 +349,113 @@ export class SusCommand extends Command {
     // Remove possibility of null from variables
     noteId = noteId!;
 
-    // TODO fetch the note and get mod input if they want to remove that note
+    // Get the note to be deleted
+    const note = await getNote(noteId);
 
-    // Remove the sus notes from the database
-    await deactivateNote(noteId);
-    await interaction.reply({
-      content: `Sus note ID ${noteId} has been removed successfully`,
+    // Checks if managed to fetch the note
+    if (note === null) {
+      await interaction.reply({
+        content: 'Error fetching note from database!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Get user GuildMembers for user and mod and person who ran command
+    const user = await guild!.members.cache.get(note!.userId);
+    const mod = await guild!.members.cache.get(note!.modId);
+
+    // Get user's name
+    let userName = note!.userId;
+    if (user !== undefined) {
+      userName = user!.displayName;
+    }
+
+    // Get mod name
+    let modName = note!.modId;
+    if (mod !== undefined) {
+      modName = mod!.displayName;
+    }
+
+    // Create an embed for the note
+    const noteEmbed = new MessageEmbed()
+      .setColor('#ff0000')
+      .setTitle(`Sus note for ${userName}`)
+      .setThumbnail(user!.avatarURL()!) // TODO avatar does not show when run
+      .addField(
+        `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note!.time.getTime() / 1000)}>`,
+          note!.note,
+      );
+
+    // Create buttons to delete or cancel the deletion
+    const buttons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId('delete')
+          .setLabel('Delete')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+        new MessageButton()
+          .setCustomId('cancel')
+          .setLabel('Cancel')
+          .setStyle(Constants.MessageButtonStyles.SECONDARY),
+      );
+
+    // Sends the note to verify this note is to be deleted
+    const message = await interaction.reply({
+      embeds: [noteEmbed],
+      components: [buttons],
       ephemeral: true,
       fetchReply: true,
     });
+
+    // Checks if the message is not an APIMessage
+    if (!isMessageInstance(message)) {
+      await interaction.editReply('Failed to retrieve the message :(');
+      return;
+    }
+
+    // Listen for the button presses
+    const collector = channel!.createMessageComponentCollector({
+      max: 1, // Maximum of 1 button press
+      time: 60000, // 60 seconds
+    });
+
+    // Button pressed
+    collector.on('collect', async (button: ButtonInteraction) => {
+      if (button.customId === 'delete') {
+        await deactivateNote(noteId!);
+        await interaction.editReply({
+          content: `${user!}'s sus note (ID: ${noteId}) has been successfully removed`,
+          embeds: [],
+        });
+      }
+    });
+
+    // Remove the buttons after they have been clicked
+    collector.on('end', async () => {
+      await interaction.editReply({
+        components: [],
+      });
+    });
+
+    // TODO create a new Prisma function to only count and not to get a whole list of sus notes
+    // Check how many notes the user has and if 0, then remove sus note
+    const notes = await findNotes(user!.id, true);
+
+    // Checks if there are no notes on the user and if there's none, remove the sus role
+    if (notes.length === 0) {
+      await user!.roles.remove(IDs.roles.restrictions.sus);
+    }
   }
 
   public async removeAllNotes(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let user = interaction.options.getUser('user');
+    const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null) {
+    if (user === null || guild === null || channel === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -355,10 +466,21 @@ export class SusCommand extends Command {
 
     // Remove possibility of null from variables
     user = user!;
+    const userGuildMember = guild!.members.cache.get(user.id);
+
+    // Checks if managed to find GuildMember for the user
+    if (userGuildMember === undefined) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
 
     // Check if the user had sus notes before trying to remove them
     // Gets the sus notes from the database
-    const notes = await findNote(user.id, true);
+    const notes = await findNotes(user.id, true);
 
     // Checks if there are no notes on the user
     if (notes.length === 0) {
@@ -370,14 +492,80 @@ export class SusCommand extends Command {
       return;
     }
 
-    // TODO display all notes from user and get mod input if they want to remove all those notes
+    // Creates the embed to display the sus note
+    const noteEmbed = new MessageEmbed()
+      .setColor('#ff0000')
+      .setTitle(`Delete ${notes.length} sus notes for ${user.username}?`)
+      .setThumbnail(user.avatarURL()!);
 
-    // Remove the sus notes from the database
-    await deactivateAllNotes(user.id);
-    await interaction.reply({
-      content: `Sus notes have been removed for ${user} successfully`,
+    // Add up to 10 of the latest sus notes to the embed
+    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+      // Get mod name
+      const modGuildMember = guild!.members.cache.get(notes[i].modId);
+      let mod = notes[i].modId;
+      if (modGuildMember !== undefined) {
+        mod = modGuildMember!.displayName;
+      }
+      // Add sus note to embed
+      noteEmbed.addField(
+        `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        notes[i].note,
+      );
+    }
+
+    // Create buttons to delete or cancel the deletion
+    const buttons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId('delete')
+          .setLabel('Delete')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+        new MessageButton()
+          .setCustomId('cancel')
+          .setLabel('Cancel')
+          .setStyle(Constants.MessageButtonStyles.SECONDARY),
+      );
+
+    // Sends the note to verify this note is to be deleted
+    const message = await interaction.reply({
+      embeds: [noteEmbed],
+      components: [buttons],
       ephemeral: true,
       fetchReply: true,
     });
+
+    // Checks if the message is not an APIMessage
+    if (!isMessageInstance(message)) {
+      await interaction.editReply('Failed to retrieve the message :(');
+      return;
+    }
+
+    // Listen for the button presses
+    const collector = channel!.createMessageComponentCollector({
+      max: 1, // Maximum of 1 button press
+      time: 60000, // 60 seconds
+    });
+
+    // Button pressed
+    collector.on('collect', async (button: ButtonInteraction) => {
+      if (button.customId === 'delete') {
+        // Remove sus note from database
+        await deactivateAllNotes(user!.id);
+        await interaction.editReply({
+          content: `Removed all of ${userGuildMember!}'s sus notes successfully`,
+          embeds: [],
+        });
+      }
+    });
+
+    // Remove the buttons after they have been clicked
+    collector.on('end', async () => {
+      await interaction.editReply({
+        components: [],
+      });
+    });
+
+    // Remove sus role from the user
+    await userGuildMember!.roles.remove(IDs.roles.restrictions.sus);
   }
 }
