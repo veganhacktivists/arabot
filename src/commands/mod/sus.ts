@@ -382,11 +382,11 @@ export class SusCommand extends Command {
     const buttons = new MessageActionRow<MessageButton>()
       .addComponents(
         new MessageButton()
-          .setCustomId('delete')
+          .setCustomId(`delete${noteId}`)
           .setLabel('Delete')
           .setStyle(Constants.MessageButtonStyles.DANGER),
         new MessageButton()
-          .setCustomId('cancel')
+          .setCustomId(`cancel${noteId}`)
           .setLabel('Cancel')
           .setStyle(Constants.MessageButtonStyles.SECONDARY),
       );
@@ -408,12 +408,12 @@ export class SusCommand extends Command {
     // Listen for the button presses
     const collector = channel!.createMessageComponentCollector({
       max: 1, // Maximum of 1 button press
-      time: 60000, // 60 seconds
+      time: 15000, // 15 seconds
     });
 
     // Button pressed
     collector.on('collect', async (button: ButtonInteraction) => {
-      if (button.customId === 'delete') {
+      if (button.customId === `delete${noteId}`) {
         await deactivateNote(noteId!);
         await interaction.editReply({
           content: `${user!}'s sus note (ID: ${noteId}) has been successfully removed`,
@@ -454,9 +454,7 @@ export class SusCommand extends Command {
       return;
     }
 
-    // Remove possibility of null from variables
-    user = user!;
-    const userGuildMember = guild!.members.cache.get(user.id);
+    const userGuildMember = guild!.members.cache.get(user!.id);
 
     // Checks if managed to find GuildMember for the user
     if (userGuildMember === undefined) {
@@ -470,12 +468,12 @@ export class SusCommand extends Command {
 
     // Check if the user had sus notes before trying to remove them
     // Gets the sus notes from the database
-    const notes = await findNotes(user.id, true);
+    const notes = await findNotes(user!.id, true);
 
     // Checks if there are no notes on the user
     if (notes.length === 0) {
       await interaction.reply({
-        content: `${user} had no notes!`,
+        content: `${user!} had no notes!`,
         ephemeral: true,
         fetchReply: true,
       });
@@ -485,8 +483,8 @@ export class SusCommand extends Command {
     // Creates the embed to display the sus note
     const noteEmbed = new MessageEmbed()
       .setColor('#ff0000')
-      .setTitle(`Delete ${notes.length} sus notes for ${user.username}?`)
-      .setThumbnail(user.avatarURL()!);
+      .setTitle(`Delete ${notes.length} sus notes for ${user!.username}?`)
+      .setThumbnail(user!.avatarURL()!);
 
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
@@ -507,11 +505,11 @@ export class SusCommand extends Command {
     const buttons = new MessageActionRow<MessageButton>()
       .addComponents(
         new MessageButton()
-          .setCustomId('delete')
+          .setCustomId(`delete${user!.id}`)
           .setLabel('Delete')
           .setStyle(Constants.MessageButtonStyles.DANGER),
         new MessageButton()
-          .setCustomId('cancel')
+          .setCustomId(`cancel${user!.id}`)
           .setLabel('Cancel')
           .setStyle(Constants.MessageButtonStyles.SECONDARY),
       );
@@ -533,12 +531,12 @@ export class SusCommand extends Command {
     // Listen for the button presses
     const collector = channel!.createMessageComponentCollector({
       max: 1, // Maximum of 1 button press
-      time: 60000, // 60 seconds
+      time: 15000, // 15 seconds
     });
 
     // Button pressed
     collector.on('collect', async (button: ButtonInteraction) => {
-      if (button.customId === 'delete') {
+      if (button.customId === `delete${user!.id}`) {
         // Remove sus note from database
         await deactivateAllNotes(user!.id);
         await interaction.editReply({
