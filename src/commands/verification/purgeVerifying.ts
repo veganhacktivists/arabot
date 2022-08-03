@@ -114,6 +114,10 @@ export class purgeVerifyingCommand extends Command {
         await member.roles.add(IDs.roles.nonvegan.nonvegan);
       }, apiTimeout * (i - otherRoles));
     }
+
+    // Change reply to include how many have been skipped
+    await interaction.editReply(`Processing ${verVeganLength - otherRoles} users...\nEstimated time to completion: ${calcETA(apiTimeout, 0, (verVeganLength - otherRoles))}`);
+
     /* Disabled due to invalid webhook token - most likely expired
     // Set the timeout for the completion
     setTimeout(
