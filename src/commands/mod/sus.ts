@@ -208,9 +208,10 @@ export class SusCommand extends Command {
     // Get the arguments
     let user = interaction.options.getUser('user');
     let note = interaction.options.getString('note');
+    const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || interaction.member === null || note === null) {
+    if (user === null || interaction.member === null || note === null || guild === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -227,21 +228,8 @@ export class SusCommand extends Command {
     // Add the data to the database
 
     // Check if the user exists on the database
-    const currentGuild = interaction.guild;
-
-    // Checks if currentGuild is not null
-    if (currentGuild === null) {
-      await interaction.reply({
-        content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Check if the user exists on the database
-    const userGuildMember = currentGuild!.members.cache.get(user.id);
-    const modGuildMember = currentGuild!.members.cache.get(mod.id);
+    const userGuildMember = guild!.members.cache.get(user.id);
+    const modGuildMember = guild!.members.cache.get(mod.id);
     // TODO potentially add a method to add user by Snowflake
     if (userGuildMember === undefined || modGuildMember === undefined) {
       await interaction.reply({
@@ -261,8 +249,10 @@ export class SusCommand extends Command {
     }
     await addToDatabase(user.id, mod.id, note);
 
-    // Give the user the sus role
-    await userGuildMember!.roles.add(IDs.roles.restrictions.sus);
+    // Give the user the sus role they don't already have the sus note
+    if (userGuildMember.roles.cache.has(IDs.roles.restrictions.sus)) {
+      await userGuildMember!.roles.add(IDs.roles.restrictions.sus);
+    }
 
     await interaction.reply({
       content: `${user} note: ${note}`,
@@ -429,6 +419,15 @@ export class SusCommand extends Command {
           content: `${user!}'s sus note (ID: ${noteId}) has been successfully removed`,
           embeds: [],
         });
+
+        // TODO create a new Prisma function to only count and not to get a whole list of sus notes
+        // Check how many notes the user has and if 0, then remove sus note
+        const notes = await findNotes(user!.id, true);
+
+        // Checks if there are no notes on the user and if there's none, remove the sus role
+        if (notes.length === 0) {
+          await user!.roles.remove(IDs.roles.restrictions.sus);
+        }
       }
     });
 
@@ -438,15 +437,6 @@ export class SusCommand extends Command {
         components: [],
       });
     });
-
-    // TODO create a new Prisma function to only count and not to get a whole list of sus notes
-    // Check how many notes the user has and if 0, then remove sus note
-    const notes = await findNotes(user!.id, true);
-
-    // Checks if there are no notes on the user and if there's none, remove the sus role
-    if (notes.length === 0) {
-      await user!.roles.remove(IDs.roles.restrictions.sus);
-    }
   }
 
   public async removeAllNotes(interaction: Command.ChatInputInteraction) {
