@@ -56,6 +56,15 @@ const IDs = {
       coordinators: '989249700353953843',
       standup: '996009201237233684',
     },
+    diversity: {
+      women: '938808963544285324',
+      lgbtqia: '956224226556272670',
+      potgm: '956224095509442600',
+      disabilities: '933078769365823518',
+    },
+  },
+  categories: {
+    diversity: '933078380394459146',
   },
 };
 
