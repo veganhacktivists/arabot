@@ -441,7 +441,7 @@ export class SusCommand extends Command {
 
   public async removeAllNotes(interaction: Command.ChatInputInteraction) {
     // Get the arguments
-    let user = interaction.options.getUser('user');
+    const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
