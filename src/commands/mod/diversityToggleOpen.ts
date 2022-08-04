@@ -25,8 +25,8 @@ export class ToggleOpenCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'toggleopen',
-      description: 'Toggles read-only for vegans in diversity section',
+      name: 'diversity',
+      description: 'Commands for the Diversity Coordinators',
       preconditions: ['DiversityCoordinatorOnly'],
     });
   }
@@ -36,7 +36,9 @@ export class ToggleOpenCommand extends Command {
     registry.registerChatInputCommand(
       (builder) => builder
         .setName(this.name)
-        .setDescription(this.description),
+        .setDescription(this.description)
+        .addSubcommand((command) => command.setName('toggleopen')
+          .setDescription('Toggles read-only for vegans in diversity section')),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -45,6 +47,25 @@ export class ToggleOpenCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
+    const subcommand = interaction.options.getSubcommand(true);
+
+    // Checks what subcommand was run
+    switch (subcommand) {
+      case 'toggleopen': {
+        return await this.toggleOpen(interaction);
+      }
+    }
+
+    // If subcommand is invalid
+    await interaction.reply({
+      content: 'Invalid sub command!',
+      ephemeral: true,
+      fetchReply: true,
+    });
+  }
+
+  // Command run
+  public async toggleOpen(interaction: Command.ChatInputInteraction) {
     // Check if guild is not null
     if (interaction.guild === null) {
       await interaction.reply({
