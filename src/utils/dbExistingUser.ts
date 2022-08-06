@@ -17,7 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { GuildMember } from 'discord.js';
+import type { GuildMember, GuildMemberRoleManager } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { IDs } from './ids';
 
@@ -43,6 +43,22 @@ export async function userExists(user: GuildMember) {
   return false;
 }
 
+function getRoles(roles: GuildMemberRoleManager) {
+  // Checks what roles the user has
+  const rolesDict = {
+    vegan: roles.cache.has(IDs.roles.vegan.vegan),
+    activist: roles.cache.has(IDs.roles.vegan.activist),
+    plus: roles.cache.has(IDs.roles.vegan.plus),
+    notVegan: roles.cache.has(IDs.roles.nonvegan.nonvegan),
+    vegCurious: roles.cache.has(IDs.roles.nonvegan.vegCurious),
+    convinced: roles.cache.has(IDs.roles.nonvegan.convinced),
+    trusted: roles.cache.has(IDs.roles.trusted),
+    muted: roles.cache.has(IDs.roles.restrictions.muted),
+  };
+
+  return rolesDict;
+}
+
 // Adds the user to the database if they were already on the server before the bot/database
 export async function addExistingUser(user: GuildMember) {
   // Initialises Prisma Client
@@ -60,28 +76,55 @@ export async function addExistingUser(user: GuildMember) {
     return;
   }
 
-  // Checks what roles the user has
-  const hasVegan = user.roles.cache.has(IDs.roles.vegan.vegan);
-  const hasActivist = user.roles.cache.has(IDs.roles.vegan.activist);
-  const hasPlus = user.roles.cache.has(IDs.roles.vegan.plus);
-  const hasNotVegan = user.roles.cache.has(IDs.roles.nonvegan.nonvegan);
-  const hasVegCurious = user.roles.cache.has(IDs.roles.nonvegan.vegCurious);
-  const hasConvinced = user.roles.cache.has(IDs.roles.nonvegan.convinced);
-  const hasTrusted = user.roles.cache.has(IDs.roles.trusted);
-  const hasMuted = user.roles.cache.has(IDs.roles.restrictions.muted);
+  // Parse all the roles into a dictionary
+  const roles = getRoles(user.roles);
 
   // Create the user in the database
   await prisma.user.create({
     data: {
       id: user.id,
-      vegan: hasVegan,
-      trusted: hasTrusted,
-      activist: hasActivist,
-      plus: hasPlus,
-      notVegan: hasNotVegan,
-      vegCurious: hasVegCurious,
-      convinced: hasConvinced,
-      muted: hasMuted,
+      vegan: roles.vegan,
+      trusted: roles.trusted,
+      activist: roles.activist,
+      plus: roles.plus,
+      notVegan: roles.notVegan,
+      vegCurious: roles.vegCurious,
+      convinced: roles.convinced,
+      muted: roles.muted,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+}
+
+export async function updateUser(user: GuildMember) {
+  // Check if the user is already on the database
+  if (!(await userExists(user))) {
+    await addExistingUser(user);
+    return;
+  }
+
+  // Parse all the roles into a dictionary
+  const roles = getRoles(user.roles);
+
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      id: user.id,
+      vegan: roles.vegan,
+      trusted: roles.trusted,
+      activist: roles.activist,
+      plus: roles.plus,
+      notVegan: roles.notVegan,
+      vegCurious: roles.vegCurious,
+      convinced: roles.convinced,
+      muted: roles.muted,
     },
   });
 
