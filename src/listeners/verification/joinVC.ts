@@ -64,10 +64,10 @@ export class VerificationJoinVCListener extends Listener {
     const currentChannel = guild.channels.cache.get(newState.channel.id) as VoiceChannel;
 
     // Check if the user has the verifiers role
-    if (newState.member?.roles.cache.has('999431675123597406')) {
-      await channel.setName('Verifiers Only');
+    if (newState.member?.roles.cache.has('999431675123597406')) { // TODO add check if they are trial-verifiers
+      await channel.setName('Verifier Meeting');
     } else {
-      await channel.setName(`Verification - ${newState.member?.displayName}`);
+      await channel.setName(`${newState.member?.displayName} - Verification`);
       await currentChannel.send(`Hiya ${newState.member?.user}, please be patient as a verifier has been called out to verify you.\n\nIf you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.`);
     }
 
@@ -77,7 +77,6 @@ export class VerificationJoinVCListener extends Listener {
 
     // Create a new channel for others to join
 
-    // TODO add a global max size
     // Checks if there are more than 10 voice channels
     if (listVoiceChannels.size > maxVCs - 1) {
       await guild.channels.create('Verification', {

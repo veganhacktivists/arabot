@@ -44,24 +44,51 @@ export class VerificationLeaveVCListener extends Listener {
     const user = guild.members.cache.get(oldState.member!.id)!;
 
     // Remove verify as vegan and give non vegan role
-    await user.roles.remove('999431675081666597'); // Verify-as-vegan
-    await user.roles.add('999431675081666598'); // Not vegan
-
-    // Delete the channel
-    await oldState.channel!.delete();
+    if (!user.roles.cache.has('999431675098447937')) { // If the user does not have vegan role
+      await user.roles.remove('999431675081666597'); // Verify-as-vegan
+      await user.roles.add('999431675081666598'); // Not vegan
+    }
 
     // Check how many voice channels there are
     const category = guild.channels.cache.get('999431677006860409') as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
 
-    console.log(listVoiceChannels.size);
+    // Check that it is not deleting the 'Verification' channel (in case bot crashes)
+    if (oldState.channel.name !== 'Verification') {
+      // Delete the channel
+      await oldState.channel!.delete();
+    }
+
+    // If there are no VCs left in verification after having the channel deleted
+    if (listVoiceChannels.size === 0) {
+      // Create a verification channel
+      await guild.channels.create('Verification', {
+        type: 'GUILD_VOICE',
+        parent: '999431677006860409', // Verification topic
+        userLimit: 1,
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone,
+            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+          {
+            id: '999431675081666597', // verify-as-vegan
+            allow: ['VIEW_CHANNEL'],
+          },
+          {
+            id: '999431675123597406', // Verifiers
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+        ],
+      });
+    }
+
     // If there are less than 10, stop
     if (listVoiceChannels.size < maxVCs) {
       return;
     }
 
     const verification = listVoiceChannels.last() as VoiceChannel;
-    console.log(verification?.name);
 
     await verification!.permissionOverwrites.set([
       {
