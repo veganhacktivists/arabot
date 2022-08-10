@@ -17,7 +17,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-const IDs = {
+// eslint-disable-next-line import/extensions
+import devIDs from './devIDs';
+
+let IDs = {
   roles: {
     trusted: '731563158011117590',
     nonvegan: {
@@ -68,4 +71,11 @@ const IDs = {
   },
 };
 
-export { IDs };
+require('dotenv').config();
+
+// Check if the bot is in development mode
+if (process.env.DEVELOPMENT === 'true') {
+  IDs = devIDs;
+}
+
+export default { IDs };
