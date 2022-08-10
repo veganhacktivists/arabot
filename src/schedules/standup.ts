@@ -19,7 +19,7 @@
 
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
-import { IDs } from '../utils/ids';
+import IDs from '../utils/ids';
 
 export async function standupRun() {
   const { client } = container;
