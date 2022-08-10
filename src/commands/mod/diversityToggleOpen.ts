@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
-import { IDs } from '../../utils/ids';
+import IDs from '../../utils/ids';
 
 export class ToggleOpenCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
