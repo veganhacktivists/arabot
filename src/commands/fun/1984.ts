@@ -51,7 +51,9 @@ export class N1984Command extends Command {
     const memberGuildMember = interaction.guild!.members.cache.get(member.id)!;
 
     // Creates the embed for the 1984 reaction
-    const random1984 = N1984[Math.floor(Math.random() * N1984.length)];
+    // Add a 1 in 1000 chance of Dantas literally making ARA 1984
+    const random1984 = Math.random() < 0.001 ? 'https://tenor.com/view/arthuria-dantas-dancing-dantas-woke-weebs-gif-18773803'
+      : N1984[Math.floor(Math.random() * N1984.length)];
     const n1984Embed = new MessageEmbed()
       .setColor('#ffffff')
       .setTitle(`${memberGuildMember.displayName} is happy!`)
