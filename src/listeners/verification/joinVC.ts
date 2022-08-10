@@ -21,7 +21,8 @@ import { container, Listener } from '@sapphire/framework';
 import type {
   TextChannel, VoiceChannel, CategoryChannel, VoiceState,
 } from 'discord.js';
-import { maxVCs } from './config';
+import { maxVCs } from '../../utils/verificationConfig';
+import IDs from '../../utils/ids';
 
 export class VerificationJoinVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -33,8 +34,8 @@ export class VerificationJoinVCListener extends Listener {
 
   public async run(oldState: VoiceState, newState: VoiceState) {
     // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id === '999431677006860409' // ID for Verification category
-      || newState.channel?.parent?.id !== '999431677006860409' // ID for Verification category
+    if (oldState.channel?.parent?.id === IDs.categories.verification
+      || newState.channel?.parent?.id !== IDs.categories.verification
     ) {
       return;
     }
@@ -43,7 +44,7 @@ export class VerificationJoinVCListener extends Listener {
     if (newState.channel.members.size === 2) {
       await newState.channel!.permissionOverwrites.set([
         {
-          id: '999431675081666597', // verify-as-vegan
+          id: IDs.categories.verification,
           allow: ['SEND_MESSAGES'],
         },
       ]);
@@ -64,7 +65,7 @@ export class VerificationJoinVCListener extends Listener {
     const currentChannel = guild.channels.cache.get(newState.channel.id) as VoiceChannel;
 
     // Check if the user has the verifiers role
-    if (newState.member?.roles.cache.has('999431675123597406')) { // TODO add check if they are trial-verifiers
+    if (newState.member?.roles.cache.has(IDs.roles.staff.verifier)) { // TODO add check if they are trial-verifiers
       await channel.setName('Verifier Meeting');
     } else {
       await channel.setName(`${newState.member?.displayName} - Verification`);
@@ -72,7 +73,7 @@ export class VerificationJoinVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const category = guild.channels.cache.get('999431677006860409') as CategoryChannel;
+    const category = guild.channels.cache.get(IDs.categories.verification) as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
 
     // Create a new channel for others to join
@@ -81,7 +82,7 @@ export class VerificationJoinVCListener extends Listener {
     if (listVoiceChannels.size > maxVCs - 1) {
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
-        parent: '999431677006860409', // Verification topic
+        parent: IDs.categories.verification,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -89,12 +90,12 @@ export class VerificationJoinVCListener extends Listener {
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
           {
-            id: '999431675081666597', // verify-as-vegan
+            id: IDs.roles.verifyingAsVegan,
             allow: ['VIEW_CHANNEL'],
             deny: ['CONNECT'],
           },
           {
-            id: '999431675123597406', // Verifiers
+            id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
         ],
@@ -102,7 +103,7 @@ export class VerificationJoinVCListener extends Listener {
     } else {
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
-        parent: '999431677006860409', // Verification topic
+        parent: IDs.categories.verification,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -110,11 +111,11 @@ export class VerificationJoinVCListener extends Listener {
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
           {
-            id: '999431675081666597', // verify-as-vegan
+            id: IDs.roles.verifyingAsVegan,
             allow: ['VIEW_CHANNEL'],
           },
           {
-            id: '999431675123597406', // Verifiers
+            id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
         ],
@@ -128,7 +129,7 @@ export class VerificationJoinVCListener extends Listener {
         deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
       },
       {
-        id: '999431675081666597', // verify-as-vegan
+        id: IDs.roles.verifyingAsVegan,
         deny: ['VIEW_CHANNEL'],
       },
       {
@@ -139,7 +140,7 @@ export class VerificationJoinVCListener extends Listener {
     await currentChannel.setUserLimit(0);
 
     // Send a message that someone wants to be verified
-    const verifyChannel = client.channels.cache.get('999431677006860411') as TextChannel; // Verifiers channel
-    verifyChannel.send(`${newState.member?.user} wants to be verified in ${newState.channel}`);
+    const verifyChannel = client.channels.cache.get(IDs.channels.staff.verifiers) as TextChannel;
+    await verifyChannel.send(`${newState.member?.user} wants to be verified in ${newState.channel}`);
   }
 }

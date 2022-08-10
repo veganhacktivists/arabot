@@ -58,6 +58,7 @@ let IDs = {
     staff: {
       coordinators: '989249700353953843',
       standup: '996009201237233684',
+      verifiers: '873215538627756072',
     },
     diversity: {
       women: '938808963544285324',
@@ -67,6 +68,7 @@ let IDs = {
     },
   },
   categories: {
+    verification: '797505409073676299',
     diversity: '933078380394459146',
   },
 };
@@ -78,4 +80,4 @@ if (process.env.DEVELOPMENT === 'true') {
   IDs = devIDs;
 }
 
-export default { IDs };
+export default IDs;

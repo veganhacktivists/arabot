@@ -55,6 +55,7 @@ export const devIDs = {
     staff: {
       coordinators: '999431676058927254',
       standup: '999431676289622183',
+      verifiers: '999431677006860411',
     },
     diversity: {
       women: '999431679053660187',
@@ -64,6 +65,7 @@ export const devIDs = {
     },
   },
   categories: {
+    verification: '999431677006860409',
     diversity: '999431679053660185',
   },
 };

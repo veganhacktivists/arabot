@@ -19,7 +19,8 @@
 
 import { container, Listener } from '@sapphire/framework';
 import type { VoiceState, CategoryChannel, VoiceChannel } from 'discord.js';
-import { maxVCs } from './config';
+import { maxVCs } from '../../utils/verificationConfig';
+import IDs from '../../utils/ids';
 
 export class VerificationLeaveVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -31,8 +32,8 @@ export class VerificationLeaveVCListener extends Listener {
 
   public async run(oldState: VoiceState, newState: VoiceState) {
     // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id !== '999431677006860409' // ID for Verification category
-      || newState.channel?.parent?.id === '999431677006860409' // ID for Verification category
+    if (oldState.channel?.parent?.id !== IDs.categories.verification
+      || newState.channel?.parent?.id === IDs.categories.verification
       || oldState.channel.members.size > 0
     ) {
       return;
@@ -44,13 +45,13 @@ export class VerificationLeaveVCListener extends Listener {
     const user = guild.members.cache.get(oldState.member!.id)!;
 
     // Remove verify as vegan and give non vegan role
-    if (!user.roles.cache.has('999431675098447937')) { // If the user does not have vegan role
-      await user.roles.remove('999431675081666597'); // Verify-as-vegan
-      await user.roles.add('999431675081666598'); // Not vegan
+    if (!user.roles.cache.has(IDs.roles.vegan.vegan)) {
+      await user.roles.remove(IDs.roles.verifyingAsVegan);
+      await user.roles.add(IDs.roles.nonvegan.nonvegan);
     }
 
     // Check how many voice channels there are
-    const category = guild.channels.cache.get('999431677006860409') as CategoryChannel;
+    const category = guild.channels.cache.get(IDs.categories.verification) as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
 
     // Check that it is not deleting the 'Verification' channel (in case bot crashes)
@@ -64,7 +65,7 @@ export class VerificationLeaveVCListener extends Listener {
       // Create a verification channel
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
-        parent: '999431677006860409', // Verification topic
+        parent: IDs.categories.verification,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -72,11 +73,11 @@ export class VerificationLeaveVCListener extends Listener {
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
           {
-            id: '999431675081666597', // verify-as-vegan
+            id: IDs.roles.verifyingAsVegan,
             allow: ['VIEW_CHANNEL'],
           },
           {
-            id: '999431675123597406', // Verifiers
+            id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
         ],
@@ -92,7 +93,7 @@ export class VerificationLeaveVCListener extends Listener {
 
     await verification!.permissionOverwrites.set([
       {
-        id: '999431675081666597', // verify-as-vegan
+        id: IDs.roles.verifyingAsVegan,
         allow: ['VIEW_CHANNEL'],
       },
     ]);
