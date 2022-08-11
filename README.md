@@ -56,7 +56,7 @@ You can also contact Anthony in the [ARA Discord Server](https://discord.com/inv
 
 ## Support
 
-For support, feel free to reach out to Anthony or send a ModMail on the [ARA Discord Server](https://discord.com/invite/animalrights).
+For support, feel free to send an email to anthony@aramovement.org or reach out to Anthony or send a ModMail on the [ARA Discord Server](https://discord.com/invite/animalrights).
 
 ## Authors
 
