@@ -39,7 +39,7 @@ export class DiversityCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   }
 
   private async checkDiversityCoordinator(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.staff.devCoordinator)
+    return user.roles.cache.has(IDs.roles.staff.diversityCoordinator)
       ? this.ok()
       : this.error({ message: 'Only diversity coordinators can run this command!' });
   }
