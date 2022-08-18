@@ -18,13 +18,12 @@
 */
 
 import { container, Listener } from '@sapphire/framework';
-import type {
-  TextChannel, VoiceChannel, CategoryChannel, VoiceState,
-} from 'discord.js';
+import type { VoiceChannel, CategoryChannel, VoiceState } from 'discord.js';
 import { maxVCs } from '../../utils/verificationConfig';
+import { joinVerification, startVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
-export class VerificationJoinVCListener extends Listener {
+export default class VerificationJoinVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -40,6 +39,9 @@ export class VerificationJoinVCListener extends Listener {
       return;
     }
 
+    // Variable if this channel is a Verifiers only VC
+    let verifier = false;
+
     // Checks if a verifier has joined
     if (newState.channel.members.size === 2) {
       await newState.channel!.permissionOverwrites.set([
@@ -51,30 +53,71 @@ export class VerificationJoinVCListener extends Listener {
       return;
     }
 
+    // Check if a verifier joined a verification VC and update database
+    if (newState.channel.members.size === 2) {
+      if (!newState.channel.name.includes(' - Verification')) {
+        return;
+      }
+
+      await startVerification(newState.member!, newState.channelId!);
+      return;
+    }
+
     // Checks if there is more than one person who has joined or if the channel has members
     if (newState.channel.members.size !== 1
       || !newState.channel.members.has(newState.member!.id)) {
       return;
     }
 
-    // TODO add database information
-
     const channel = newState.channel!;
     const { client } = container;
     const guild = client.guilds.cache.get(newState.guild.id)!;
-    const currentChannel = guild.channels.cache.get(newState.channel.id) as VoiceChannel;
+    const currentChannel = guild.channels.cache.get(newState.channelId!) as VoiceChannel;
 
     // Check if the user has the verifiers role
-    if (newState.member?.roles.cache.has(IDs.roles.staff.verifier)) { // TODO add check if they are trial-verifiers
+    if (newState.member?.roles.cache.has(IDs.roles.staff.verifier)
+      || newState.member?.roles.cache.has(IDs.roles.staff.trialVerifier)) {
       await channel.setName('Verifier Meeting');
+      verifier = true;
     } else {
       await channel.setName(`${newState.member?.displayName} - Verification`);
       await currentChannel.send(`Hiya ${newState.member?.user}, please be patient as a verifier has been called out to verify you.\n\nIf you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.`);
+      // Adds to the database that the user joined verification
+      await joinVerification(newState.member!, channel.id);
     }
 
     // Check how many voice channels there are
     const category = guild.channels.cache.get(IDs.categories.verification) as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
+
+    // Create a text channel for verifiers only
+    // Checks if there are more than 10 voice channels
+    if (!verifier) {
+      const verificationText = await guild.channels.create(`✅┃${newState.member?.displayName}-verification`, {
+        type: 'GUILD_TEXT',
+        topic: `Channel for verifiers only. ${newState.member?.id} (Please do not change this)`,
+        parent: IDs.categories.verification,
+        userLimit: 1,
+        permissionOverwrites: [
+          {
+            id: guild.roles.everyone,
+            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.verifyBlock,
+            deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+          },
+          {
+            id: IDs.roles.staff.verifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+        ],
+      });
+
+      // Send a message that someone wants to be verified
+      await verificationText.send(`${newState.member?.user} wants to be verified in ${newState.channel}
+      \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
+    }
 
     // Create a new channel for others to join
 
@@ -88,6 +131,10 @@ export class VerificationJoinVCListener extends Listener {
           {
             id: guild.roles.everyone,
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.verifyBlock,
+            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
             id: IDs.roles.verifyingAsVegan,
@@ -109,6 +156,10 @@ export class VerificationJoinVCListener extends Listener {
           {
             id: guild.roles.everyone,
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.verifyBlock,
+            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
             id: IDs.roles.verifyingAsVegan,
@@ -138,9 +189,5 @@ export class VerificationJoinVCListener extends Listener {
       },
     ]);
     await currentChannel.setUserLimit(0);
-
-    // Send a message that someone wants to be verified
-    const verifyChannel = client.channels.cache.get(IDs.channels.staff.verifiers) as TextChannel;
-    await verifyChannel.send(`${newState.member?.user} wants to be verified in ${newState.channel}`);
   }
 }

@@ -19,7 +19,7 @@
 
 import type { GuildMember, GuildMemberRoleManager } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
-import { IDs } from './ids';
+import IDs from '../ids';
 
 // Checks if the user exists on the database
 export async function userExists(user: GuildMember) {
@@ -130,4 +130,26 @@ export async function updateUser(user: GuildMember) {
 
   // Close the database connection
   await prisma.$disconnect();
+}
+
+export async function fetchRoles(user: string) {
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  // Get the user's roles
+  const roles = await prisma.user.findUnique({
+    where: {
+      id: user,
+    },
+    select: {
+      trusted: true,
+      plus: true,
+      vegCurious: true,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+
+  return roles;
 }

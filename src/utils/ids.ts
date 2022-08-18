@@ -50,10 +50,12 @@ let IDs = {
       restricted: '851624392928264222',
       moderator: '826157475815489598',
       verifier: '871802735031373856',
+      trialVerifier: '982635638010572850',
     },
     patron: '765370219207852055',
     patreon: '993848684640997406',
     verifyingAsVegan: '854725899576279060',
+    verifyBlock: '',
   },
   channels: {
     staff: {

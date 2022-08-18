@@ -41,15 +41,18 @@ export const devIDs = {
     staff: {
       coordinator: '999431675165556822',
       devCoordinator: '999431675165556818',
+      diversityCoordinator: '999431675140382808',
       mentorCoordinator: '999431675140382809',
       verifierCoordinator: '999431675140382810',
       restricted: '999431675123597407',
       moderator: '999431675123597408',
       verifier: '999431675123597406',
+      trialVerifier: '999431675123597405',
     },
     patron: '999431675098447935',
     patreon: '999431675098447936',
     verifyingAsVegan: '999431675081666597',
+    verifyBlock: '1007477161835372574',
   },
   channels: {
     staff: {

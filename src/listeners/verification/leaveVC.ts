@@ -18,8 +18,11 @@
 */
 
 import { container, Listener } from '@sapphire/framework';
-import type { VoiceState, CategoryChannel, VoiceChannel } from 'discord.js';
+import type {
+  VoiceState, CategoryChannel, VoiceChannel, TextChannel,
+} from 'discord.js';
 import { maxVCs } from '../../utils/verificationConfig';
+import { getUser } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
 export class VerificationLeaveVCListener extends Listener {
@@ -42,12 +45,30 @@ export class VerificationLeaveVCListener extends Listener {
     // Allow more people to join VC if there are less than 10 VCs
     const { client } = container;
     const guild = client.guilds.cache.get(newState.guild.id)!;
-    const user = guild.members.cache.get(oldState.member!.id)!;
+    let verifier = false;
 
-    // Remove verify as vegan and give non vegan role
-    if (!user.roles.cache.has(IDs.roles.vegan.vegan)) {
-      await user.roles.remove(IDs.roles.verifyingAsVegan);
-      await user.roles.add(IDs.roles.nonvegan.nonvegan);
+    // Get the user that was being verified
+    const userSnowflake = await getUser(oldState.channel.id);
+    if (userSnowflake === null) {
+      verifier = true;
+    }
+
+    if (!verifier) {
+      console.log(userSnowflake);
+      const user = guild.members.cache.get(userSnowflake!)!;
+
+      /*
+      // Add the user to the database if it's not a verifier meeting
+      if (!oldState.channel.name.includes(' - Verification')) {
+        await finishVerification(oldState.channelId!, true, true, false, false);
+      }
+       */
+
+      // Remove verify as vegan and give non vegan role
+      if (!user.roles.cache.has(IDs.roles.vegan.vegan)) {
+        await user.roles.remove(IDs.roles.verifyingAsVegan);
+        await user.roles.add(IDs.roles.nonvegan.nonvegan);
+      }
     }
 
     // Check how many voice channels there are
@@ -58,6 +79,19 @@ export class VerificationLeaveVCListener extends Listener {
     if (oldState.channel.name !== 'Verification') {
       // Delete the channel
       await oldState.channel!.delete();
+    }
+
+    // Delete text channel
+    if (!verifier) {
+      // Gets a list of all the text channels in the verification category
+      const listTextChannels = category.children.filter((c) => c.type === 'GUILD_TEXT');
+      listTextChannels.forEach((c) => {
+        const textChannel = c as TextChannel;
+        // Checks if the channel topic has the user's snowflake
+        if (textChannel.topic!.includes(userSnowflake!)) {
+          textChannel.delete();
+        }
+      });
     }
 
     // If there are no VCs left in verification after having the channel deleted
@@ -71,6 +105,10 @@ export class VerificationLeaveVCListener extends Listener {
           {
             id: guild.roles.everyone,
             deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.verifyBlock,
+            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
             id: IDs.roles.verifyingAsVegan,
