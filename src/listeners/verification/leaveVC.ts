@@ -34,6 +34,14 @@ export class VerificationLeaveVCListener extends Listener {
   }
 
   public async run(oldState: VoiceState, newState: VoiceState) {
+    // If the event was not a user joining the channel
+    if (oldState.channel?.parent?.id !== IDs.categories.verification
+      || newState.channel?.parent?.id === IDs.categories.verification
+      || oldState.channel.members.size > 0
+    ) {
+      return;
+    }
+
     let verifier = false;
 
     // Check for undefined variables
@@ -58,14 +66,6 @@ export class VerificationLeaveVCListener extends Listener {
     const userSnowflake = await getUser(channel.id);
     if (userSnowflake === null) {
       verifier = true;
-    }
-
-    // If the event was not a user joining the channel
-    if (channel.parent?.id !== IDs.categories.verification
-      || newState.channel?.parent?.id === IDs.categories.verification
-      || channel.members.size > 0
-    ) {
-      return;
     }
 
     // Allow more people to join VC if there are less than 10 VCs

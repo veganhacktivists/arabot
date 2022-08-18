@@ -18,7 +18,20 @@
 */
 
 import { container, Listener } from '@sapphire/framework';
-import type { VoiceChannel, CategoryChannel, VoiceState } from 'discord.js';
+import type {
+  VoiceChannel,
+  CategoryChannel,
+  VoiceState,
+  TextChannel,
+  GuildMember,
+} from 'discord.js';
+import {
+  ButtonInteraction,
+  Constants,
+  MessageActionRow,
+  MessageButton,
+  MessageEmbed,
+} from 'discord.js';
 import { maxVCs } from '../../utils/verificationConfig';
 import { joinVerification, startVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
@@ -32,6 +45,13 @@ export default class VerificationJoinVCListener extends Listener {
   }
 
   public async run(oldState: VoiceState, newState: VoiceState) {
+    // If the event was not a user joining the channel
+    if (oldState.channel?.parent?.id === IDs.categories.verification
+      || newState.channel?.parent?.id !== IDs.categories.verification
+    ) {
+      return;
+    }
+
     // Variable if this channel is a Verifiers only VC
     let verifier = false;
 
@@ -55,13 +75,6 @@ export default class VerificationJoinVCListener extends Listener {
     }
     const currentChannel = currentChannelGuild as VoiceChannel;
     const category = categoryGuild as CategoryChannel;
-
-    // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id === category.id
-      || channel.parent?.id !== category.id
-    ) {
-      return;
-    }
 
     // Checks if a verifier has joined
     if (channel.members.size === 2) {
@@ -132,6 +145,8 @@ export default class VerificationJoinVCListener extends Listener {
       // Send a message that someone wants to be verified
       await verificationText.send(`${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
+
+      await this.verificationProcess(member, verificationText, channel.id);
     }
 
     // Create a new channel for others to join
@@ -204,5 +219,120 @@ export default class VerificationJoinVCListener extends Listener {
       },
     ]);
     await currentChannel.setUserLimit(0);
+  }
+
+  private async verificationProcess(
+    user: GuildMember,
+    channel: TextChannel,
+    id: string,
+  ) {
+    const embedColor = '#0099ff';
+    const { displayName } = user;
+
+    // Create an embeds for each page
+    const initialEmbed = new MessageEmbed()
+      .setColor(embedColor)
+      .setTitle(`Do you think ${displayName} is definitely vegan?`);
+
+    const activistEmbed = new MessageEmbed()
+      .setColor(embedColor)
+      .setTitle('Offer to ask questions for Activist. Do you think they should get it?');
+
+    const noActivistEmbed = new MessageEmbed()
+      .setColor(embedColor)
+      .setTitle('Do some activism, asking Activist questions. Now which role should they get?');
+
+    /*
+    const vegCuriousEmbed = new MessageEmbed()
+      .setColor(embedColor)
+      .setTitle('Should this user get Veg Curious?');
+     */
+
+    // Create buttons to delete or cancel the deletion
+    const initialButtons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId(`yesVegan${id}`)
+          .setLabel('Yes')
+          .setStyle(Constants.MessageButtonStyles.SUCCESS),
+        new MessageButton()
+          .setCustomId(`noVegan${id}`)
+          .setLabel('No')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+      );
+
+    const activistButtons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId(`yesActivist${id}`)
+          .setLabel('Yes')
+          .setStyle(Constants.MessageButtonStyles.SUCCESS),
+        new MessageButton()
+          .setCustomId(`noActivist${id}`)
+          .setLabel('No')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+      );
+
+    const noActivistButtons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId(`vegan${id}`)
+          .setLabel('Vegan')
+          .setStyle(Constants.MessageButtonStyles.SUCCESS),
+        new MessageButton()
+          .setCustomId(`convinced${id}`)
+          .setLabel('Convinced')
+          .setStyle(Constants.MessageButtonStyles.SECONDARY),
+        new MessageButton()
+          .setCustomId(`notVegan${id}`)
+          .setLabel('Non-vegan')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+      );
+
+    /*
+    const vegCuriousButtons = new MessageActionRow<MessageButton>()
+      .addComponents(
+        new MessageButton()
+          .setCustomId(`yesVegCurious${id}`)
+          .setLabel('Yes')
+          .setStyle(Constants.MessageButtonStyles.SUCCESS),
+        new MessageButton()
+          .setCustomId(`noVegCurious${id}`)
+          .setLabel('No')
+          .setStyle(Constants.MessageButtonStyles.DANGER),
+      );
+     */
+
+    // Sends the note to verify this note is to be deleted
+    const message = await channel.send({
+      embeds: [initialEmbed],
+      components: [initialButtons],
+    });
+
+    // Listen for the button presses
+    const collector = channel.createMessageComponentCollector({
+      max: 2, // Maximum of 1 button press
+    });
+
+    // Button pressed
+    collector.on('collect', async (button: ButtonInteraction) => {
+      // Select roles
+      // Definitely vegan?
+      if (button.customId === `yesVegan${id}`) {
+        await button.deferUpdate();
+        await message.edit({
+          embeds: [activistEmbed],
+          components: [activistButtons],
+        });
+      }
+      // Not as vegan
+      if (button.customId === `noVegan${id}`) {
+        await button.deferUpdate();
+        await message.edit({
+          embeds: [noActivistEmbed],
+          components: [noActivistButtons],
+        });
+      }
+    });
   }
 }
