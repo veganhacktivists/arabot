@@ -32,21 +32,42 @@ export default class VerificationJoinVCListener extends Listener {
   }
 
   public async run(oldState: VoiceState, newState: VoiceState) {
+    // Variable if this channel is a Verifiers only VC
+    let verifier = false;
+
+    // Checks for not null
+    const { channel } = newState;
+    const { member } = newState;
+    const { client } = container;
+    const guild = client.guilds.cache.get(newState.guild.id);
+
+    if (channel === null || member === null || guild === undefined) {
+      console.error('Verification channel not found');
+      return;
+    }
+
+    // Get current category and channel
+    const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
+    const currentChannelGuild = guild.channels.cache.get(channel.id);
+    if (currentChannelGuild === undefined || categoryGuild === undefined) {
+      console.error('Verification channel not found');
+      return;
+    }
+    const currentChannel = currentChannelGuild as VoiceChannel;
+    const category = categoryGuild as CategoryChannel;
+
     // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id === IDs.categories.verification
-      || newState.channel?.parent?.id !== IDs.categories.verification
+    if (oldState.channel?.parent?.id === category.id
+      || channel.parent?.id !== category.id
     ) {
       return;
     }
 
-    // Variable if this channel is a Verifiers only VC
-    let verifier = false;
-
     // Checks if a verifier has joined
-    if (newState.channel.members.size === 2) {
+    if (channel.members.size === 2) {
       await newState.channel!.permissionOverwrites.set([
         {
-          id: IDs.categories.verification,
+          id: guild.roles.everyone,
           allow: ['SEND_MESSAGES'],
         },
       ]);
@@ -54,49 +75,43 @@ export default class VerificationJoinVCListener extends Listener {
     }
 
     // Check if a verifier joined a verification VC and update database
-    if (newState.channel.members.size === 2) {
-      if (!newState.channel.name.includes(' - Verification')) {
+    if (channel.members.size === 2) {
+      if (!channel.name.includes(' - Verification')) {
         return;
       }
 
-      await startVerification(newState.member!, newState.channelId!);
+      await startVerification(member, channel.id);
       return;
     }
 
     // Checks if there is more than one person who has joined or if the channel has members
-    if (newState.channel.members.size !== 1
-      || !newState.channel.members.has(newState.member!.id)) {
+    if (channel.members.size !== 1
+      || !channel.members.has(member.id)) {
       return;
     }
 
-    const channel = newState.channel!;
-    const { client } = container;
-    const guild = client.guilds.cache.get(newState.guild.id)!;
-    const currentChannel = guild.channels.cache.get(newState.channelId!) as VoiceChannel;
-
     // Check if the user has the verifiers role
-    if (newState.member?.roles.cache.has(IDs.roles.staff.verifier)
-      || newState.member?.roles.cache.has(IDs.roles.staff.trialVerifier)) {
+    if (member.roles.cache.has(IDs.roles.staff.verifier)
+      || member.roles.cache.has(IDs.roles.staff.trialVerifier)) {
       await channel.setName('Verifier Meeting');
       verifier = true;
     } else {
-      await channel.setName(`${newState.member?.displayName} - Verification`);
-      await currentChannel.send(`Hiya ${newState.member?.user}, please be patient as a verifier has been called out to verify you.\n\nIf you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.`);
+      await channel.setName(`${member.displayName} - Verification`);
+      await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\nIf you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.`);
       // Adds to the database that the user joined verification
-      await joinVerification(newState.member!, channel.id);
+      await joinVerification(member, channel.id);
     }
 
     // Check how many voice channels there are
-    const category = guild.channels.cache.get(IDs.categories.verification) as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
 
     // Create a text channel for verifiers only
     // Checks if there are more than 10 voice channels
     if (!verifier) {
-      const verificationText = await guild.channels.create(`✅┃${newState.member?.displayName}-verification`, {
+      const verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
         type: 'GUILD_TEXT',
-        topic: `Channel for verifiers only. ${newState.member?.id} (Please do not change this)`,
-        parent: IDs.categories.verification,
+        topic: `Channel for verifiers only. ${member.id} (Please do not change this)`,
+        parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -115,7 +130,7 @@ export default class VerificationJoinVCListener extends Listener {
       });
 
       // Send a message that someone wants to be verified
-      await verificationText.send(`${newState.member?.user} wants to be verified in ${newState.channel}
+      await verificationText.send(`${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
     }
 
@@ -125,7 +140,7 @@ export default class VerificationJoinVCListener extends Listener {
     if (listVoiceChannels.size > maxVCs - 1) {
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
-        parent: IDs.categories.verification,
+        parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -150,7 +165,7 @@ export default class VerificationJoinVCListener extends Listener {
     } else {
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
-        parent: IDs.categories.verification,
+        parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
@@ -184,7 +199,7 @@ export default class VerificationJoinVCListener extends Listener {
         deny: ['VIEW_CHANNEL'],
       },
       {
-        id: newState.member!.id,
+        id: member.id,
         allow: ['VIEW_CHANNEL'],
       },
     ]);

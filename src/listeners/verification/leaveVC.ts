@@ -34,24 +34,41 @@ export class VerificationLeaveVCListener extends Listener {
   }
 
   public async run(oldState: VoiceState, newState: VoiceState) {
+    let verifier = false;
+
+    // Check for undefined variables
+    const { client } = container;
+    const { channel } = oldState;
+    const guild = client.guilds.cache.get(newState.guild.id);
+
+    if (channel === null || guild === undefined) {
+      console.error('Verification channel not found');
+      return;
+    }
+
+    // Get the category
+    const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
+    if (categoryGuild === null) {
+      console.error('Verification channel not found');
+      return;
+    }
+    const category = categoryGuild as CategoryChannel;
+
+    // Get the user that was being verified
+    const userSnowflake = await getUser(channel.id);
+    if (userSnowflake === null) {
+      verifier = true;
+    }
+
     // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id !== IDs.categories.verification
+    if (channel.parent?.id !== IDs.categories.verification
       || newState.channel?.parent?.id === IDs.categories.verification
-      || oldState.channel.members.size > 0
+      || channel.members.size > 0
     ) {
       return;
     }
 
     // Allow more people to join VC if there are less than 10 VCs
-    const { client } = container;
-    const guild = client.guilds.cache.get(newState.guild.id)!;
-    let verifier = false;
-
-    // Get the user that was being verified
-    const userSnowflake = await getUser(oldState.channel.id);
-    if (userSnowflake === null) {
-      verifier = true;
-    }
 
     if (!verifier) {
       console.log(userSnowflake);
@@ -72,13 +89,12 @@ export class VerificationLeaveVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const category = guild.channels.cache.get(IDs.categories.verification) as CategoryChannel;
     const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
 
     // Check that it is not deleting the 'Verification' channel (in case bot crashes)
-    if (oldState.channel.name !== 'Verification') {
+    if (channel.name !== 'Verification') {
       // Delete the channel
-      await oldState.channel!.delete();
+      await channel.delete();
     }
 
     // Delete text channel
