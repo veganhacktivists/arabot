@@ -228,6 +228,24 @@ export default class VerificationJoinVCListener extends Listener {
   ) {
     const embedColor = '#0099ff';
     const { displayName } = user;
+    let info = {
+      page: 0,
+      find: {
+        reason: 0,
+        where: 0,
+      },
+      length: 0,
+      reasoning: 0,
+      life: 0,
+      food: 0,
+      roles: {
+        vegan: false,
+        activist: false,
+        trusted: false,
+        vegCurious: false,
+        convinced: false,
+      },
+    };
 
     // Create an embeds for each page
     const initialEmbed = new MessageEmbed()
@@ -320,6 +338,7 @@ export default class VerificationJoinVCListener extends Listener {
       // Definitely vegan?
       if (button.customId === `yesVegan${id}`) {
         await button.deferUpdate();
+        info.roles.vegan = true;
         await message.edit({
           embeds: [activistEmbed],
           components: [activistButtons],

@@ -48,16 +48,19 @@ model User {
 }
 
 model Verify {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation("verUser", fields: [userId], references: [id])
+  id          String    @id
+  user        User      @relation("verUser", fields: [userId], references: [id])
   userId      String
-  verifier    User?    @relation("verVerifier", fields: [verifierId], references: [id])
+  verifier    User?     @relation("verVerifier", fields: [verifierId], references: [id])
   verifierId  String?
-  time        DateTime @default(now())
-  timedOut    Boolean  @default(false) // If they got kicked out of verification because they timed out
-  vegan       Boolean  @default(false) // If they got verified as a vegan
-  text        Boolean  @default(false) // If they used text verification
-  serverVegan Boolean  @default(false) // People that went vegan on the server
+  joinTime    DateTime  @default(now())
+  startTime   DateTime?
+  finishTime  DateTime?
+  timedOut    Boolean   @default(false) // If they got kicked out of verification because they timed out
+  //incomplete  Boolean   @default(false) // If the verification was incomplete
+  vegan       Boolean   @default(false) // If they got verified as a vegan
+  text        Boolean   @default(false) // If they used text verification
+  serverVegan Boolean   @default(false) // People that went vegan on the server
   notes       String?
 }
 
