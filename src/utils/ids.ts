@@ -47,11 +47,13 @@ let IDs = {
       diversityCoordinator: '948284375827640321',
       mentorCoordinator: '947905630939807785',
       verifierCoordinator: '940721280376778822',
+      eventCoordinator: '944732860554817586',
       restricted: '851624392928264222',
       moderator: '826157475815489598',
       verifier: '871802735031373856',
       trialVerifier: '982635638010572850',
     },
+    stageHost: '854893757593419786',
     patron: '765370219207852055',
     patreon: '993848684640997406',
     verifyingAsVegan: '854725899576279060',
@@ -59,7 +61,7 @@ let IDs = {
   },
   channels: {
     staff: {
-      coordinators: '989249700353953843',
+      coordinators: '1006240682505142354',
       standup: '996009201237233684',
       verifiers: '873215538627756072',
     },

@@ -18,9 +18,13 @@
 */
 
 import { AllFlowsPrecondition } from '@sapphire/framework';
-import type { CommandInteraction, ContextMenuInteraction, Message } from 'discord.js';
+import type {
+  CommandInteraction,
+  ContextMenuInteraction,
+  Message,
+  GuildMember,
+} from 'discord.js';
 import IDs from '../utils/ids';
-import type { GuildMember } from 'discord.js';
 
 export class PatreonOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
