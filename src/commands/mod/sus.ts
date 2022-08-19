@@ -24,7 +24,7 @@ import {
 import { PrismaClient } from '@prisma/client';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
-import { IDs } from '../../utils/ids';
+import IDs from '../../utils/ids';
 
 // TODO add a check when they join the server to give the user the sus role again
 
