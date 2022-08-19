@@ -17,7 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-export const devIDs = {
+const devIDs = {
   roles: {
     trusted: '999431675081666599',
     nonvegan: {
@@ -41,6 +41,7 @@ export const devIDs = {
     staff: {
       coordinator: '999431675165556822',
       devCoordinator: '999431675165556818',
+      diversityCoordinator: '999431675140382808',
       mentorCoordinator: '999431675140382809',
       verifierCoordinator: '999431675140382810',
       restricted: '999431675123597407',

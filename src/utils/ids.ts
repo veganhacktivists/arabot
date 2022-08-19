@@ -57,7 +57,7 @@ let IDs = {
   },
   channels: {
     staff: {
-      coordinators: '989249700353953843',
+      coordinators: '1006240682505142354',
       standup: '996009201237233684',
     },
     diversity: {
