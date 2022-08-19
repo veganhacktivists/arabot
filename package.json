@@ -27,12 +27,15 @@
   "homepage": "https://github.com/veganhacktivists/arabot#readme",
   "dependencies": {
     "@prisma/client": "^4.0.0",
-    "@sapphire/framework": "^3.0.0-next.8007303.0",
+    "@sapphire/framework": "^3.0.0-next.7dd13af.0",
+    "@sapphire/plugin-scheduled-tasks": "^4.0.0-next.15d7f9b.0",
     "@sapphire/plugin-subcommands": "^2.2.2",
+    "@sapphire/stopwatch": "^1.4.1",
     "@sapphire/ts-config": "^3.3.4",
     "@sapphire/utilities": "^3.7.0",
     "@types/cron": "^2.0.0",
     "@types/node": "^18.0.3",
+    "bullmq": "^1.87.2",
     "cron": "^2.1.0",
     "discord-api-types": "^0.33.3",
     "discord.js": "^13.9.2",
@@ -42,6 +45,7 @@
     "typescript": "^4.7.4"
   },
   "devDependencies": {
+    "@types/ioredis": "^4.28.10",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
     "eslint": "^8.20.0",

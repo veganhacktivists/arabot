@@ -21,7 +21,7 @@
 */
 
 import { LogLevel, SapphireClient } from '@sapphire/framework';
-import { ScheduleManager } from './utils/scheduleManager';
+import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
 
 require('dotenv').config();
 
@@ -43,6 +43,16 @@ const client = new SapphireClient({
     'DIRECT_MESSAGES',
     'DIRECT_MESSAGE_REACTIONS',
   ],
+  tasks: {
+    // Scheduler with redis
+    strategy: new ScheduledTaskRedisStrategy({
+      bull: {
+        connection: {
+          host: 'redis',
+        },
+      },
+    }),
+  },
 });
 
 // Main function to log in
@@ -57,9 +67,6 @@ const main = async () => {
     client.destroy();
     process.exit(1);
   }
-
-  // Scheduled Commands
-  await ScheduleManager();
 };
 
 main();

@@ -17,15 +17,31 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '../utils/ids';
 
-export async function standupRun() {
-  const { client } = container;
+export class StandupTask extends ScheduledTask {
+  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+    super(context, {
+      ...options,
+      cron: '0 12 * * 1',
+    });
+  }
 
-  const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
+  public async run() {
+    const { client } = container;
 
-  await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
+    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
+
+    await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
                             \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
+  }
+}
+
+declare module '@sapphire/plugin-scheduled-tasks' {
+  interface ScheduledTasks {
+    cron: never;
+  }
 }
