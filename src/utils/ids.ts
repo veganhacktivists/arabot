@@ -79,4 +79,4 @@ if (process.env.DEVELOPMENT === 'true') {
   IDs = devIDs;
 }
 
-export default { IDs };
+export default IDs;
