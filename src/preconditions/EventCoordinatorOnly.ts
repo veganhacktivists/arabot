@@ -26,31 +26,31 @@ import type {
 } from 'discord.js';
 import IDs from '../utils/ids';
 
-export class ModOnlyPrecondition extends AllFlowsPrecondition {
+export class EventCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
-    return this.checkMod(message.member!);
+    return this.checkEventCoordinator(message.member!);
   }
 
   public override async chatInputRun(interaction: CommandInteraction) {
     // for slash command
-    return this.checkMod(interaction.member! as GuildMember);
+    return this.checkEventCoordinator(interaction.member! as GuildMember);
   }
 
   public override async contextMenuRun(interaction: ContextMenuInteraction) {
     // for context menu command
-    return this.checkMod(interaction.member! as GuildMember);
+    return this.checkEventCoordinator(interaction.member! as GuildMember);
   }
 
-  private async checkMod(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.staff.moderator)
+  private async checkEventCoordinator(user: GuildMember) {
+    return user.roles.cache.has(IDs.roles.staff.eventCoordinator)
       ? this.ok()
-      : this.error({ message: 'Only moderators can run this command!' });
+      : this.error({ message: 'Only event coordinators can run this command!' });
   }
 }
 
 declare module '@sapphire/framework' {
   interface Preconditions {
-    ModOnly: never;
+    EventCoordinatorOnly: never;
   }
 }
