@@ -19,7 +19,7 @@
 
 import type { GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
-import { IDs } from './ids';
+import IDs from './ids';
 
 // Checks if the user exists on the database
 export async function userExists(user: GuildMember) {
