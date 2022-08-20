@@ -52,7 +52,7 @@ export class N1984Command extends Command {
 
     // Creates the embed for the 1984 reaction
     // Add a 1 in 1000 chance of Dantas literally making ARA 1984
-    const random1984 = Math.random() < 0.001 ? 'https://tenor.com/view/arthuria-dantas-dancing-dantas-woke-weebs-gif-18773803'
+    const random1984 = Math.random() < 0.001 ? 'https://c.tenor.com/0BwU0BjWYX4AAAAC/arthuria-dantas.gif'
       : N1984[Math.floor(Math.random() * N1984.length)];
     const n1984Embed = new MessageEmbed()
       .setColor('#ffffff')
