@@ -60,10 +60,7 @@ const devIDs = {
     staff: {
       coordinators: '999431676058927254',
       standup: '999431676289622183',
-<<<<<<< HEAD
       verifiers: '999431677006860411',
-=======
->>>>>>> origin/main
     },
     diversity: {
       women: '999431679053660187',
