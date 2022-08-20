@@ -48,16 +48,19 @@ const devIDs = {
       restricted: '999431675123597407',
       moderator: '999431675123597408',
       verifier: '999431675123597406',
+      trialVerifier: '999431675123597405',
     },
     stageHost: '999431675123597411',
     patron: '999431675098447935',
     patreon: '999431675098447936',
     verifyingAsVegan: '999431675081666597',
+    verifyBlock: '1007477161835372574',
   },
   channels: {
     staff: {
       coordinators: '999431676058927254',
       standup: '999431676289622183',
+      verifiers: '999431677006860411',
     },
     diversity: {
       women: '999431679053660187',
@@ -67,6 +70,7 @@ const devIDs = {
     },
   },
   categories: {
+    verification: '999431677006860409',
     diversity: '999431679053660185',
   },
 };
