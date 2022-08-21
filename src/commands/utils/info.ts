@@ -19,7 +19,8 @@
 
 import { Command } from '@sapphire/framework';
 
-export class InfoCommand extends Command {
+class InfoCommand extends Command {
+  argMap: Map<string, string>;
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -41,7 +42,7 @@ export class InfoCommand extends Command {
   // Command run
   public async getInfo(interaction: Command.ChatInputInteraction) {
     const argument = interaction.options.getString('argument');
-    const argMap = new Map<string, string>([
+    this.argMap = new Map<string, string>([
       ['natural', 'Murder and rape are both natural. Does that mean they are okay?'],
       ['but I can', 'You could also probably kill a baby if you wanted to. Does that make it right?'],
       ['resources', 'Here are some resources compiled in a spreadsheet form! https://vegancheatsheet.org'],
@@ -74,3 +75,4 @@ export class InfoCommand extends Command {
     }
   }
 }
+export default InfoCommand;
