@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2022  Anthony Berg, Kate Fort
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
