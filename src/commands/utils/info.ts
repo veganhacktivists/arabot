@@ -21,7 +21,7 @@ import { Command } from '@sapphire/framework';
 
 class InfoCommand extends Command {
   argMap: Map<string, string>;
-  
+
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
