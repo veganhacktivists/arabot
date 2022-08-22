@@ -20,7 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import IDs from '../../utils/ids';
 
-export class StageHostCommand extends Command {
+class StageHostCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -98,3 +98,5 @@ export class StageHostCommand extends Command {
     });
   }
 }
+
+export default StageHostCommand;

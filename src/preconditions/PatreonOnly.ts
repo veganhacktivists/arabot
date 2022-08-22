@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '../utils/ids';
 
-export class PatreonOnlyPrecondition extends AllFlowsPrecondition {
+class PatreonOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
     return this.checkPatreon(message.member!);
@@ -54,3 +54,5 @@ declare module '@sapphire/framework' {
     PatreonOnly: never;
   }
 }
+
+export default PatreonOnlyPrecondition;

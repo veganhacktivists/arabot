@@ -23,7 +23,7 @@
 import { Listener } from '@sapphire/framework';
 import type { Client } from 'discord.js';
 
-export class ReadyListener extends Listener {
+class ReadyListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -37,3 +37,5 @@ export class ReadyListener extends Listener {
     this.container.logger.info(`Successfully logged in as ${username} (${id})`);
   }
 }
+
+export default ReadyListener;

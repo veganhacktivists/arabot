@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import IDs from '../../utils/ids';
 
-export class purgeVerifyingCommand extends Command {
+class PurgeVerifyingCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -129,3 +129,5 @@ export class purgeVerifyingCommand extends Command {
  */
   }
 }
+
+export default PurgeVerifyingCommand;

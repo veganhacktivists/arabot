@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '../utils/ids';
 
-export class DevCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
+class DevCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
     return this.checkDevCoordinator(message.member!);
@@ -54,3 +54,5 @@ declare module '@sapphire/framework' {
     DevCoordinatorOnly: never;
   }
 }
+
+export default DevCoordinatorOnlyPrecondition;

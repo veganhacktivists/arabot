@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { MessageEmbed } from 'discord.js';
 import { Hugs } from '../../utils/gifs';
 
-export class HugCommand extends Command {
+class HugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -65,3 +65,5 @@ export class HugCommand extends Command {
     await interaction.reply({ content: `<@${user.id}>`, embeds: [hugEmbed], fetchReply: true });
   }
 }
+
+export default HugCommand;

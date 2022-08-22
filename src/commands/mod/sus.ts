@@ -127,7 +127,7 @@ async function deactivateAllNotes(userId: string) {
 }
 
 // Main command
-export class SusCommand extends Command {
+class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
       name: 'sus',
@@ -557,3 +557,5 @@ export class SusCommand extends Command {
     await userGuildMember!.roles.remove(IDs.roles.restrictions.sus);
   }
 }
+
+export default SusCommand;
