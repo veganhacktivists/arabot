@@ -27,7 +27,7 @@ export async function userExists(user: GuildMember) {
   const prisma = new PrismaClient();
 
   // Counts if the user is on the database by their snowflake
-  const userExists = await prisma.user.count({
+  const userQuery = await prisma.user.count({
     where: {
       id: user.id,
     },
@@ -37,10 +37,7 @@ export async function userExists(user: GuildMember) {
   await prisma.$disconnect();
 
   // If the user is found on the database, then return true, otherwise, false.
-  if (userExists > 0) {
-    return true;
-  }
-  return false;
+  return userQuery > 0;
 }
 
 // Adds the user to the database if they were already on the server before the bot/database
@@ -49,14 +46,14 @@ export async function addExistingUser(user: GuildMember) {
   const prisma = new PrismaClient();
 
   // Counts if the user is on the database by their snowflake
-  const userExists = await prisma.user.count({
+  const userQuery = await prisma.user.count({
     where: {
       id: user.id,
     },
   });
 
   // If the user is already in the database
-  if (userExists > 0) {
+  if (userQuery > 0) {
     return;
   }
 

@@ -52,16 +52,18 @@ class ToggleOpenCommand extends Command {
     // Checks what subcommand was run
     switch (subcommand) {
       case 'toggleopen': {
-        return await this.toggleOpen(interaction);
+        await this.toggleOpen(interaction);
+        return;
+      }
+      default: {
+        // If subcommand is invalid
+        await interaction.reply({
+          content: 'Invalid sub command!',
+          ephemeral: true,
+          fetchReply: true,
+        });
       }
     }
-
-    // If subcommand is invalid
-    await interaction.reply({
-      content: 'Invalid sub command!',
-      ephemeral: true,
-      fetchReply: true,
-    });
   }
 
   // Command run

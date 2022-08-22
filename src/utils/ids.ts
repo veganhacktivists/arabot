@@ -19,6 +19,7 @@
 
 import devIDs from './devIDs';
 
+// eslint-disable-next-line import/no-mutable-exports
 let IDs = {
   roles: {
     trusted: '731563158011117590',
