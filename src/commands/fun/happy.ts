@@ -27,7 +27,6 @@ export class HappyCommand extends Command {
       ...options,
       name: 'happy',
       description: 'Express your happiness',
-      preconditions: [['CoordinatorOnly', 'PatreonOnly']],
     });
   }
 
