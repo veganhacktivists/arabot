@@ -58,9 +58,15 @@ let IDs = {
     verifyingAsVegan: '854725899576279060',
   },
   channels: {
+    information: {
+      news: '866000393259319306',
+    },
     staff: {
       coordinators: '1006240682505142354',
       standup: '996009201237233684',
+    },
+    nonVegan: {
+      general: '798967615636504657',
     },
     diversity: {
       women: '938808963544285324',

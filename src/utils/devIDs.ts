@@ -57,10 +57,16 @@ const devIDs = {
     verifyBlock: '1007477161835372574',
   },
   channels: {
+    information: {
+      news: '999431676058927247',
+    },
     staff: {
       coordinators: '999431676058927254',
       standup: '999431676289622183',
       verifiers: '999431677006860411',
+    },
+    nonVegan: {
+      general: '999431677325615189',
     },
     diversity: {
       women: '999431679053660187',
