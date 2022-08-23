@@ -19,12 +19,12 @@
 
 import { container, Listener } from '@sapphire/framework';
 import type {
-  VoiceChannel,
   CategoryChannel,
-  VoiceState,
-  TextChannel,
-  GuildMember,
   ColorResolvable,
+  GuildMember,
+  TextChannel,
+  VoiceChannel,
+  VoiceState,
 } from 'discord.js';
 import {
   ButtonInteraction,
@@ -33,7 +33,7 @@ import {
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
-import { maxVCs } from '../../utils/verificationConfig';
+import { maxVCs, questionInfo } from '../../utils/verificationConfig';
 import { joinVerification, startVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
@@ -111,7 +111,8 @@ class VerificationJoinVCListener extends Listener {
       verifier = true;
     } else {
       await channel.setName(`${member.displayName} - Verification`);
-      await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\nIf you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.`);
+      await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\n`
+      + 'If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you\'d like to verify as a vegan again, you\'d have to contact a Mod, which could be done via ModMail.');
       // Adds to the database that the user joined verification
       await joinVerification(member, channel.id);
     }
@@ -230,7 +231,7 @@ class VerificationJoinVCListener extends Listener {
     const embedColor = '#0099ff';
     const { displayName } = user;
     console.log(displayName); // TODO remove this - literally just used to shut up TypeScript
-    let info = {
+    const info = {
       page: 0,
       find: {
         reason: 0,
@@ -250,61 +251,12 @@ class VerificationJoinVCListener extends Listener {
     };
 
     // TODO add a variable that tells if each order has a reversed value, e.g. 0-3 or 3-0
-    const questionInfo = [
-      {
-        question: 'Welcome to Animal Rights Advocates! How did you find the server?',
-        buttons: [
-          'Friend',
-          'YouTube',
-          'Another Server',
-          'Vegan Org',
-        ],
-      },
-      {
-        question: 'How long have you been vegan?',
-        buttons: [
-          '<1 month',
-          '1-2 months',
-          '3-6 months',
-          '6 months – 1 year',
-          '1-2 years',
-          '2+ years',
-        ],
-      },
-      {
-        question: 'Ask the user why they went vegan and to define veganism.\n'
-          + 'Do they cite ethical concerns and abstinence from at least meat, dairy, eggs, leather, and fur?',
-        buttons: [
-          'Yes',
-          'Yes with prompting',
-          'No',
-        ],
-      },
-      {
-        question: 'Ask the user about their life as a vegan, including things like watching documentaries or social media content and interactions with family and friends. What are their stories like?',
-        buttons: [
-          'Believable',
-          'Unbelievable',
-          'Short',
-        ],
-      },
-      {
-        question: 'Ask the user about food and nutrition. Do they seem to know how to live as a vegan?',
-        buttons: [
-          'Dietitian / Chef',
-          'Acceptable',
-          'Salads / Smoothies',
-          'No clue',
-        ],
-      },
-    ];
+    const questionLength = questionInfo.length;
 
     // Create an embeds for each page
-    /*
-    const initialEmbed = new MessageEmbed()
+    const veganEmbed = new MessageEmbed()
       .setColor(embedColor)
       .setTitle(`Do you think ${displayName} is definitely vegan?`);
-     */
 
     const activistEmbed = new MessageEmbed()
       .setColor(embedColor)
@@ -318,7 +270,7 @@ class VerificationJoinVCListener extends Listener {
     const vegCuriousEmbed = new MessageEmbed()
       .setColor(embedColor)
       .setTitle('Should this user get Veg Curious?');
-
+     */
 
     // Create buttons to delete or cancel the deletion
     const initialButtons = new MessageActionRow<MessageButton>()
@@ -332,7 +284,6 @@ class VerificationJoinVCListener extends Listener {
           .setLabel('No')
           .setStyle(Constants.MessageButtonStyles.DANGER),
       );
-     */
 
     const activistButtons = new MessageActionRow<MessageButton>()
       .addComponents(
@@ -376,8 +327,8 @@ class VerificationJoinVCListener extends Listener {
       );
      */
 
-    const embed = await this.createEmbed(questionInfo[0].question, embedColor);
-    const buttons = await this.createButtons(questionInfo[0].buttons);
+    let embed = await this.createEmbed(questionInfo[0].question, embedColor);
+    let buttons = await this.createButtons(questionInfo[0].buttons);
 
     // Sends the note to verify this note is to be deleted
     const message = await channel.send({
@@ -387,12 +338,42 @@ class VerificationJoinVCListener extends Listener {
 
     // Listen for the button presses
     const collector = channel.createMessageComponentCollector({
-      max: 2, // Maximum of 1 button press
+      // max: 2, // Maximum of 1 button press
     });
 
     // Button pressed
     collector.on('collect', async (button: ButtonInteraction) => {
       // Select roles
+      if (button.customId.includes('button')) {
+        await button.deferUpdate();
+        /*
+        const buttonChoice = button.customId.at(button.customId.length - 1);
+        switch (buttonChoice) {
+          case 1: {
+            info.length = buttonChoice;
+            break;
+          }
+          case 2: {
+
+          }
+        }
+       */
+        info.page += 1;
+        // Checks if finished all the questions
+        if (info.page < questionLength) {
+          embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
+          buttons = await this.createButtons(questionInfo[info.page].buttons);
+          await message.edit({
+            embeds: [embed],
+            components: [buttons],
+          });
+        } else {
+          await message.edit({
+            embeds: [veganEmbed],
+            components: [initialButtons],
+          });
+        }
+      }
       // Definitely vegan?
       if (button.customId === `yesVegan${id}`) {
         await button.deferUpdate();
@@ -414,11 +395,9 @@ class VerificationJoinVCListener extends Listener {
   }
 
   private async createEmbed(title: string, color: ColorResolvable) {
-    const embed = new MessageEmbed()
+    return new MessageEmbed()
       .setColor(color)
       .setTitle(title);
-
-    return embed;
   }
 
   private async createButtons(buttons: string[]) {
