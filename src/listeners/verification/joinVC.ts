@@ -24,6 +24,7 @@ import type {
   VoiceState,
   TextChannel,
   GuildMember,
+  ColorResolvable,
 } from 'discord.js';
 import {
   ButtonInteraction,
@@ -36,7 +37,7 @@ import { maxVCs } from '../../utils/verificationConfig';
 import { joinVerification, startVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
-export default class VerificationJoinVCListener extends Listener {
+class VerificationJoinVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -228,6 +229,7 @@ export default class VerificationJoinVCListener extends Listener {
   ) {
     const embedColor = '#0099ff';
     const { displayName } = user;
+    console.log(displayName); // TODO remove this - literally just used to shut up TypeScript
     let info = {
       page: 0,
       find: {
@@ -247,10 +249,62 @@ export default class VerificationJoinVCListener extends Listener {
       },
     };
 
+    // TODO add a variable that tells if each order has a reversed value, e.g. 0-3 or 3-0
+    const questionInfo = [
+      {
+        question: 'Welcome to Animal Rights Advocates! How did you find the server?',
+        buttons: [
+          'Friend',
+          'YouTube',
+          'Another Server',
+          'Vegan Org',
+        ],
+      },
+      {
+        question: 'How long have you been vegan?',
+        buttons: [
+          '<1 month',
+          '1-2 months',
+          '3-6 months',
+          '6 months – 1 year',
+          '1-2 years',
+          '2+ years',
+        ],
+      },
+      {
+        question: 'Ask the user why they went vegan and to define veganism.\n'
+          + 'Do they cite ethical concerns and abstinence from at least meat, dairy, eggs, leather, and fur?',
+        buttons: [
+          'Yes',
+          'Yes with prompting',
+          'No',
+        ],
+      },
+      {
+        question: 'Ask the user about their life as a vegan, including things like watching documentaries or social media content and interactions with family and friends. What are their stories like?',
+        buttons: [
+          'Believable',
+          'Unbelievable',
+          'Short',
+        ],
+      },
+      {
+        question: 'Ask the user about food and nutrition. Do they seem to know how to live as a vegan?',
+        buttons: [
+          'Dietitian / Chef',
+          'Acceptable',
+          'Salads / Smoothies',
+          'No clue',
+        ],
+      },
+    ];
+
     // Create an embeds for each page
+    /*
     const initialEmbed = new MessageEmbed()
       .setColor(embedColor)
       .setTitle(`Do you think ${displayName} is definitely vegan?`);
+     */
 
     const activistEmbed = new MessageEmbed()
       .setColor(embedColor)
@@ -264,7 +318,7 @@ export default class VerificationJoinVCListener extends Listener {
     const vegCuriousEmbed = new MessageEmbed()
       .setColor(embedColor)
       .setTitle('Should this user get Veg Curious?');
-     */
+
 
     // Create buttons to delete or cancel the deletion
     const initialButtons = new MessageActionRow<MessageButton>()
@@ -278,6 +332,7 @@ export default class VerificationJoinVCListener extends Listener {
           .setLabel('No')
           .setStyle(Constants.MessageButtonStyles.DANGER),
       );
+     */
 
     const activistButtons = new MessageActionRow<MessageButton>()
       .addComponents(
@@ -321,10 +376,13 @@ export default class VerificationJoinVCListener extends Listener {
       );
      */
 
+    const embed = await this.createEmbed(questionInfo[0].question, embedColor);
+    const buttons = await this.createButtons(questionInfo[0].buttons);
+
     // Sends the note to verify this note is to be deleted
     const message = await channel.send({
-      embeds: [initialEmbed],
-      components: [initialButtons],
+      embeds: [embed],
+      components: [buttons],
     });
 
     // Listen for the button presses
@@ -354,4 +412,30 @@ export default class VerificationJoinVCListener extends Listener {
       }
     });
   }
+
+  private async createEmbed(title: string, color: ColorResolvable) {
+    const embed = new MessageEmbed()
+      .setColor(color)
+      .setTitle(title);
+
+    return embed;
+  }
+
+  private async createButtons(buttons: string[]) {
+    const buttonAction = new MessageActionRow<MessageButton>();
+
+    for (let i = 0; i < buttons.length; i += 1) {
+      buttonAction
+        .addComponents(
+          new MessageButton()
+            .setCustomId(`button${i}`)
+            .setLabel(buttons[i])
+            .setStyle(Constants.MessageButtonStyles.SECONDARY),
+        );
+    }
+
+    return buttonAction;
+  }
 }
+
+export default VerificationJoinVCListener;
