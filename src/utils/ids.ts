@@ -19,6 +19,7 @@
 
 import devIDs from './devIDs';
 
+// eslint-disable-next-line import/no-mutable-exports
 let IDs = {
   roles: {
     trusted: '731563158011117590',
@@ -59,10 +60,16 @@ let IDs = {
     verifyBlock: '',
   },
   channels: {
+    information: {
+      news: '866000393259319306',
+    },
     staff: {
       coordinators: '1006240682505142354',
       standup: '996009201237233684',
       verifiers: '873215538627756072',
+    },
+    nonVegan: {
+      general: '798967615636504657',
     },
     diversity: {
       women: '938808963544285324',

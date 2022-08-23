@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '../utils/ids';
 
-export class DiversityCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
+class DiversityCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
     return this.checkDiversityCoordinator(message.member!);
@@ -54,3 +54,5 @@ declare module '@sapphire/framework' {
     DiversityCoordinatorOnly: never;
   }
 }
+
+export default DiversityCoordinatorOnlyPrecondition;
