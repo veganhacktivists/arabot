@@ -346,19 +346,39 @@ class VerificationJoinVCListener extends Listener {
       // Select roles
       if (button.customId.includes('button')) {
         await button.deferUpdate();
-        /*
-        const buttonChoice = button.customId.at(button.customId.length - 1);
-        switch (buttonChoice) {
-          case 1: {
-            info.length = buttonChoice;
-            break;
-          }
-          case 2: {
-
+        // Get the button choice
+        const buttonChoice = this.getButtonValue(button.customId);
+        if (!isNaN(buttonChoice)) {
+          // Set the value of the button choice to the page the question was on
+          switch (info.page) {
+            case 0: {
+              info.find.reason = buttonChoice;
+              break;
+            }
+            case 1: {
+              info.length = buttonChoice;
+              break;
+            }
+            case 2: {
+              info.reasoning = buttonChoice;
+              break;
+            }
+            case 3: {
+              info.life = buttonChoice;
+              break;
+            }
+            case 4: {
+              info.food = buttonChoice;
+              break;
+            }
+            default: {
+              console.error('Button clicked out of range');
+              break;
+            }
           }
         }
-       */
         info.page += 1;
+        console.log(info);
         // Checks if finished all the questions
         if (info.page < questionLength) {
           embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
@@ -414,6 +434,15 @@ class VerificationJoinVCListener extends Listener {
     }
 
     return buttonAction;
+  }
+
+  // Finds the value of the choice in the butotn
+  private getButtonValue(button: string) {
+    const buttonChoice = button.at(button.length - 1);
+    if (buttonChoice === undefined) {
+      return NaN;
+    }
+    return parseInt(buttonChoice, 10);
   }
 }
 
