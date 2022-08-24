@@ -269,7 +269,7 @@ class VerificationJoinVCListener extends Listener {
         await button.deferUpdate();
         // Get the button choice
         const buttonChoice = this.getButtonValue(button.customId);
-        if (isNaN(buttonChoice)) {
+        if (Number.isNaN(buttonChoice)) {
           return;
         }
         // Set the value of the button choice to the page the question was on
