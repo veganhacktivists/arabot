@@ -230,7 +230,6 @@ class VerificationJoinVCListener extends Listener {
   ) {
     const embedColor = '#0099ff';
     const { displayName } = user;
-    console.log(displayName); // TODO remove this - literally just used to shut up TypeScript
     const info = {
       page: 0,
       find: {
@@ -333,7 +332,7 @@ class VerificationJoinVCListener extends Listener {
     // Sends the note to verify this note is to be deleted
     const message = await channel.send({
       embeds: [embed],
-      components: [buttons],
+      components: buttons,
     });
 
     // Listen for the button presses
@@ -378,14 +377,13 @@ class VerificationJoinVCListener extends Listener {
           }
         }
         info.page += 1;
-        console.log(info);
         // Checks if finished all the questions
         if (info.page < questionLength) {
           embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
           buttons = await this.createButtons(questionInfo[info.page].buttons);
           await message.edit({
             embeds: [embed],
-            components: [buttons],
+            components: buttons,
           });
         } else {
           await message.edit({
@@ -421,10 +419,14 @@ class VerificationJoinVCListener extends Listener {
   }
 
   private async createButtons(buttons: string[]) {
-    const buttonAction = new MessageActionRow<MessageButton>();
+    const buttonActions = [];
 
     for (let i = 0; i < buttons.length; i += 1) {
-      buttonAction
+      // Check if it exceeds the maximum buttons in a ActionRow
+      if (i % 5 === 0) {
+        buttonActions.push(new MessageActionRow<MessageButton>());
+      }
+      buttonActions[Math.floor(i / 5)]
         .addComponents(
           new MessageButton()
             .setCustomId(`button${i}`)
@@ -433,10 +435,10 @@ class VerificationJoinVCListener extends Listener {
         );
     }
 
-    return buttonAction;
+    return buttonActions;
   }
 
-  // Finds the value of the choice in the butotn
+  // Finds the value of the choice in the button
   private getButtonValue(button: string) {
     const buttonChoice = button.at(button.length - 1);
     if (buttonChoice === undefined) {

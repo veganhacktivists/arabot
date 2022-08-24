@@ -33,7 +33,7 @@ export const questionInfo = [
     question: 'How long have you been vegan?',
     buttons: [
       '<1 month',
-      // '1-2 months',
+      '1-2 months',
       '3-6 months',
       '6 months - 1 year',
       '1-2 years',
