@@ -23,6 +23,7 @@ export const questionInfo = [
   {
     question: 'Welcome to Animal Rights Advocates! How did you find the server?',
     buttons: [
+      'Search',
       'Friend',
       'YouTube',
       'Another Server',
@@ -64,6 +65,73 @@ export const questionInfo = [
       'Acceptable',
       'Salads / Smoothies',
       'No clue',
+    ],
+  },
+  {
+    question: 'Do you think this user is definitely vegan?',
+    buttons: [
+      'Yes',
+      'No',
+    ],
+  },
+  {
+    question: 'Offer to ask questions for Activist. Do you think they should get it?',
+    buttons: [
+      'Yes',
+      'No',
+    ],
+  },
+  {
+    question: 'Do some activism, asking Activist questions. Now which role should they get?',
+    buttons: [
+      'Vegan',
+      'Convinced',
+      'Non-vegan',
+    ],
+  },
+  {
+    question: 'Should this user get Veg Curious?',
+    buttons: [
+      'Yes',
+      'No',
+    ],
+  },
+];
+
+export const serverFind = [
+  // From a friend
+  {
+    question: 'Ask for username and indicate',
+    buttons: [
+      'Vegan',
+      'Non-Vegan',
+      'Unknown',
+    ],
+  },
+  // From a video
+  {
+    question: 'Ask what video',
+    buttons: [
+      'Troll video',
+      'Our content',
+      'Other',
+    ],
+  },
+  // From another server
+  {
+    question: 'Ask which server',
+    buttons: [
+      'Vegan',
+      'Debate',
+      'Other',
+    ],
+  },
+  // From a vegan organisation
+  {
+    question: 'Ask which one',
+    buttons: [
+      'Vegan Hacktivists',
+      'Other',
     ],
   },
 ];

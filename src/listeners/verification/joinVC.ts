@@ -21,7 +21,6 @@ import { container, Listener } from '@sapphire/framework';
 import type {
   CategoryChannel,
   ColorResolvable,
-  GuildMember,
   TextChannel,
   VoiceChannel,
   VoiceState,
@@ -33,7 +32,7 @@ import {
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
-import { maxVCs, questionInfo } from '../../utils/verificationConfig';
+import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
 import { joinVerification, startVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
@@ -148,7 +147,7 @@ class VerificationJoinVCListener extends Listener {
       await verificationText.send(`${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
 
-      await this.verificationProcess(member, verificationText, channel.id);
+      await this.verificationProcess(verificationText);
     }
 
     // Create a new channel for others to join
@@ -224,12 +223,9 @@ class VerificationJoinVCListener extends Listener {
   }
 
   private async verificationProcess(
-    user: GuildMember,
     channel: TextChannel,
-    id: string,
   ) {
     const embedColor = '#0099ff';
-    const { displayName } = user;
     const info = {
       page: 0,
       find: {
@@ -252,80 +248,6 @@ class VerificationJoinVCListener extends Listener {
     // TODO add a variable that tells if each order has a reversed value, e.g. 0-3 or 3-0
     const questionLength = questionInfo.length;
 
-    // Create an embeds for each page
-    const veganEmbed = new MessageEmbed()
-      .setColor(embedColor)
-      .setTitle(`Do you think ${displayName} is definitely vegan?`);
-
-    const activistEmbed = new MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Offer to ask questions for Activist. Do you think they should get it?');
-
-    const noActivistEmbed = new MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Do some activism, asking Activist questions. Now which role should they get?');
-
-    /*
-    const vegCuriousEmbed = new MessageEmbed()
-      .setColor(embedColor)
-      .setTitle('Should this user get Veg Curious?');
-     */
-
-    // Create buttons to delete or cancel the deletion
-    const initialButtons = new MessageActionRow<MessageButton>()
-      .addComponents(
-        new MessageButton()
-          .setCustomId(`yesVegan${id}`)
-          .setLabel('Yes')
-          .setStyle(Constants.MessageButtonStyles.SUCCESS),
-        new MessageButton()
-          .setCustomId(`noVegan${id}`)
-          .setLabel('No')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-      );
-
-    const activistButtons = new MessageActionRow<MessageButton>()
-      .addComponents(
-        new MessageButton()
-          .setCustomId(`yesActivist${id}`)
-          .setLabel('Yes')
-          .setStyle(Constants.MessageButtonStyles.SUCCESS),
-        new MessageButton()
-          .setCustomId(`noActivist${id}`)
-          .setLabel('No')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-      );
-
-    const noActivistButtons = new MessageActionRow<MessageButton>()
-      .addComponents(
-        new MessageButton()
-          .setCustomId(`vegan${id}`)
-          .setLabel('Vegan')
-          .setStyle(Constants.MessageButtonStyles.SUCCESS),
-        new MessageButton()
-          .setCustomId(`convinced${id}`)
-          .setLabel('Convinced')
-          .setStyle(Constants.MessageButtonStyles.SECONDARY),
-        new MessageButton()
-          .setCustomId(`notVegan${id}`)
-          .setLabel('Non-vegan')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-      );
-
-    /*
-    const vegCuriousButtons = new MessageActionRow<MessageButton>()
-      .addComponents(
-        new MessageButton()
-          .setCustomId(`yesVegCurious${id}`)
-          .setLabel('Yes')
-          .setStyle(Constants.MessageButtonStyles.SUCCESS),
-        new MessageButton()
-          .setCustomId(`noVegCurious${id}`)
-          .setLabel('No')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-      );
-     */
-
     let embed = await this.createEmbed(questionInfo[0].question, embedColor);
     let buttons = await this.createButtons(questionInfo[0].buttons);
 
@@ -347,33 +269,79 @@ class VerificationJoinVCListener extends Listener {
         await button.deferUpdate();
         // Get the button choice
         const buttonChoice = this.getButtonValue(button.customId);
-        if (!isNaN(buttonChoice)) {
-          // Set the value of the button choice to the page the question was on
-          switch (info.page) {
-            case 0: {
-              info.find.reason = buttonChoice;
-              break;
+        if (isNaN(buttonChoice)) {
+          return;
+        }
+        // Set the value of the button choice to the page the question was on
+        switch (info.page) {
+          case 0: {
+            info.find.reason = buttonChoice;
+            if (buttonChoice !== 0) {
+              embed = await this.createEmbed(serverFind[info.page].question, embedColor);
+              buttons = await this.createButtons(serverFind[info.page].buttons);
+              await message.edit({
+                embeds: [embed],
+                components: buttons,
+              });
+              return;
             }
-            case 1: {
-              info.length = buttonChoice;
-              break;
+            if (info.find.reason !== 0) {
+              info.find.where = buttonChoice;
             }
-            case 2: {
-              info.reasoning = buttonChoice;
-              break;
+            break;
+          }
+          case 1: {
+            info.length = buttonChoice;
+            break;
+          }
+          case 2: {
+            info.reasoning = buttonChoice;
+            break;
+          }
+          case 3: {
+            info.life = buttonChoice;
+            break;
+          }
+          case 4: {
+            info.food = buttonChoice;
+            break;
+          }
+          // If they are definitely vegan or not
+          case 5: {
+            if (buttonChoice === 0) {
+              info.roles.vegan = true;
+              info.roles.trusted = true;
+            } else {
+              info.page += 1;
             }
-            case 3: {
-              info.life = buttonChoice;
-              break;
+            break;
+          }
+          // If they are vegan but should get activist role
+          case 6: {
+            if (buttonChoice === 0) {
+              info.roles.activist = true;
             }
-            case 4: {
-              info.food = buttonChoice;
-              break;
+            info.page += 1;
+            break;
+          }
+          // If they should get vegan, convinced or non-vegan
+          case 7: {
+            if (buttonChoice === 0) {
+              info.roles.vegan = true;
+            } else if (buttonChoice === 1) {
+              info.roles.convinced = true;
             }
-            default: {
-              console.error('Button clicked out of range');
-              break;
+            break;
+          }
+          case 8: {
+            if (buttonChoice === 0) {
+              info.roles.vegCurious = true;
             }
+            break;
+          }
+          default: {
+            console.error('Button clicked out of range');
+            return;
           }
         }
         info.page += 1;
@@ -385,29 +353,7 @@ class VerificationJoinVCListener extends Listener {
             embeds: [embed],
             components: buttons,
           });
-        } else {
-          await message.edit({
-            embeds: [veganEmbed],
-            components: [initialButtons],
-          });
         }
-      }
-      // Definitely vegan?
-      if (button.customId === `yesVegan${id}`) {
-        await button.deferUpdate();
-        info.roles.vegan = true;
-        await message.edit({
-          embeds: [activistEmbed],
-          components: [activistButtons],
-        });
-      }
-      // Not as vegan
-      if (button.customId === `noVegan${id}`) {
-        await button.deferUpdate();
-        await message.edit({
-          embeds: [noActivistEmbed],
-          components: [noActivistButtons],
-        });
       }
     });
   }
