@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
 
-export class ToggleOpenCommand extends Command {
+class ToggleOpenCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -52,16 +52,18 @@ export class ToggleOpenCommand extends Command {
     // Checks what subcommand was run
     switch (subcommand) {
       case 'toggleopen': {
-        return await this.toggleOpen(interaction);
+        await this.toggleOpen(interaction);
+        return;
+      }
+      default: {
+        // If subcommand is invalid
+        await interaction.reply({
+          content: 'Invalid sub command!',
+          ephemeral: true,
+          fetchReply: true,
+        });
       }
     }
-
-    // If subcommand is invalid
-    await interaction.reply({
-      content: 'Invalid sub command!',
-      ephemeral: true,
-      fetchReply: true,
-    });
   }
 
   // Command run
@@ -123,3 +125,5 @@ export class ToggleOpenCommand extends Command {
     });
   }
 }
+
+export default ToggleOpenCommand;

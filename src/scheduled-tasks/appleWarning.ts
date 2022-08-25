@@ -15,28 +15,29 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '../utils/ids';
 
-class StandupTask extends ScheduledTask {
+class AppleWarningTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      cron: '0 12 * * 1',
+      cron: '0 */2 * * 2-3',
     });
   }
 
   public async run() {
     const { client } = container;
 
-    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
+    const channel = client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel;
 
-    await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
-                            \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
+    await channel.send('Hiya everyone, this is a warning to all **Apple users**!\n'
+      + 'Make sure to update your iOS, iPadOS and MacOS as there is a hack that lets anyone get remote access to your device if you click on a malicious link.\n'
+      + `For more information, read the post in <#${IDs.channels.information.news}>`);
   }
 }
 
@@ -46,4 +47,4 @@ declare module '@sapphire/plugin-scheduled-tasks' {
   }
 }
 
-export default StandupTask;
+export default AppleWarningTask;

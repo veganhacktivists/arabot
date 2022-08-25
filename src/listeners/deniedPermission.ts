@@ -20,7 +20,7 @@
 import type { UserError, ChatInputCommandDeniedPayload } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 
-export class CommandDeniedListener extends Listener {
+class CommandDeniedListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -33,3 +33,5 @@ export class CommandDeniedListener extends Listener {
     return interaction.reply(error.message);
   }
 }
+
+export default CommandDeniedListener;

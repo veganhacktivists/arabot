@@ -59,7 +59,7 @@ async function findNotes(userId: string, active: boolean) {
   const prisma = new PrismaClient();
 
   // Query to get the specific user's sus notes
-  const getNote = await prisma.sus.findMany({
+  const note = await prisma.sus.findMany({
     where: {
       userId,
       active,
@@ -68,7 +68,7 @@ async function findNotes(userId: string, active: boolean) {
 
   // Close the database connection
   await prisma.$disconnect();
-  return getNote;
+  return note;
 }
 
 // Get one note from the id
@@ -77,7 +77,7 @@ async function getNote(noteId: number) {
   const prisma = new PrismaClient();
 
   // Query to get the specific user's sus notes
-  const getNote = await prisma.sus.findUnique({
+  const note = await prisma.sus.findUnique({
     where: {
       id: noteId,
     },
@@ -85,7 +85,7 @@ async function getNote(noteId: number) {
 
   // Close the database connection
   await prisma.$disconnect();
-  return getNote;
+  return note;
 }
 
 async function deactivateNote(noteId: number) {
@@ -127,7 +127,7 @@ async function deactivateAllNotes(userId: string) {
 }
 
 // Main command
-export class SusCommand extends Command {
+class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
       name: 'sus',
@@ -182,29 +182,34 @@ export class SusCommand extends Command {
     // Checks what subcommand was run
     switch (subcommand) {
       case 'add': {
-        return await this.addNote(interaction);
+        await this.addNote(interaction);
+        return;
       }
       case 'view': {
-        return await this.listNote(interaction);
+        await this.listNote(interaction);
+        return;
       }
       case 'remove': {
-        return await this.removeNote(interaction);
+        await this.removeNote(interaction);
+        return;
       }
       case 'purge': {
-        return await this.removeAllNotes(interaction);
+        await this.removeAllNotes(interaction);
+        return;
+      }
+      default: {
+        // If subcommand is invalid
+        await interaction.reply({
+          content: 'Invalid sub command!',
+          ephemeral: true,
+          fetchReply: true,
+        });
       }
     }
-
-    // If subcommand is invalid
-    await interaction.reply({
-      content: 'Invalid sub command!',
-      ephemeral: true,
-      fetchReply: true,
-    });
   }
 
   // Subcommand to add sus note
-  public async addNote(interaction: Command.ChatInputInteraction) {
+  private async addNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let user = interaction.options.getUser('user');
     let note = interaction.options.getString('note');
@@ -261,7 +266,7 @@ export class SusCommand extends Command {
     });
   }
 
-  public async listNote(interaction: Command.ChatInputInteraction) {
+  private async listNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let user = interaction.options.getUser('user');
     const { guild } = interaction;
@@ -321,7 +326,7 @@ export class SusCommand extends Command {
     });
   }
 
-  public async removeNote(interaction: Command.ChatInputInteraction) {
+  private async removeNote(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     let noteId = interaction.options.getInteger('id');
     const { guild, channel } = interaction;
@@ -375,7 +380,7 @@ export class SusCommand extends Command {
       .setThumbnail(user!.avatarURL()!) // TODO avatar does not show when run
       .addField(
         `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note!.time.getTime() / 1000)}>`,
-          note!.note,
+        note!.note,
       );
 
     // Create buttons to delete or cancel the deletion
@@ -439,7 +444,7 @@ export class SusCommand extends Command {
     });
   }
 
-  public async removeAllNotes(interaction: Command.ChatInputInteraction) {
+  private async removeAllNotes(interaction: Command.ChatInputInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
@@ -557,3 +562,5 @@ export class SusCommand extends Command {
     await userGuildMember!.roles.remove(IDs.roles.restrictions.sus);
   }
 }
+
+export default SusCommand;
