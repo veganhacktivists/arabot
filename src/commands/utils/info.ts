@@ -99,17 +99,17 @@ class InfoCommand extends Command {
 
   // Command run
   public static async getInfo(interaction: Command.ChatInputInteraction) {
-    const argy = interaction.options.getString('argument');
-    if (argy === null) {
+    const response = interaction.options.getString('argument');
+    if (response === null) {
       await interaction.reply({
         content:
-          'Please choose a listed argument or talk to an activist for further questions!',
+          'Please choose a listed argument, or talk to an activist for further questions!',
         ephemeral: true,
         fetchReply: true,
       });
     } else {
       await interaction.reply({
-        content: `${argy}`,
+        content: `${response}`,
         ephemeral: false,
         fetchReply: true,
       });
