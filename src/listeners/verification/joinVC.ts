@@ -117,6 +117,15 @@ class VerificationJoinVCListener extends Listener {
       + 'If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you\'d like to verify as a vegan again, you\'d have to contact a Mod, which could be done via ModMail.');
       // Adds to the database that the user joined verification
       await joinVerification(channel.id, member);
+
+      // Remove all roles from the user
+      await member.roles.remove([
+        IDs.roles.vegan.vegan,
+        IDs.roles.trusted,
+        IDs.roles.nonvegan.nonvegan,
+        IDs.roles.nonvegan.convinced,
+        IDs.roles.nonvegan.vegCurious,
+      ]);
     }
 
     // Check how many voice channels there are
