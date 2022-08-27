@@ -57,10 +57,22 @@ model Verify {
   startTime   DateTime?
   finishTime  DateTime?
   timedOut    Boolean   @default(false) // If they got kicked out of verification because they timed out
-  //incomplete  Boolean   @default(false) // If the verification was incomplete
+  //complete  Boolean   @default(false) // If the verification was incomplete
+  // Roles they got from verification
   vegan       Boolean   @default(false) // If they got verified as a vegan
+  activist    Boolean   @default(false) // If they got the activist role when they verified
+  trusted     Boolean   @default(false) // If they got the trusted role when they verified
+  vegCurious  Boolean   @default(false) // If they got the Veg Curious role
+  convinced   Boolean   @default(false)
   text        Boolean   @default(false) // If they used text verification
   serverVegan Boolean   @default(false) // People that went vegan on the server
+  // Stats on verification
+  reason      Int?
+  where       Int?
+  length      Int?
+  reasoning   Int?
+  life        Int?
+  food        Int?
   notes       String?
 }
 

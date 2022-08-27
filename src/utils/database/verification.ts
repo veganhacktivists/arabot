@@ -21,7 +21,7 @@ import type { GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { updateUser } from './dbExistingUser';
 
-export async function joinVerification(user: GuildMember, channelId: string) {
+export async function joinVerification(channelId: string, user: GuildMember) {
   // Update the user on the database with the current roles they have
   await updateUser(user);
 
@@ -43,7 +43,7 @@ export async function joinVerification(user: GuildMember, channelId: string) {
   await prisma.$disconnect();
 }
 
-export async function startVerification(verifier: GuildMember, channelId: string) {
+export async function startVerification(channelId: string) {
   // Initialises Prisma Client
   const prisma = new PrismaClient();
 
@@ -52,11 +52,6 @@ export async function startVerification(verifier: GuildMember, channelId: string
       id: channelId,
     },
     data: {
-      verifier: {
-        connect: {
-          id: verifier.id,
-        },
-      },
       startTime: new Date(),
     },
   });
@@ -93,24 +88,26 @@ export async function getUser(channelId: string) {
 
 export async function finishVerification(
   channelId: string,
-  timedOut: boolean,
-  vegan: boolean,
-  text:boolean,
-  serverVegan: boolean,
+  info: {
+    page: number,
+    find: {
+      reason: number,
+      where: number
+    },
+    length: number,
+    reasoning: number,
+    life: number,
+    food: number,
+    roles: {
+      vegan: boolean,
+      activist: boolean,
+      trusted: boolean,
+      vegCurious: boolean,
+      convinced: boolean
+    } },
 ) {
   // Initialises Prisma Client
   const prisma = new PrismaClient();
-
-  /*
-  const user = await prisma.verify.findUnique({
-    where: {
-      id: channelId,
-    },
-    select: {
-      userId: true,
-    },
-  });
-   */
 
   // TODO potentially add an incomplete tracker?
   await prisma.verify.update({
@@ -118,36 +115,23 @@ export async function finishVerification(
       id: channelId,
     },
     data: {
-      timedOut,
-      vegan,
-      text,
-      serverVegan,
+      finishTime: new Date(),
+      // Roles
+      vegan: info.roles.vegan,
+      activist: info.roles.activist,
+      trusted: info.roles.trusted,
+      vegCurious: info.roles.vegCurious,
+      convinced: info.roles.convinced,
+      // Statistics
+      reason: info.find.reason,
+      where: info.find.where,
+      length: info.length,
+      reasoning: info.reasoning,
+      life: info.life,
+      food: info.food,
     },
   });
 
   // Close database connection
   await prisma.$disconnect();
-
-  // TODO add a way to give roles back after adding the new verification
-  /*
-  const roles = await fetchRoles(user!.userId);
-
-  if (roles === null) {
-    return;
-  }
-
-  // Give roles to the user
-  const giveRoles = [];
-  if (roles.trusted) {
-    giveRoles.push(IDs.roles.trusted);
-  }
-  if (roles.plus) {
-    giveRoles.push(IDs.roles.vegan.plus);
-  }
-  if (roles.vegCurious) {
-    giveRoles.push(IDs.roles.nonvegan.vegCurious);
-  }
-
-  await user.roles.add(giveRoles);
-  */
 }

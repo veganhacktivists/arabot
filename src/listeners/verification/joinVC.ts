@@ -24,6 +24,7 @@ import type {
   TextChannel,
   VoiceChannel,
   VoiceState,
+  GuildMember,
 } from 'discord.js';
 import {
   ButtonInteraction,
@@ -33,7 +34,7 @@ import {
   MessageEmbed,
 } from 'discord.js';
 import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
-import { joinVerification, startVerification } from '../../utils/database/verification';
+import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
 class VerificationJoinVCListener extends Listener {
@@ -93,7 +94,7 @@ class VerificationJoinVCListener extends Listener {
         return;
       }
 
-      await startVerification(member, channel.id);
+      await startVerification(channel.id);
       return;
     }
 
@@ -113,7 +114,7 @@ class VerificationJoinVCListener extends Listener {
       await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\n`
       + 'If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you\'d like to verify as a vegan again, you\'d have to contact a Mod, which could be done via ModMail.');
       // Adds to the database that the user joined verification
-      await joinVerification(member, channel.id);
+      await joinVerification(channel.id, member);
     }
 
     // Check how many voice channels there are
@@ -147,7 +148,7 @@ class VerificationJoinVCListener extends Listener {
       await verificationText.send(`${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
 
-      await this.verificationProcess(verificationText);
+      await this.verificationProcess(verificationText, channel.id, member);
     }
 
     // Create a new channel for others to join
@@ -224,6 +225,8 @@ class VerificationJoinVCListener extends Listener {
 
   private async verificationProcess(
     channel: TextChannel,
+    verId: string,
+    user: GuildMember,
   ) {
     const embedColor = '#0099ff';
     const info = {
@@ -354,6 +357,50 @@ class VerificationJoinVCListener extends Listener {
             components: buttons,
           });
         }
+        // Confirmation to give roles to the user being verified
+        if (info.page === questionLength) {
+          // Create embed with all the roles the user has
+          embed = new MessageEmbed()
+            .setColor(embedColor)
+            .setTitle(`Give these roles to ${user.displayName}?`)
+            .setThumbnail(user.avatarURL()!)
+            .addFields(
+              { name: 'Roles:', value: this.getTextRoles(info.roles) },
+            );
+
+          // Create buttons for input
+          buttons = [new MessageActionRow<MessageButton>()
+            .addComponents(
+              new MessageButton()
+                .setCustomId('confirm')
+                .setLabel('Yes')
+                .setStyle(Constants.MessageButtonStyles.SUCCESS),
+              new MessageButton()
+                .setCustomId('cancel')
+                .setLabel('No')
+                .setStyle(Constants.MessageButtonStyles.DANGER),
+            )];
+          await message.edit({
+            embeds: [embed],
+            components: buttons,
+          });
+        }
+      }
+      // Confirming and finishing the verification
+      if (button.customId === 'confirm' && info.page >= questionLength) {
+        await finishVerification(verId, info);
+        await this.giveRoles(user, info.roles);
+        embed = new MessageEmbed()
+          .setColor('#34c000')
+          .setTitle(`Successfully verified ${user.displayName}!`)
+          .setThumbnail(user.avatarURL()!)
+          .addFields(
+            { name: 'Roles:', value: this.getTextRoles(info.roles) },
+          );
+        await message.edit({
+          embeds: [embed],
+          components: [],
+        });
       }
     });
   }
@@ -391,6 +438,67 @@ class VerificationJoinVCListener extends Listener {
       return NaN;
     }
     return parseInt(buttonChoice, 10);
+  }
+
+  private getTextRoles(
+    roles: {
+      vegan: boolean,
+      activist: boolean,
+      trusted: boolean,
+      vegCurious: boolean,
+      convinced: boolean
+    },
+  ) {
+    let rolesText = '';
+    if (roles.convinced) {
+      rolesText += `<@&${IDs.roles.nonvegan.convinced}>`;
+    }
+    if (roles.vegan) {
+      rolesText += `<@&${IDs.roles.vegan.vegan}>`;
+    } else {
+      rolesText += `<@&${IDs.roles.nonvegan.nonvegan}>`;
+    }
+    if (roles.activist) {
+      rolesText += `<@&${IDs.roles.vegan.activist}>`;
+    }
+    if (roles.trusted) {
+      rolesText += `<@&${IDs.roles.trusted}>`;
+    }
+    if (roles.vegCurious) {
+      rolesText += `<@&${IDs.roles.nonvegan.vegCurious}>`;
+    }
+    return rolesText;
+  }
+
+  private async giveRoles(
+    user: GuildMember,
+    roles: {
+      vegan: boolean,
+      activist: boolean,
+      trusted: boolean,
+      vegCurious: boolean,
+      convinced: boolean
+    },
+  ) {
+    const rolesAdd = [];
+    if (roles.convinced) {
+      rolesAdd.push(IDs.roles.nonvegan.convinced);
+    }
+    if (roles.vegan) {
+      rolesAdd.push(IDs.roles.vegan.vegan);
+    } else {
+      rolesAdd.push(IDs.roles.nonvegan.nonvegan);
+    }
+    if (roles.activist) {
+      rolesAdd.push(IDs.roles.vegan.activist);
+    }
+    if (roles.trusted) {
+      rolesAdd.push(IDs.roles.trusted);
+    }
+    if (roles.vegCurious) {
+      rolesAdd.push(IDs.roles.nonvegan.vegCurious);
+    }
+    await user.roles.add(rolesAdd);
   }
 }
 
