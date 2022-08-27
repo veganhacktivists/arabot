@@ -25,6 +25,7 @@ import type {
   VoiceChannel,
   VoiceState,
   GuildMember,
+  Guild,
 } from 'discord.js';
 import {
   ButtonInteraction,
@@ -35,6 +36,7 @@ import {
 } from 'discord.js';
 import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
+import { userExists, addExistingUser } from '../../utils/database/dbExistingUser';
 import IDs from '../../utils/ids';
 
 class VerificationJoinVCListener extends Listener {
@@ -148,7 +150,7 @@ class VerificationJoinVCListener extends Listener {
       await verificationText.send(`${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
 
-      await this.verificationProcess(verificationText, channel.id, member);
+      await this.verificationProcess(verificationText, channel.id, member, guild);
     }
 
     // Create a new channel for others to join
@@ -227,6 +229,7 @@ class VerificationJoinVCListener extends Listener {
     channel: TextChannel,
     verId: string,
     user: GuildMember,
+    guild: Guild,
   ) {
     const embedColor = '#0099ff';
     const info = {
@@ -279,7 +282,7 @@ class VerificationJoinVCListener extends Listener {
         switch (info.page) {
           case 0: {
             info.find.reason = buttonChoice;
-            if (buttonChoice !== 0) {
+            if (buttonChoice !== 0 && info.find.reason === 0) {
               embed = await this.createEmbed(serverFind[info.page].question, embedColor);
               buttons = await this.createButtons(serverFind[info.page].buttons);
               await message.edit({
@@ -388,8 +391,22 @@ class VerificationJoinVCListener extends Listener {
       }
       // Confirming and finishing the verification
       if (button.customId === 'confirm' && info.page >= questionLength) {
-        await finishVerification(verId, info);
+        // Check verifier is on the database
+        const verifierGuildMember = await guild.members.cache.get(button.user.id);
+        if (verifierGuildMember === undefined) {
+          await message.edit({ content: 'Verifier not found!' });
+          return;
+        }
+        // Add verifier to database if they're not on the database
+        if (!(await userExists(verifierGuildMember))) {
+          await addExistingUser(verifierGuildMember);
+        }
+
+        // Add verification data to database
+        await finishVerification(verId, button.user.id, info);
+        // Give roles on Discord
         await this.giveRoles(user, info.roles);
+        // Add embed saying verification completed
         embed = new MessageEmbed()
           .setColor('#34c000')
           .setTitle(`Successfully verified ${user.displayName}!`)

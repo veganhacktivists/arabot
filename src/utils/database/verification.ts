@@ -88,6 +88,7 @@ export async function getUser(channelId: string) {
 
 export async function finishVerification(
   channelId: string,
+  verifierId: string,
   info: {
     page: number,
     find: {
@@ -115,6 +116,11 @@ export async function finishVerification(
       id: channelId,
     },
     data: {
+      verifier: {
+        connect: {
+          id: verifierId,
+        },
+      },
       finishTime: new Date(),
       // Roles
       vegan: info.roles.vegan,
