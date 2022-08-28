@@ -75,5 +75,5 @@ export const Wave = [
   'https://c.tenor.com/PBG8IAgoXvQAAAAi/hello-waving-frog.gif',
   'https://c.tenor.com/q2d-2wQ4qxQAAAAC/hello.gif',
   'https://c.tenor.com/pqqlX7Ha8PcAAAAC/hello-bob.gif',
-  'https://c.tenor.com/_CA1LzW9opoAAAAi/wumpus-wumpuswave.gif'
+  'https://c.tenor.com/_CA1LzW9opoAAAAi/wumpus-wumpuswave.gif',
 ];
