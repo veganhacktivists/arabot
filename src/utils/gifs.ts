@@ -68,3 +68,12 @@ export const N1984 = [
   'https://c.tenor.com/dcxOO-080OcAAAAd/discord-moderators.gif',
   'https://c.tenor.com/-cUS-fPIEBsAAAAd/5second-slow-mode-1984.gif',
 ];
+
+export const Wave = [
+  'https://c.tenor.com/Og0XNCa_vo8AAAAi/qoobee-hi.gif',
+  'https://c.tenor.com/DcDYpWonGbIAAAAi/budding-pop-cute.gif',
+  'https://c.tenor.com/PBG8IAgoXvQAAAAi/hello-waving-frog.gif',
+  'https://c.tenor.com/q2d-2wQ4qxQAAAAC/hello.gif',
+  'https://c.tenor.com/pqqlX7Ha8PcAAAAC/hello-bob.gif',
+  'https://c.tenor.com/_CA1LzW9opoAAAAi/wumpus-wumpuswave.gif'
+];
