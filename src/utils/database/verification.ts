@@ -141,3 +141,30 @@ export async function finishVerification(
   // Close database connection
   await prisma.$disconnect();
 }
+
+// Checks if verification was complete
+export async function checkFinish(channelId: string) {
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  // Get the snowflake of the user verifying
+  const finish = await prisma.verify.findUnique({
+    where: {
+      id: channelId,
+    },
+    select: {
+      finishTime: true,
+    },
+  });
+
+  // Close database connection
+  await prisma.$disconnect();
+
+  // Checks if query returned is null
+  if (finish === null) {
+    return false;
+  }
+
+  // Return if a finish time has been set meaning verification is complete
+  return finish.finishTime !== null;
+}

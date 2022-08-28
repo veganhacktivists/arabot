@@ -22,10 +22,10 @@ import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
 import { maxVCs } from '../../utils/verificationConfig';
-import { getUser } from '../../utils/database/verification';
+import { getUser, checkFinish } from '../../utils/database/verification';
 import IDs from '../../utils/ids';
 
-export class VerificationLeaveVCListener extends Listener {
+class VerificationLeaveVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -82,9 +82,14 @@ export class VerificationLeaveVCListener extends Listener {
        */
 
       // Remove verify as vegan and give non vegan role
-      if (!user.roles.cache.has(IDs.roles.vegan.vegan)) {
+      if (!await checkFinish(channel.id)) {
         await user.roles.remove(IDs.roles.verifyingAsVegan);
-        await user.roles.add(IDs.roles.nonvegan.nonvegan);
+        await user.roles.add([
+          IDs.roles.nonvegan.nonvegan,
+          IDs.roles.verifyBlock,
+        ]);
+        // @ts-ignore
+        this.container.tasks.create('verifyUnblock', { userId: user.id, guildId: guild.id }, 30000);
       }
     }
 
@@ -153,3 +158,5 @@ export class VerificationLeaveVCListener extends Listener {
     ]);
   }
 }
+
+export default VerificationLeaveVCListener;
