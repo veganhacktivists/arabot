@@ -27,17 +27,23 @@ export class VerifyUnblock extends ScheduledTask {
 
   public async run(payload: { userId: string, guildId: string }) {
     // Get the guild where the user is in
-    const guild = this.container.client.guilds.cache.get(payload.guildId);
+    let guild = this.container.client.guilds.cache.get(payload.guildId);
     if (guild === undefined) {
-      console.error('verifyUnblock: Guild not found!');
-      return;
+      guild = await this.container.client.guilds.fetch(payload.guildId);
+      if (guild === undefined) {
+        console.error('verifyUnblock: Guild not found!');
+        return;
+      }
     }
 
     // Find GuildMember for the user
-    const user = guild.members.cache.get(payload.userId);
+    let user = guild.members.cache.get(payload.userId);
     if (user === undefined) {
-      console.error('verifyUnblock: GuildMember not found!');
-      return;
+      user = await guild.members.fetch(payload.userId);
+      if (user === undefined) {
+        console.error('verifyUnblock: GuildMember not found!');
+        return;
+      }
     }
 
     // Remove the 'verify block' role
