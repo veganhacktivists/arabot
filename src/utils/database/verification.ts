@@ -168,3 +168,22 @@ export async function checkFinish(channelId: string) {
   // Return if a finish time has been set meaning verification is complete
   return finish.finishTime !== null;
 }
+
+// Counts how many times the user has not had a verifier join their VC before leaving
+export async function countIncomplete(userId: string) {
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  // Count how many times the user has not completed a verification
+  const incompleteCount = await prisma.verify.count({
+    where: {
+      userId,
+      finishTime: null,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+
+  return incompleteCount;
+}

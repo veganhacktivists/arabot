@@ -21,8 +21,9 @@ import { container, Listener } from '@sapphire/framework';
 import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
-import { maxVCs } from '../../utils/verificationConfig';
-import { getUser, checkFinish } from '../../utils/database/verification';
+import { maxVCs, leaveBan } from '../../utils/verificationConfig';
+import { getUser, checkFinish, countIncomplete } from '../../utils/database/verification';
+import { fibonacci } from '../../utils/mathsSeries';
 import IDs from '../../utils/ids';
 
 class VerificationLeaveVCListener extends Listener {
@@ -88,8 +89,16 @@ class VerificationLeaveVCListener extends Listener {
           IDs.roles.nonvegan.nonvegan,
           IDs.roles.verifyBlock,
         ]);
+        // Create timeout block for user
+        // Counts the recent times they have incomplete verifications
+        const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
+        // Creates the length of the time for the ban
+        const banLength = fibonacci(incompleteCount) * 10000; // * 3600 commented because development
+        console.log(incompleteCount);
+        console.log(fibonacci(incompleteCount));
+
         // @ts-ignore
-        this.container.tasks.create('verifyUnblock', { userId: user.id, guildId: guild.id }, 30000);
+        this.container.tasks.create('verifyUnblock', { userId: user.id, guildId: guild.id }, banLength);
       }
     }
 

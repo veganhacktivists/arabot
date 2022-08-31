@@ -17,7 +17,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// The maximum amount of verification VCs there can be
 export const maxVCs = 10;
+
+// The maximum amount of leaving bans before time resets
+export const leaveBan = 8;
 
 export const questionInfo = [
   {
