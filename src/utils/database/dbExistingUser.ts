@@ -134,19 +134,52 @@ export async function fetchRoles(user: string) {
   const prisma = new PrismaClient();
 
   // Get the user's roles
-  const roles = await prisma.user.findUnique({
+  const roleQuery = await prisma.user.findUnique({
     where: {
       id: user,
     },
     select: {
+      vegan: true,
       trusted: true,
+      activist: true,
       plus: true,
+      notVegan: true,
       vegCurious: true,
+      convinced: true,
     },
   });
 
   // Close the database connection
   await prisma.$disconnect();
+
+  // Assign roles to role snowflakes
+  const roles = [];
+
+  if (roleQuery === null) {
+    roles.push('');
+    return roles;
+  }
+  if (roleQuery.vegan) {
+    roles.push(IDs.roles.vegan.vegan);
+  }
+  if (roleQuery.trusted) {
+    roles.push(IDs.roles.trusted);
+  }
+  if (roleQuery.activist) {
+    roles.push(IDs.roles.vegan.activist);
+  }
+  if (roleQuery.plus) {
+    roles.push(IDs.roles.vegan.plus);
+  }
+  if (roleQuery.notVegan) {
+    roles.push(IDs.roles.nonvegan.nonvegan);
+  }
+  if (roleQuery.vegCurious) {
+    roles.push(IDs.roles.nonvegan.vegCurious);
+  }
+  if (roleQuery.convinced) {
+    roles.push(IDs.roles.nonvegan.convinced);
+  }
 
   return roles;
 }

@@ -23,6 +23,7 @@ import type {
 } from 'discord.js';
 import { maxVCs, leaveBan } from '../../utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '../../utils/database/verification';
+import { fetchRoles } from '../../utils/database/dbExistingUser';
 import { fibonacci } from '../../utils/mathsSeries';
 import IDs from '../../utils/ids';
 
@@ -85,17 +86,16 @@ class VerificationLeaveVCListener extends Listener {
       // Remove verify as vegan and give non vegan role
       if (!await checkFinish(channel.id)) {
         await user.roles.remove(IDs.roles.verifyingAsVegan);
-        await user.roles.add([
-          IDs.roles.nonvegan.nonvegan,
-          IDs.roles.verifyBlock,
-        ]);
+
+        // Get roles to give back to the user
+        const roles = await fetchRoles(user.id);
+        roles.push(IDs.roles.verifyBlock);
+        await user.roles.add(roles);
         // Create timeout block for user
         // Counts the recent times they have incomplete verifications
         const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
         // Creates the length of the time for the ban
         const banLength = fibonacci(incompleteCount) * 10000; // * 3600 commented because development
-        console.log(incompleteCount);
-        console.log(fibonacci(incompleteCount));
 
         // @ts-ignore
         this.container.tasks.create('verifyUnblock', { userId: user.id, guildId: guild.id }, banLength);
