@@ -141,8 +141,16 @@ class VerificationLeaveVCListener extends Listener {
             deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
-            id: IDs.roles.verifyingAsVegan,
+            id: IDs.roles.nonvegan.nonvegan,
             allow: ['VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.vegan.vegan,
+            allow: ['VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.vegan.activist,
+            deny: ['VIEW_CHANNEL', 'CONNECT'],
           },
           {
             id: IDs.roles.staff.verifier,
@@ -161,7 +169,11 @@ class VerificationLeaveVCListener extends Listener {
 
     await verification!.permissionOverwrites.set([
       {
-        id: IDs.roles.verifyingAsVegan,
+        id: IDs.roles.nonvegan.nonvegan,
+        allow: ['VIEW_CHANNEL'],
+      },
+      {
+        id: IDs.roles.vegan.vegan,
         allow: ['VIEW_CHANNEL'],
       },
     ]);

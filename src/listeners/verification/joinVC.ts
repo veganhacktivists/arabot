@@ -34,9 +34,11 @@ import {
   MessageButton,
   MessageEmbed,
 } from 'discord.js';
+import { time } from '@discordjs/builders';
 import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
 import { userExists, addExistingUser } from '../../utils/database/dbExistingUser';
+import { rolesToString } from '../../utils/formatter';
 import IDs from '../../utils/ids';
 
 class VerificationJoinVCListener extends Listener {
@@ -78,6 +80,8 @@ class VerificationJoinVCListener extends Listener {
     }
     const currentChannel = currentChannelGuild as VoiceChannel;
     const category = categoryGuild as CategoryChannel;
+
+    const roles = rolesToString(member.roles.cache.map((r) => r.id));
 
     // Checks if a verifier has joined
     if (channel.members.size === 2) {
@@ -156,8 +160,12 @@ class VerificationJoinVCListener extends Listener {
       });
 
       // Send a message that someone wants to be verified
-      await verificationText.send(`${member.user} wants to be verified in ${channel}
-      \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`);
+      const userInfoEmbed = await this.getUserInfo(member, roles);
+      await verificationText.send({
+        content: `${member.user} wants to be verified in ${channel}
+      \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`,
+        embeds: [userInfoEmbed],
+      });
 
       await this.verificationProcess(verificationText, channel.id, member, guild);
     }
@@ -180,9 +188,18 @@ class VerificationJoinVCListener extends Listener {
             deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
-            id: IDs.roles.verifyingAsVegan,
+            id: IDs.roles.nonvegan.nonvegan,
             allow: ['VIEW_CHANNEL'],
             deny: ['CONNECT'],
+          },
+          {
+            id: IDs.roles.vegan.vegan,
+            allow: ['VIEW_CHANNEL'],
+            deny: ['CONNECT'],
+          },
+          {
+            id: IDs.roles.vegan.activist,
+            deny: ['VIEW_CHANNEL', 'CONNECT'],
           },
           {
             id: IDs.roles.staff.verifier,
@@ -205,8 +222,16 @@ class VerificationJoinVCListener extends Listener {
             deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
           },
           {
-            id: IDs.roles.verifyingAsVegan,
+            id: IDs.roles.nonvegan.nonvegan,
             allow: ['VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.vegan.vegan,
+            allow: ['VIEW_CHANNEL'],
+          },
+          {
+            id: IDs.roles.vegan.activist,
+            deny: ['VIEW_CHANNEL', 'CONNECT'],
           },
           {
             id: IDs.roles.staff.verifier,
@@ -223,7 +248,11 @@ class VerificationJoinVCListener extends Listener {
         deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
       },
       {
-        id: IDs.roles.verifyingAsVegan,
+        id: IDs.roles.nonvegan.nonvegan,
+        deny: ['VIEW_CHANNEL'],
+      },
+      {
+        id: IDs.roles.vegan.vegan,
         deny: ['VIEW_CHANNEL'],
       },
       {
@@ -232,6 +261,24 @@ class VerificationJoinVCListener extends Listener {
       },
     ]);
     await currentChannel.setUserLimit(0);
+  }
+
+  // Creates an embed for information about the user
+  private async getUserInfo(user: GuildMember, roles: string) {
+    const joinTime = time(user.joinedAt!);
+    const registerTime = time(user.user.createdAt);
+
+    const embed = new MessageEmbed()
+      .setColor(user.displayHexColor)
+      .setTitle(`Information on ${user.user.username}`)
+      .setThumbnail(user.user.avatarURL()!)
+      .addFields(
+        { name: 'Joined:', value: `${joinTime}`, inline: true },
+        { name: 'Created:', value: `${registerTime}`, inline: true },
+        { name: 'Roles:', value: roles },
+      );
+
+    return embed;
   }
 
   private async verificationProcess(
@@ -419,7 +466,7 @@ class VerificationJoinVCListener extends Listener {
         embed = new MessageEmbed()
           .setColor('#34c000')
           .setTitle(`Successfully verified ${user.displayName}!`)
-          .setThumbnail(user.avatarURL()!)
+          .setThumbnail(user.user.avatarURL()!)
           .addFields(
             { name: 'Roles:', value: this.getTextRoles(info.roles) },
           );
