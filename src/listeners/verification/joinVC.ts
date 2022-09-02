@@ -462,6 +462,14 @@ class VerificationJoinVCListener extends Listener {
         await finishVerification(verId, button.user.id, info);
         // Give roles on Discord
         await this.giveRoles(user, info.roles);
+        // Add timeout if they do not have activist role
+        if (!info.roles.activist) {
+          // @ts-ignore
+          this.container.tasks.create('verifyUnblock', {
+            userId: user.id,
+            guildId: guild.id,
+          }, (info.roles.vegan || info.roles.convinced) ? 604800000 : 1814400000);
+        }
         // Add embed saying verification completed
         embed = new MessageEmbed()
           .setColor('#34c000')
@@ -564,6 +572,8 @@ class VerificationJoinVCListener extends Listener {
     }
     if (roles.activist) {
       rolesAdd.push(IDs.roles.vegan.activist);
+    } else {
+      rolesAdd.push(IDs.roles.verifyBlock);
     }
     if (roles.trusted) {
       rolesAdd.push(IDs.roles.trusted);

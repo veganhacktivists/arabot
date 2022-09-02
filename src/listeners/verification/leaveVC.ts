@@ -76,13 +76,6 @@ class VerificationLeaveVCListener extends Listener {
       console.log(userSnowflake);
       const user = guild.members.cache.get(userSnowflake!)!;
 
-      /*
-      // Add the user to the database if it's not a verifier meeting
-      if (!oldState.channel.name.includes(' - Verification')) {
-        await finishVerification(oldState.channelId!, true, true, false, false);
-      }
-       */
-
       // Remove verify as vegan and give non vegan role
       if (!await checkFinish(channel.id)) {
         await user.roles.remove(IDs.roles.verifyingAsVegan);
@@ -98,7 +91,10 @@ class VerificationLeaveVCListener extends Listener {
         const banLength = fibonacci(incompleteCount) * 10000; // * 3600 commented because development
 
         // @ts-ignore
-        this.container.tasks.create('verifyUnblock', { userId: user.id, guildId: guild.id }, banLength);
+        this.container.tasks.create('verifyUnblock', {
+          userId: user.id,
+          guildId: guild.id,
+        }, banLength);
       }
     }
 
