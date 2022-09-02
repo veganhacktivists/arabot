@@ -33,15 +33,13 @@ class WaveCommand extends Command {
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
-    registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option
-          .setName('user')
-          .setDescription('User you want to wave to')
-          .setRequired(true)
-        ), { behaviorWhenNotIdentical: RegisterBehavior.Overwrite });
+    registry.registerChatInputCommand((builder) => builder
+      .setName(this.name)
+      .setDescription(this.description)
+      .addUserOption((option) => option
+        .setName('user')
+        .setDescription('User you want to wave to')
+        .setRequired(true)), { behaviorWhenNotIdentical: RegisterBehavior.Overwrite });
   }
 
   // Command run
