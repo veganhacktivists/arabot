@@ -17,44 +17,48 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
-import { Wave } from '../../utils/gifs';
+import { Command, RegisterBehavior } from "@sapphire/framework";
+import { MessageEmbed } from "discord.js";
+import { Wave } from "../../utils/gifs";
 
-export class WaveCommand extends Command {
+class WaveCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'wave',
-      description: 'Wave to a user',
-      preconditions: [['CoordinatorOnly', 'PatreonOnly']],
+      name: "wave",
+      description: "Wave to a user",
+      preconditions: [["CoordinatorOnly", "PatreonOnly"]],
     });
   }
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
-    registry.registerChatInputCommand((builder) => builder
-      .setName(this.name)
-      .setDescription(this.description)
-      .addUserOption((option) => option
-        .setName('user')
-        .setDescription('User you want to wave to')
-        .setRequired(true)),
-      { behaviorWhenNotIdentical: RegisterBehavior.Overwrite });
+    registry.registerChatInputCommand(
+      (builder) => builder
+        .setName(this.name)
+        .setDescription(this.description)
+        .addUserOption((option) =>
+          option
+            .setName("user")
+            .setDescription("User you want to wave to")
+            .setRequired(true)
+        ),
+      { behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
+    );
   }
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
     // Get the users
     // TODO exception handling
-    const user = interaction.options.getUser('user')!;
+    const user = interaction.options.getUser("user")!;
     const waver = interaction.member!.user;
     const waverGuildMember = interaction.guild!.members.cache.get(waver.id)!;
 
     // Creates the embed for the wave
     const randomWave = Wave[Math.floor(Math.random() * Wave.length)];
     const waveEmbed = new MessageEmbed()
-      .setColor('#0099ff')
+      .setColor("#0099ff")
       .setTitle(`${waverGuildMember.displayName} waves at you, hello!`)
       .setImage(randomWave);
 
@@ -66,3 +70,5 @@ export class WaveCommand extends Command {
     });
   }
 }
+
+export default WaveCommand;
