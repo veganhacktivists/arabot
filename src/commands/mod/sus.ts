@@ -17,10 +17,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Command, RegisterBehavior } from '@sapphire/framework';
+import { Command, RegisterBehavior, Args } from '@sapphire/framework';
 import {
   MessageEmbed, MessageActionRow, MessageButton, Constants, ButtonInteraction,
 } from 'discord.js';
+import type { Message, GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser, userExists } from '../../utils/dbExistingUser';
@@ -560,6 +561,49 @@ class SusCommand extends Command {
 
     // Remove sus role from the user
     await userGuildMember!.roles.remove(IDs.roles.restrictions.sus);
+  }
+
+  // Non Application Command method of adding a sus note
+  public async messageRun(message: Message, args: Args) {
+    // Get arguments
+    let user: GuildMember;
+    try {
+      user = await args.pick('member');
+    } catch {
+      await message.react('❌');
+      await message.reply('User to give sus note to was not provided!');
+      return;
+    }
+    const note = args.finished ? null : await args.rest('string');
+    const mod = message.member;
+
+    if (note === null) {
+      await message.react('❌');
+      await message.reply('No sus note was provided!');
+      return;
+    }
+
+    if (mod === null) {
+      await message.react('❌');
+      await message.reply('Moderator not found! Try again or contact a developer!');
+      return;
+    }
+
+    // Check if user and mod are on the database
+    if (!await userExists(user)) {
+      await addExistingUser(user);
+    }
+    if (!await userExists(mod!)) {
+      await addExistingUser(mod!);
+    }
+    await addToDatabase(user.id, mod.id, note);
+
+    // Give the user the sus role they don't already have the sus note
+    if (!user.roles.cache.has(IDs.roles.restrictions.sus)) {
+      await user!.roles.add(IDs.roles.restrictions.sus);
+    }
+
+    await message.react('✅');
   }
 }
 
