@@ -44,6 +44,7 @@ class ModOnlyPrecondition extends AllFlowsPrecondition {
 
   private async checkMod(user: GuildMember) {
     return user.roles.cache.has(IDs.roles.staff.moderator)
+    || user.roles.cache.has(IDs.roles.staff.trialModerator)
       ? this.ok()
       : this.error({ message: 'Only moderators can run this command!' });
   }

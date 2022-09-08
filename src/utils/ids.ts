@@ -50,6 +50,7 @@ let IDs = {
       eventCoordinator: '944732860554817586',
       restricted: '851624392928264222',
       moderator: '826157475815489598',
+      trialModerator: '982074555596152904',
       verifier: '871802735031373856',
     },
     stageHost: '854893757593419786',
