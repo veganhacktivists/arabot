@@ -571,7 +571,7 @@ class SusCommand extends Command {
       user = await args.pick('member');
     } catch {
       await message.react('❌');
-      await message.reply('User to give sus note to was not provided!');
+      await message.reply('User was not provided!');
       return;
     }
     const note = args.finished ? null : await args.rest('string');
