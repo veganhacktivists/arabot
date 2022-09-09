@@ -26,9 +26,10 @@
   },
   "homepage": "https://github.com/veganhacktivists/arabot#readme",
   "dependencies": {
+    "@discordjs/builders": "^1.2.0",
     "@prisma/client": "^4.0.0",
     "@sapphire/discord.js-utilities": "^5.0.0",
-    "@sapphire/framework": "^3.0.0",
+    "@sapphire/framework": "^3.1.1",
     "@sapphire/plugin-scheduled-tasks": "^4.0.0",
     "@sapphire/plugin-subcommands": "^3.0.0",
     "@sapphire/stopwatch": "^1.4.1",
@@ -47,7 +48,7 @@
     "@types/ioredis": "^4.28.10",
     "@typescript-eslint/eslint-plugin": "^5.30.7",
     "@typescript-eslint/parser": "^5.30.7",
-    "eslint": "^8.20.0",
+    "eslint": "8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0"
