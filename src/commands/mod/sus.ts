@@ -564,6 +564,7 @@ class SusCommand extends Command {
   }
 
   // Non Application Command method of adding a sus note
+  // xlevra begged me to add this... so I guess here it is
   public async messageRun(message: Message, args: Args) {
     // Get arguments
     let user: GuildMember;
@@ -601,6 +602,11 @@ class SusCommand extends Command {
     // Give the user the sus role they don't already have the sus note
     if (!user.roles.cache.has(IDs.roles.restrictions.sus)) {
       await user!.roles.add(IDs.roles.restrictions.sus);
+    }
+
+    // Checks if the user is xlevra to send a very kind message
+    if (mod.id === '259624904746467329') {
+      await message.reply('Fuck you for making me add this feature 🤬');
     }
 
     await message.react('✅');
