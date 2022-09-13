@@ -1,0 +1,31 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# ESLint is a tool for identifying and reporting on patterns
+# found in ECMAScript/JavaScript code.
+# More details at https://github.com/eslint/eslint
+# and https://eslint.org
+
+name: Deploy
+
+on:
+  push:
+    branches: [ "main", "github-deploy-action" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+
+jobs:
+  eslint:
+    name: Deploy Bot
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    env:
+      DEPLOY_HOST: 206.189.96.198
+    steps:
+      - name: ssh
+        run: |
+          ssh ${DEPLOY_HOST} -c "echo $HOST"
