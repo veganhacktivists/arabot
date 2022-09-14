@@ -28,4 +28,5 @@ jobs:
     steps:
       - name: ssh
         run: |
+          ssh-add - <<< "$DEPLOY_PRIVATE_KEY"
           ssh ${DEPLOY_HOST} -C "echo $HOST"
