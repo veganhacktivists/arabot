@@ -28,5 +28,6 @@ jobs:
     steps:
       - name: ssh
         run: |
+          eval `ssh-agent -s`
           ssh-add - <<< "$DEPLOY_PRIVATE_KEY"
           ssh ${DEPLOY_HOST} -C "echo $HOST"
