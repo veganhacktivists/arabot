@@ -28,4 +28,4 @@ jobs:
     steps:
       - name: ssh
         run: |
-          ssh ${DEPLOY_HOST} -c "echo $HOST"
+          ssh ${DEPLOY_HOST} -C "echo $HOST"
