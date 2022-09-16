@@ -25,6 +25,7 @@ jobs:
       security-events: write
     env:
       DEPLOY_HOST: 206.189.96.198
+      DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
     steps:
       - name: ssh
         run: |
