@@ -26,9 +26,11 @@ jobs:
     env:
       DEPLOY_HOST: 206.189.96.198
       DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
+      REPO: git@github.com:veganhacktivists/arabot.git
+      DEPLOY_USER: deploy
     steps:
-      - name: ssh
+      - name: setup-ssh
         run: |
           eval `ssh-agent -s`
           ssh-add - <<< "$DEPLOY_PRIVATE_KEY"
-          ssh -o StrictHostKeyChecking=no deploy@${DEPLOY_HOST} uptime
+          ssh -o StrictHostKeyChecking=no ${DEPOY_USER}@${DEPLOY_HOST} -C "cd /tmp && clone ${REPO} && docker compose build"
