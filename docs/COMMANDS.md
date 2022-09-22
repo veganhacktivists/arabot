@@ -12,7 +12,7 @@ or anything that is not serious enough for a warning.
 #### Application Commands
 
 - `/sus add <user> <note>`
-- `/sus view <user <note>`
+- `/sus view <user>`
 - `/sus remove <id>`
 - `/sus purge <user>`
 
