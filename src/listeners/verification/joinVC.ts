@@ -37,6 +37,7 @@ import {
 import { time } from '@discordjs/builders';
 import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
+import { findNotes } from '../../utils/database/sus';
 import { userExists, addExistingUser } from '../../utils/database/dbExistingUser';
 import { rolesToString } from '../../utils/formatter';
 import IDs from '../../utils/ids';
@@ -161,10 +162,11 @@ class VerificationJoinVCListener extends Listener {
 
       // Send a message that someone wants to be verified
       const userInfoEmbed = await this.getUserInfo(member, roles);
+      const susNotes = await this.getSus(member, guild);
       await verificationText.send({
         content: `${member.user} wants to be verified in ${channel}
       \n<@&${IDs.roles.staff.verifier}> <@&${IDs.roles.staff.trialVerifier}>`,
-        embeds: [userInfoEmbed],
+        embeds: [userInfoEmbed, susNotes],
       });
 
       await this.verificationProcess(verificationText, channel.id, member, guild);
@@ -277,6 +279,32 @@ class VerificationJoinVCListener extends Listener {
         { name: 'Created:', value: `${registerTime}`, inline: true },
         { name: 'Roles:', value: roles },
       );
+
+    return embed;
+  }
+
+  // Creates the embed to display the sus note
+  private async getSus(user: GuildMember, guild: Guild) {
+    const notes = await findNotes(user.id, true);
+
+    const embed = new MessageEmbed()
+      .setColor(user.displayHexColor)
+      .setTitle(`${notes.length} sus notes for ${user.user.username}`);
+
+    // Add up to 10 of the latest sus notes to the embed
+    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+      // Get mod name
+      const modGuildMember = guild!.members.cache.get(notes[i].modId);
+      let mod = notes[i].modId;
+      if (modGuildMember !== undefined) {
+        mod = modGuildMember!.displayName;
+      }
+      // Add sus note to embed
+      embed.addFields({
+        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        value: notes[i].note,
+      });
+    }
 
     return embed;
   }
