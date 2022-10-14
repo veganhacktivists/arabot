@@ -131,6 +131,13 @@ class VerificationJoinVCListener extends Listener {
         IDs.roles.nonvegan.convinced,
         IDs.roles.nonvegan.vegCurious,
       ]);
+
+      // Start 15-minute timer if verifier does not join
+      // @ts-ignore
+      this.container.tasks.create('verifyTimeout', {
+        userId: member.id,
+        guildId: guild.id,
+      }, 30_000);
     }
 
     // Check how many voice channels there are
