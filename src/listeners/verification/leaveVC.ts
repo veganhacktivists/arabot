@@ -21,6 +21,7 @@ import { container, Listener } from '@sapphire/framework';
 import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
+import { time } from '@discordjs/builders';
 import { maxVCs, leaveBan } from '../../utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '../../utils/database/verification';
 import { fetchRoles } from '../../utils/database/dbExistingUser';
@@ -94,6 +95,9 @@ class VerificationLeaveVCListener extends Listener {
           userId: user.id,
           guildId: guild.id,
         }, banLength);
+
+        await user.user.send('You have disconnected or been timed out as a verifier had not joined for 15 minutes from Verification.\n\n'
+          + `You can verify again at: ${time(Math.round(Date.now() / 1000) + (banLength / 1000))}`);
       }
     }
 
