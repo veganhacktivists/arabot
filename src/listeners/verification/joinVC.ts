@@ -137,7 +137,7 @@ class VerificationJoinVCListener extends Listener {
       this.container.tasks.create('verifyTimeout', {
         channelId: channel.id,
         userId: member.id,
-      }, 30_000);
+      }, 30_000); // TODO change before production to 15 mins
     }
 
     // Check how many voice channels there are
@@ -148,7 +148,7 @@ class VerificationJoinVCListener extends Listener {
     if (!verifier) {
       const verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
         type: 'GUILD_TEXT',
-        topic: `Channel for verifiers only. ${member.id} (Please do not change this)`,
+        topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
         parent: category.id,
         userLimit: 1,
         permissionOverwrites: [

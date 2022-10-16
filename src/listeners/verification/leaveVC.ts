@@ -73,7 +73,6 @@ class VerificationLeaveVCListener extends Listener {
     // Allow more people to join VC if there are less than 10 VCs
 
     if (!verifier) {
-      console.log(userSnowflake);
       const user = guild.members.cache.get(userSnowflake!)!;
 
       // Remove verify as vegan and give non vegan role
@@ -88,7 +87,7 @@ class VerificationLeaveVCListener extends Listener {
         // Counts the recent times they have incomplete verifications
         const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
         // Creates the length of the time for the ban
-        const banLength = fibonacci(incompleteCount) * 10000; // * 3600 commented because development
+        const banLength = fibonacci(incompleteCount) * 10000; // TODO * 3600 commented because development
 
         // @ts-ignore
         this.container.tasks.create('verifyUnblock', {
