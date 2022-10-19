@@ -26,6 +26,7 @@ import type {
   VoiceState,
   GuildMember,
   Guild,
+  User,
 } from 'discord.js';
 import {
   ButtonInteraction,
@@ -517,6 +518,8 @@ class VerificationJoinVCListener extends Listener {
           embeds: [embed],
           components: [],
         });
+        // Send welcome message after verification
+        await this.finishMessages(user.user, info.roles);
       }
     });
   }
@@ -617,6 +620,55 @@ class VerificationJoinVCListener extends Listener {
       rolesAdd.push(IDs.roles.nonvegan.vegCurious);
     }
     await user.roles.add(rolesAdd);
+  }
+
+  // Messages after verifying the user
+  private async finishMessages(user: User, roles: {
+    vegan: boolean,
+    activist: boolean,
+    trusted: boolean,
+    vegCurious: boolean,
+    convinced: boolean
+  }) {
+    // Not vegan
+    if (!roles.vegan) {
+      const general = this.container.client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel | undefined;
+      if (general === undefined) {
+        return;
+      }
+      let msg = `${user}, you have been verified! Please check <#${IDs.channels.information.roles}> `
+        + `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`;
+      // Add extra info if the user got veg curious or convinced.
+      if (roles.vegCurious || roles.convinced) {
+        msg += `\n\nYou also have access to <#${IDs.channels.dietSupport.main}> for help on going vegan.`;
+      }
+      await general.send(msg);
+      return;
+    }
+
+    // Vegan
+    const general = this.container.client.channels.cache.get(IDs.channels.vegan.general) as TextChannel | undefined;
+    if (general === undefined) {
+      return;
+    }
+    const msg = `Welcome ${user}! Please check out <#${IDs.channels.information.roles}> :)`;
+    await general.send(msg);
+
+    // Activist role
+    if (roles.activist) {
+      const activist = this.container.client.channels.cache.get(IDs.channels.activism.activism) as TextChannel | undefined;
+      if (activist === undefined) {
+        return;
+      }
+      const activistMsg = `${user} you have been given the activist role! This means that if you'd wish to engage with non-vegans in `
+        + `<#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
+        + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
+        + '2. Don\'t discuss social topics while activism is happening\n'
+        + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
+        + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
+        + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
+      await activist.send(activistMsg);
+    }
   }
 }
 

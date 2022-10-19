@@ -59,14 +59,27 @@ const devIDs = {
   channels: {
     information: {
       news: '999431676058927247',
+      conduct: '999431676058927248',
+      roles: '999431676058927250',
     },
     staff: {
       coordinators: '999431676058927254',
       standup: '999431676289622183',
       verifiers: '999431677006860411',
     },
+    dietSupport: {
+      info: '999431677006860417',
+      introduction: '999431677325615184',
+      main: '999431677325615185',
+    },
     nonVegan: {
       general: '999431677325615189',
+    },
+    vegan: {
+      general: '999431677535338575',
+    },
+    activism: {
+      activism: '999431678214807604',
     },
     diversity: {
       women: '999431679053660187',
