@@ -138,7 +138,7 @@ class VerificationJoinVCListener extends Listener {
       this.container.tasks.create('verifyTimeout', {
         channelId: channel.id,
         userId: member.id,
-      }, 30_000); // TODO change before production to 15 mins
+      }, 900_000); // 15 minutes
     }
 
     // Check how many voice channels there are
@@ -630,6 +630,10 @@ class VerificationJoinVCListener extends Listener {
     vegCurious: boolean,
     convinced: boolean
   }) {
+    // Send a DM with when their verification is finished
+    await this.finishDM(user, roles)
+      .catch(() => console.error('Verification: Closed DMs'));
+
     // Not vegan
     if (!roles.vegan) {
       const general = this.container.client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel | undefined;
@@ -668,6 +672,32 @@ class VerificationJoinVCListener extends Listener {
         + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
         + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
       await activist.send(activistMsg);
+    }
+  }
+
+  // Messages after verifying the user
+  private async finishDM(user: User, roles: {
+    vegan: boolean,
+    activist: boolean,
+    trusted: boolean,
+    vegCurious: boolean,
+    convinced: boolean
+  }) {
+    if (!roles.vegan && !roles.convinced) {
+      const message = 'You\'ve been verified as non-vegan!'
+        + `\n\nYou can next verify on ${time(Math.round(Date.now() / 1000) + 1814400)}`;
+
+      await user.send(message);
+    } else if (roles.convinced) {
+      const message = 'You\'ve been verified as convinced!'
+        + `\n\nYou can next verify on ${time(Math.round(Date.now() / 1000) + 604800)}`;
+
+      await user.send(message);
+    } else if (roles.vegan && !roles.activist) {
+      const message = 'You\'ve been verified as a vegan!'
+        + `\n\nYou can next get verified on ${time(Math.round(Date.now() / 1000) + 604800)} if you would wish to have the activist role.`;
+
+      await user.send(message);
     }
   }
 }
