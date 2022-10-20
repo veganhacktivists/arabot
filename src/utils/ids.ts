@@ -52,22 +52,38 @@ let IDs = {
       moderator: '826157475815489598',
       trialModerator: '982074555596152904',
       verifier: '871802735031373856',
+      trialVerifier: '982635638010572850',
     },
     stageHost: '854893757593419786',
     patron: '765370219207852055',
     patreon: '993848684640997406',
     verifyingAsVegan: '854725899576279060',
+    verifyBlock: '1032765019269640203',
   },
   channels: {
     information: {
       news: '866000393259319306',
+      conduct: '990728521531920385',
+      roles: '990761562199457813',
     },
     staff: {
       coordinators: '1006240682505142354',
       standup: '996009201237233684',
+      verifiers: '873215538627756072',
+    },
+    dietSupport: {
+      info: '993891104346873888',
+      introduction: '993272252743286874',
+      main: '822665615612837918',
     },
     nonVegan: {
       general: '798967615636504657',
+    },
+    vegan: {
+      general: '787738272616808509',
+    },
+    activism: {
+      activism: '730907954877956179',
     },
     diversity: {
       women: '938808963544285324',
@@ -77,6 +93,7 @@ let IDs = {
     },
   },
   categories: {
+    verification: '797505409073676299',
     diversity: '933078380394459146',
   },
 };

@@ -27,10 +27,6 @@ datasource db {
 
 model User {
   id             String     @id @db.VarChar(255)
-  level          Int        @default(0)
-  xp             Int        @default(0)
-  balance        Int        @default(0)
-  lastDaily      DateTime?
   vegan          Boolean    @default(false)
   trusted        Boolean    @default(false)
   activist       Boolean    @default(false)
@@ -52,16 +48,31 @@ model User {
 }
 
 model Verify {
-  id          Int      @id @default(autoincrement())
-  user        User     @relation("verUser", fields: [userId], references: [id])
+  id          String    @id
+  user        User      @relation("verUser", fields: [userId], references: [id])
   userId      String
-  verifier    User?    @relation("verVerifier", fields: [verifierId], references: [id])
+  verifier    User?     @relation("verVerifier", fields: [verifierId], references: [id])
   verifierId  String?
-  time        DateTime @default(now())
-  timedOut    Boolean  @default(false) // If they got kicked out of verification because they timed out
-  vegan       Boolean  @default(false) // If they got verified as a vegan
-  text        Boolean  @default(false) // If they used text verification
-  serverVegan Boolean  @default(false) // People that went vegan on the server
+  joinTime    DateTime  @default(now())
+  startTime   DateTime?
+  finishTime  DateTime?
+  timedOut    Boolean   @default(false) // If they got kicked out of verification because they timed out
+  //complete  Boolean   @default(false) // If the verification was incomplete
+  // Roles they got from verification
+  vegan       Boolean   @default(false) // If they got verified as a vegan
+  activist    Boolean   @default(false) // If they got the activist role when they verified
+  trusted     Boolean   @default(false) // If they got the trusted role when they verified
+  vegCurious  Boolean   @default(false) // If they got the Veg Curious role
+  convinced   Boolean   @default(false)
+  text        Boolean   @default(false) // If they used text verification
+  serverVegan Boolean   @default(false) // People that went vegan on the server
+  // Stats on verification
+  reason      Int?
+  where       Int?
+  length      Int?
+  reasoning   Int?
+  life        Int?
+  food        Int?
   notes       String?
 }
 
