@@ -88,7 +88,7 @@ class VerificationLeaveVCListener extends Listener {
         // Counts the recent times they have incomplete verifications
         const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
         // Creates the length of the time for the ban
-        const banLength = fibonacci(incompleteCount) * 10000; // TODO * 3600 commented because development
+        const banLength = fibonacci(incompleteCount) * 3600_000;
 
         // @ts-ignore
         this.container.tasks.create('verifyUnblock', {

@@ -226,5 +226,5 @@ export async function blockTime(userId: string) {
   const count = await countIncomplete(verification.userId) % (leaveBan + 1);
   const timeOff = new Date().getTime() - verification.joinTime.getTime();
   // Creates the length of the time for the ban
-  return (fibonacci(count) * 10000) - timeOff; // TODO * 3600 commented because development
+  return (fibonacci(count) * 3600_000) - timeOff;
 }
