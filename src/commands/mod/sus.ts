@@ -21,6 +21,7 @@ import { Command, RegisterBehavior, Args } from '@sapphire/framework';
 import {
   MessageEmbed, MessageActionRow, MessageButton, Constants, ButtonInteraction,
 } from 'discord.js';
+import type { Message, GuildMember } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser, userExists } from '../../utils/database/dbExistingUser';
 import {
