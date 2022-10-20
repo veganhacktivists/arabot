@@ -218,13 +218,13 @@ export async function blockTime(userId: string) {
     if (verification.activist) {
       return 0;
     }
-    const timeOff = new Date().getMilliseconds() - verification.finishTime.getMilliseconds();
+    const timeOff = new Date().getTime() - verification.finishTime.getTime();
     return ((verification.vegan || verification.convinced) ? 604800000 : 1814400000) - timeOff;
   }
 
   // Timeouts
   const count = await countIncomplete(verification.userId) % (leaveBan + 1);
-  const timeOff = new Date().getMilliseconds() - verification.joinTime.getMilliseconds();
+  const timeOff = new Date().getTime() - verification.joinTime.getTime();
   // Creates the length of the time for the ban
   return (fibonacci(count) * 10000) - timeOff; // TODO * 3600 commented because development
 }

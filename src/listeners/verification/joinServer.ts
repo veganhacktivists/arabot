@@ -40,17 +40,10 @@ class VerificationReady extends Listener {
     const timeout = await blockTime(user.id);
     if (timeout > 0) {
       roles.push(IDs.roles.verifyBlock);
-      await user.roles.add(roles);
-
-      // @ts-ignore
-      this.container.tasks.create('verifyUnblock', {
-        userId: user.id,
-        guildId: user.guild.id,
-      }, timeout);
-    } else {
-      // Add roles if they don't have verification block
-      await user.roles.add(roles);
     }
+
+    // Add roles if they don't have verification block
+    await user.roles.add(roles);
   }
 }
 
