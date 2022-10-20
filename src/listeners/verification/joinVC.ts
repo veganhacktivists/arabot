@@ -521,6 +521,21 @@ class VerificationJoinVCListener extends Listener {
         // Send welcome message after verification
         await this.finishMessages(user.user, info.roles);
       }
+      if (button.customId === 'cancel' && info.page >= questionLength) {
+        info.page = 5;
+        info.roles.vegan = false;
+        info.roles.activist = false;
+        info.roles.trusted = false;
+        info.roles.vegCurious = false;
+        info.roles.convinced = false;
+        embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
+        buttons = await this.createButtons(questionInfo[info.page].buttons);
+        await message.edit({
+          embeds: [embed],
+          components: buttons,
+        });
+        await button.deferUpdate();
+      }
     });
   }
 
