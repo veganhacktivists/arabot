@@ -47,6 +47,7 @@ const devIDs = {
       eventCoordinator: '999431675165556817',
       restricted: '999431675123597407',
       moderator: '999431675123597408',
+      trialModerator: '999431675123597404',
       verifier: '999431675123597406',
       trialVerifier: '999431675123597405',
     },
