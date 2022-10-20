@@ -20,6 +20,8 @@
 import type { GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
 import { updateUser } from './dbExistingUser';
+import { leaveBan } from '../verificationConfig';
+import { fibonacci } from '../mathsSeries';
 
 export async function joinVerification(channelId: string, user: GuildMember) {
   // Update the user on the database with the current roles they have
@@ -186,4 +188,43 @@ export async function countIncomplete(userId: string) {
   await prisma.$disconnect();
 
   return incompleteCount;
+}
+
+// Gets the amount of time left on the block
+export async function blockTime(userId: string) {
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  // Count how many times the user has not completed a verification
+  const verification = await prisma.verify.findFirst({
+    where: {
+      userId,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+
+  if (verification === null) {
+    return 0;
+  }
+
+  // If user finished verification
+  if (verification.finishTime !== null) {
+    // Activist role
+    if (verification.activist) {
+      return 0;
+    }
+    const timeOff = new Date().getMilliseconds() - verification.finishTime.getMilliseconds();
+    return ((verification.vegan || verification.convinced) ? 604800000 : 1814400000) - timeOff;
+  }
+
+  // Timeouts
+  const count = await countIncomplete(verification.userId) % (leaveBan + 1);
+  const timeOff = new Date().getMilliseconds() - verification.joinTime.getMilliseconds();
+  // Creates the length of the time for the ban
+  return (fibonacci(count) * 10000) - timeOff; // TODO * 3600 commented because development
 }
