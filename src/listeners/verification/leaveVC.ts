@@ -96,8 +96,9 @@ class VerificationLeaveVCListener extends Listener {
           guildId: guild.id,
         }, banLength);
 
-        await user.user.send('You have disconnected or been timed out as a verifier had not joined for 15 minutes from Verification.\n\n'
-          + `You can verify again at: ${time(Math.round(Date.now() / 1000) + (banLength / 1000))}`);
+        await user.user.send('You have been timed out as a verifier had not joined for 15 minutes or you disconnected from verification.\n\n'
+          + `You can verify again at: ${time(Math.round(Date.now() / 1000) + (banLength / 1000))}`)
+          .catch(() => console.error('Verification: Closed DMs'));
       }
     }
 
