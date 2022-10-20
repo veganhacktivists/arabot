@@ -57,7 +57,7 @@ let IDs = {
     patron: '765370219207852055',
     patreon: '993848684640997406',
     verifyingAsVegan: '854725899576279060',
-    verifyBlock: '',
+    verifyBlock: '1032765019269640203',
   },
   channels: {
     information: {
