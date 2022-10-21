@@ -67,6 +67,7 @@ const devIDs = {
       standup: '999431676289622183',
       verifiers: '999431677006860411',
     },
+    welcome: '999431677006860410',
     dietSupport: {
       info: '999431677006860417',
       introduction: '999431677325615184',
