@@ -85,19 +85,12 @@ class VerificationJoinVCListener extends Listener {
 
     const roles = rolesToString(member.roles.cache.map((r) => r.id));
 
-    // Checks if a verifier has joined
-    if (channel.members.size === 2) {
-      await newState.channel!.permissionOverwrites.set([
-        {
-          id: guild.roles.everyone,
-          allow: ['SEND_MESSAGES'],
-        },
-      ]);
-      return;
-    }
-
     // Check if a verifier joined a verification VC and update database
     if (channel.members.size === 2) {
+      await channel.permissionOverwrites.edit(guild.roles.everyone, {
+        SEND_MESSAGES: true,
+      });
+
       if (!channel.name.includes(' - Verification')) {
         return;
       }
@@ -165,6 +158,10 @@ class VerificationJoinVCListener extends Listener {
             id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
+          {
+            id: IDs.roles.staff.trialVerifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
         ],
       });
 
@@ -215,6 +212,10 @@ class VerificationJoinVCListener extends Listener {
             id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
+          {
+            id: IDs.roles.staff.trialVerifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
         ],
       });
     } else {
@@ -247,6 +248,10 @@ class VerificationJoinVCListener extends Listener {
             id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
+          {
+            id: IDs.roles.staff.trialVerifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
         ],
       });
     }
@@ -258,12 +263,16 @@ class VerificationJoinVCListener extends Listener {
         deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
       },
       {
-        id: IDs.roles.nonvegan.nonvegan,
-        deny: ['VIEW_CHANNEL'],
+        id: IDs.roles.verifyBlock,
+        deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
       },
       {
-        id: IDs.roles.vegan.vegan,
-        deny: ['VIEW_CHANNEL'],
+        id: IDs.roles.staff.verifier,
+        allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+      },
+      {
+        id: IDs.roles.staff.trialVerifier,
+        allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
       },
       {
         id: member.id,

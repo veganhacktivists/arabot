@@ -156,6 +156,10 @@ class VerificationLeaveVCListener extends Listener {
             id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
+          {
+            id: IDs.roles.staff.trialVerifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
         ],
       });
     }
@@ -165,18 +169,19 @@ class VerificationLeaveVCListener extends Listener {
       return;
     }
 
-    const verification = listVoiceChannels.last() as VoiceChannel;
+    const verification = listVoiceChannels.last() as VoiceChannel | undefined;
 
-    await verification!.permissionOverwrites.set([
-      {
-        id: IDs.roles.nonvegan.nonvegan,
-        allow: ['VIEW_CHANNEL'],
-      },
-      {
-        id: IDs.roles.vegan.vegan,
-        allow: ['VIEW_CHANNEL'],
-      },
-    ]);
+    if (verification === undefined) {
+      console.error('Verification: Verification channel not found.');
+      return;
+    }
+
+    await verification.permissionOverwrites.edit(IDs.roles.nonvegan.nonvegan, {
+      VIEW_CHANNEL: true,
+    });
+    await verification.permissionOverwrites.edit(IDs.roles.vegan.vegan, {
+      VIEW_CHANNEL: true,
+    });
   }
 }
 
