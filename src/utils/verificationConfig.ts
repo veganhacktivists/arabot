@@ -67,12 +67,13 @@ export const questionInfo = [
     buttons: [
       'Dietitian / Chef',
       'Acceptable',
+      'More or less',
       'Salads / Smoothies',
       'No clue',
     ],
   },
   {
-    question: 'Do you think this user is definitely vegan?',
+    question: 'Do you think this user is definitely vegan? (This is for the trusted role)',
     buttons: [
       'Yes',
       'No',
