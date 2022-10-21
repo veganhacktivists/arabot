@@ -80,7 +80,7 @@ class VerificationReady extends Listener {
         verification = true;
       }
     });
-    if (currentVCs.length === emptyVC.length || !verification) {
+    if (!verification) {
       await category.guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
         parent: IDs.categories.verification,
