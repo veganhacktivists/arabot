@@ -54,7 +54,6 @@ const devIDs = {
     stageHost: '999431675123597411',
     patron: '999431675098447935',
     patreon: '999431675098447936',
-    verifyingAsVegan: '999431675081666597',
     verifyBlock: '1007477161835372574',
   },
   channels: {

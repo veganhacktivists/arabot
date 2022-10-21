@@ -78,8 +78,6 @@ class VerificationLeaveVCListener extends Listener {
 
       // Remove verify as vegan and give non vegan role
       if (!await checkFinish(channel.id)) {
-        await user.roles.remove(IDs.roles.verifyingAsVegan);
-
         // Get roles to give back to the user
         const roles = await fetchRoles(user.id);
         roles.push(IDs.roles.verifyBlock);

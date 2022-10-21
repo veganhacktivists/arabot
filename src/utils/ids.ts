@@ -57,7 +57,6 @@ let IDs = {
     stageHost: '854893757593419786',
     patron: '765370219207852055',
     patreon: '993848684640997406',
-    verifyingAsVegan: '854725899576279060',
     verifyBlock: '1032765019269640203',
   },
   channels: {
