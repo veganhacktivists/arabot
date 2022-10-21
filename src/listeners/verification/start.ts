@@ -47,7 +47,8 @@ class VerificationReady extends Listener {
     }
 
     // Check how many voice channels there are
-    let voiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
+    const voiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
+    const currentVCs: VoiceChannel[] = [];
     const emptyVC: string[] = [];
     // Delete voice channels
     voiceChannels.forEach((c) => {
@@ -55,6 +56,8 @@ class VerificationReady extends Listener {
       if (voiceChannel.members.size === 0) {
         emptyVC.push(voiceChannel.id);
         voiceChannel.delete();
+      } else {
+        currentVCs.push(voiceChannel);
       }
     });
 
@@ -71,8 +74,13 @@ class VerificationReady extends Listener {
     });
 
     // Check if there is no voice channels, create verification
-    voiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
-    if (voiceChannels.size === emptyVC.length) {
+    let verification = false;
+    currentVCs.forEach((c) => {
+      if (c.name === 'Verification') {
+        verification = true;
+      }
+    });
+    if (currentVCs.length === emptyVC.length || !verification) {
       await category.guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
         parent: IDs.categories.verification,

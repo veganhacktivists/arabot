@@ -125,7 +125,7 @@ class VerificationLeaveVCListener extends Listener {
     }
 
     // If there are no VCs left in verification after having the channel deleted
-    if (listVoiceChannels.size === 0) {
+    if (listVoiceChannels.size - 1 === 0) {
       // Create a verification channel
       await guild.channels.create('Verification', {
         type: 'GUILD_VOICE',
