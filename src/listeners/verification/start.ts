@@ -102,6 +102,10 @@ class VerificationReady extends Listener {
             id: IDs.roles.staff.verifier,
             allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
           },
+          {
+            id: IDs.roles.staff.trialVerifier,
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+          },
         ],
       });
     }
