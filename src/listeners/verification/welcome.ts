@@ -39,7 +39,7 @@ class VerificationReady extends Listener {
     // Get verification category
     let welcome = client.channels.cache.get(IDs.channels.welcome) as TextChannel | undefined;
     if (welcome === undefined) {
-      welcome = await client.channels.fetch(IDs.categories.verification) as TextChannel | undefined;
+      welcome = await client.channels.fetch(IDs.channels.welcome) as TextChannel | undefined;
       if (welcome === undefined) {
         console.error('verifyStart: Welcome not found');
         return;
