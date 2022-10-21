@@ -154,11 +154,11 @@ class VerificationLeaveVCListener extends Listener {
           },
           {
             id: IDs.roles.staff.verifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT'],
           },
           {
             id: IDs.roles.staff.trialVerifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT'],
           },
         ],
       });
