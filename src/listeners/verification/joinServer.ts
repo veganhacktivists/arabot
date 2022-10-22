@@ -19,7 +19,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-import { fetchRoles } from '../../utils/database/dbExistingUser';
+// import { fetchRoles } from '../../utils/database/dbExistingUser';
 import IDs from '../../utils/ids';
 import { blockTime } from '../../utils/database/verification';
 
@@ -34,7 +34,10 @@ class VerificationReady extends Listener {
 
   public async run(user: GuildMember) {
     // Add basic roles
-    const roles = await fetchRoles(user.id);
+    // Removed this because it can give restricted people access back,
+    // Currently using another bot for this
+    // const roles = await fetchRoles(user.id);
+    const roles: string[] = [];
 
     // Check if the user has a verification block
     const timeout = await blockTime(user.id);
