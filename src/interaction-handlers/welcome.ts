@@ -57,7 +57,7 @@ class WelcomeButtonHandler extends InteractionHandler {
       if (!member.voice.channel) {
         await member.roles.add(IDs.roles.nonvegan.nonvegan);
 
-        await general.send(`Welcome ${member} to ARA :D. Please check <#${IDs.channels.information.roles}> `
+        await general.send(`${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> `
         + `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`
         + '\n\nIf you would like to be verified as a vegan, join the \'Verification\' voice channel.');
         return;
