@@ -311,10 +311,10 @@ class VerificationJoinVCListener extends Listener {
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
       // Get mod name
-      const modGuildMember = guild!.members.cache.get(notes[i].modId);
+      const modGuildMember = guild.members.cache.get(notes[i].modId);
       let mod = notes[i].modId;
       if (modGuildMember !== undefined) {
-        mod = modGuildMember!.displayName;
+        mod = modGuildMember.displayName;
       }
       // Add sus note to embed
       embed.addFields({

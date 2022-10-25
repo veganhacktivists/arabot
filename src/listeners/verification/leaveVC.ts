@@ -74,10 +74,10 @@ class VerificationLeaveVCListener extends Listener {
     // Allow more people to join VC if there are less than 10 VCs
 
     if (!verifier) {
-      const user = guild.members.cache.get(userSnowflake!)!;
+      const user = guild.members.cache.get(userSnowflake!);
 
       // Remove verify as vegan and give non vegan role
-      if (!await checkFinish(channel.id)) {
+      if (!await checkFinish(channel.id) && user !== undefined) {
         // Get roles to give back to the user
         const roles = await fetchRoles(user.id);
         roles.push(IDs.roles.verifyBlock);
