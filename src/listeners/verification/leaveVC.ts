@@ -17,7 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { container, Listener } from '@sapphire/framework';
+import { Listener } from '@sapphire/framework';
 import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
@@ -48,9 +48,8 @@ class VerificationLeaveVCListener extends Listener {
     let verifier = false;
 
     // Check for undefined variables
-    const { client } = container;
     const { channel } = oldState;
-    const guild = client.guilds.cache.get(newState.guild.id);
+    const { guild } = newState;
 
     if (channel === null || guild === undefined) {
       console.error('Verification channel not found');
