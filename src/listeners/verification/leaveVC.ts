@@ -80,7 +80,8 @@ class VerificationLeaveVCListener extends Listener {
         // Get roles to give back to the user
         const roles = await fetchRoles(user.id);
         roles.push(IDs.roles.verifyBlock);
-        await user.roles.add(roles);
+        await user.roles.add(roles)
+          .catch(() => console.error('Verification: User left but bot still tried to add roles'));
         // Create timeout block for user
         // Counts the recent times they have incomplete verifications
         const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
