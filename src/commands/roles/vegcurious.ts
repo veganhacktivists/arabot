@@ -63,11 +63,11 @@ class VegCuriousCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    let guildMember = guild!.members.cache.get(user!.id);
-    let vegCurious = guild!.roles.cache.get(IDs.roles.nonvegan.vegCurious);
+    const guildMember = guild.members.cache.get(user.id);
+    const vegCurious = guild.roles.cache.get(IDs.roles.nonvegan.vegCurious);
 
     // Checks if guildMember is null
-    if (guildMember === null || vegCurious === undefined) {
+    if (guildMember === undefined || vegCurious === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -76,14 +76,10 @@ class VegCuriousCommand extends Command {
       return;
     }
 
-    // Removes the possibility of guildMember being null
-    guildMember = guildMember!;
-    vegCurious = vegCurious!;
-
     // Checks if the user is vegan
     if (!guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
       await interaction.reply({
-        content: `${user!} is not vegan!`,
+        content: `${user} is not vegan!`,
         ephemeral: true,
         fetchReply: true,
       });
@@ -94,7 +90,7 @@ class VegCuriousCommand extends Command {
       // Remove the Veg Curious role from the user
       await guildMember.roles.remove(vegCurious);
       await interaction.reply({
-        content: `Removed the ${vegCurious.name} role from ${user!}`,
+        content: `Removed the ${vegCurious.name} role from ${user}`,
         ephemeral: true,
         fetchReply: true,
       });
@@ -103,7 +99,7 @@ class VegCuriousCommand extends Command {
     // Add Veg Curious role to the user
     await guildMember.roles.add(vegCurious);
     await interaction.reply({
-      content: `Gave ${user!} the ${vegCurious.name} role!`,
+      content: `Gave ${user} the ${vegCurious.name} role!`,
       ephemeral: true,
       fetchReply: true,
     });
