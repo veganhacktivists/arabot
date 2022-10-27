@@ -26,6 +26,7 @@ class ConvincedCommand extends Command {
     super(context, {
       ...options,
       name: 'convinced',
+      aliases: ['conv'],
       description: 'Gives the convinced role',
       preconditions: [['MentorOnly', 'VerifierOnly', 'ModOnly']],
     });
