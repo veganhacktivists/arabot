@@ -50,6 +50,7 @@ const devIDs = {
       trialModerator: '999431675123597404',
       verifier: '999431675123597406',
       trialVerifier: '999431675123597405',
+      mentor: '999431675140382801',
     },
     stageHost: '999431675123597411',
     patron: '999431675098447935',
