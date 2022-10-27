@@ -27,7 +27,7 @@ class ConvincedCommand extends Command {
       ...options,
       name: 'convinced',
       description: 'Gives the convinced role',
-      preconditions: ['MentorOnly', 'VerifierOnly', 'ModOnly'],
+      preconditions: [['MentorOnly', 'VerifierOnly', 'ModOnly']],
     });
   }
 
