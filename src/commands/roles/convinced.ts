@@ -151,6 +151,8 @@ class ConvincedCommand extends Command {
       await message.reply({
         content: `${user} is already vegan!`,
       });
+      await message.react('❌');
+      return;
     }
 
     // Checks if the user has Convinced and to give them or remove them based on if they have it
