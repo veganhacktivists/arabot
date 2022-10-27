@@ -63,11 +63,11 @@ class StageHostCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    let guildMember = guild!.members.cache.get(user!.id);
-    let stageHost = guild!.roles.cache.get(IDs.roles.stageHost);
+    const guildMember = guild.members.cache.get(user.id);
+    const stageHost = guild.roles.cache.get(IDs.roles.stageHost);
 
     // Checks if guildMember is null
-    if (guildMember === null || stageHost === undefined) {
+    if (guildMember === undefined || stageHost === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -76,24 +76,20 @@ class StageHostCommand extends Command {
       return;
     }
 
-    // Removes the possibility of guildMember being null
-    guildMember = guildMember!;
-    stageHost = stageHost!;
-
-    // Checks if the user has Veg Curious and to give them or remove them based on if they have it
+    // Checks if the user has Stage Host and to give them or remove them based on if they have it
     if (guildMember.roles.cache.has(IDs.roles.stageHost)) {
       // Remove the Veg Curious role from the user
       await guildMember.roles.remove(stageHost);
       await interaction.reply({
-        content: `Removed the ${stageHost.name} role from ${user!}`,
+        content: `Removed the ${stageHost.name} role from ${user}`,
         fetchReply: true,
       });
       return;
     }
-    // Add Veg Curious role to the user
+    // Give Stage Host role to the user
     await guildMember.roles.add(stageHost);
     await interaction.reply({
-      content: `Gave ${user!} the ${stageHost.name} role!`,
+      content: `Gave ${user} the ${stageHost.name} role!`,
       fetchReply: true,
     });
   }
