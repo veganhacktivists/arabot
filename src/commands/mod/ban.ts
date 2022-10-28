@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
-import { addBan } from '../../utils/database/ban';
+import { addBan, checkActive } from '../../utils/database/ban';
 
 class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -78,6 +78,11 @@ class BanCommand extends Command {
         ephemeral: true,
         fetchReply: true,
       });
+      return;
+    }
+
+    if (await checkActive(user.id)) {
+      await interaction.reply(`${user} is already banned!`);
       return;
     }
 
@@ -154,6 +159,12 @@ class BanCommand extends Command {
     if (guild === null) {
       await message.react('❌');
       await message.reply('Guild not found! Try again or contact a developer!');
+      return;
+    }
+
+    if (await checkActive(user.id)) {
+      await message.react('❌');
+      await message.reply(`${user} is already banned!`);
       return;
     }
 
