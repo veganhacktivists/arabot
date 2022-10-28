@@ -19,8 +19,9 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, TextChannel } from 'discord.js';
+import { GuildBan } from 'discord.js';
 import IDs from '../../utils/ids';
-import { removeBan, checkActive } from '../../utils/database/ban';
+import { removeBan, checkActive, addBan } from '../../utils/database/ban';
 
 class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -65,10 +66,27 @@ class UnbanCommand extends Command {
     }
 
     if (!await checkActive(user.id)) {
-      await interaction.reply({
-        content: `${user} is not banned.`,
-      });
-      return;
+      let ban: GuildBan;
+      try {
+        ban = await guild.bans.fetch(user.id);
+      } catch {
+        try {
+          ban = await guild.bans.fetch({ user, force: true });
+        } catch {
+          await interaction.reply({
+            content: `${user} is not banned.`,
+          });
+          return;
+        }
+      }
+      let { reason } = ban;
+
+      if (reason === null || reason === undefined) {
+        reason = '';
+      }
+
+      // Add missing ban
+      await addBan(user.id, mod.user.id, `(Mod who banned is not accurate) - ${reason}`);
     }
 
     // Unban the user
@@ -127,11 +145,28 @@ class UnbanCommand extends Command {
     }
 
     if (!await checkActive(user.id)) {
-      await message.react('❌');
-      await message.reply({
-        content: `${user} is not banned.`,
-      });
-      return;
+      let ban: GuildBan;
+      try {
+        ban = await guild.bans.fetch(user.id);
+      } catch {
+        try {
+          ban = await guild.bans.fetch({ user, force: true });
+        } catch {
+          await message.react('❌');
+          await message.reply({
+            content: `${user} is not banned.`,
+          });
+          return;
+        }
+      }
+      let { reason } = ban;
+
+      if (reason === null || reason === undefined) {
+        reason = '';
+      }
+
+      // Add missing ban
+      await addBan(user.id, mod.user.id, `(Mod who banned is not accurate) - ${reason}`);
     }
 
     // Unban the user
