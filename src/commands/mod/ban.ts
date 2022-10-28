@@ -95,7 +95,7 @@ class BanCommand extends Command {
     // Send DM for reason of ban
     await guildMember.send(`You have been banned from ARA for: ${reason}`
     + '\n\nhttps://vbcamp.org/ARA')
-      .catch();
+      .catch(() => {});
 
     // Ban the user
     await guildMember.ban({ reason });
@@ -181,7 +181,7 @@ class BanCommand extends Command {
       // Send DM for reason of ban
       await user.send(`You have been banned from ARA for: ${reason}`
         + '\n\nhttps://vbcamp.org/ARA')
-        .catch();
+        .catch(() => {});
 
       // Ban the user
       await guildMember.ban({ reason });

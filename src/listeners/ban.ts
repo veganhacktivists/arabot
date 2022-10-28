@@ -42,7 +42,7 @@ class BanJoin extends Listener {
     // Send DM for ban reason
     await user.send(`You have been banned from ARA for: ${reason}`
       + '\n\nhttps://vbcamp.org/ARA')
-      .catch();
+      .catch(() => {});
 
     // Ban the user
     await user.ban({ reason });
