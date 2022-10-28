@@ -95,6 +95,34 @@ export async function addExistingUser(user: GuildMember) {
   await prisma.$disconnect();
 }
 
+// Add an empty user to database in case they are not on the server
+export async function addEmptyUser(userId: string) {
+  // Initialises Prisma Client
+  const prisma = new PrismaClient();
+
+  // Counts if the user is on the database by their snowflake
+  const userQuery = await prisma.user.count({
+    where: {
+      id: userId,
+    },
+  });
+
+  // If the user is already in the database
+  if (userQuery > 0) {
+    return;
+  }
+
+  // Create the user in the database
+  await prisma.user.create({
+    data: {
+      id: userId,
+    },
+  });
+
+  // Close the database connection
+  await prisma.$disconnect();
+}
+
 export async function updateUser(user: GuildMember) {
   // Check if the user is already on the database
   if (!(await userExists(user.id))) {

@@ -26,6 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '../../utils/ids';
 import { removeBan, checkActive, addBan } from '../../utils/database/ban';
+import { addEmptyUser, addExistingUser, userExists } from '../../utils/database/dbExistingUser';
 
 class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -69,6 +70,24 @@ class UnbanCommand extends Command {
       return;
     }
 
+    // Gets mod's GuildMember
+    const modGuildMember = guild.members.cache.get(mod.user.id);
+
+    // Checks if guildMember is null
+    if (modGuildMember === undefined) {
+      await interaction.reply({
+        content: 'Error fetching mod!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Check if mod is in database
+    if (!await userExists(modGuildMember.id)) {
+      await addExistingUser(modGuildMember);
+    }
+
     if (!await checkActive(user.id)) {
       let ban: GuildBan;
       try {
@@ -87,6 +106,11 @@ class UnbanCommand extends Command {
 
       if (reason === null || reason === undefined) {
         reason = '';
+      }
+
+      // Check if user and mod are on the database
+      if (!await userExists(user.id)) {
+        await addEmptyUser(user.id);
       }
 
       // Add missing ban
@@ -148,6 +172,11 @@ class UnbanCommand extends Command {
       return;
     }
 
+    // Check if mod is in database
+    if (!await userExists(mod.id)) {
+      await addExistingUser(mod);
+    }
+
     if (!await checkActive(user.id)) {
       let ban: GuildBan;
       try {
@@ -167,6 +196,11 @@ class UnbanCommand extends Command {
 
       if (reason === null || reason === undefined) {
         reason = '';
+      }
+
+      // Check if user and mod are on the database
+      if (!await userExists(user.id)) {
+        await addEmptyUser(user.id);
       }
 
       // Add missing ban

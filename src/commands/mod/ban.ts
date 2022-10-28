@@ -21,6 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
 import { addBan, checkActive } from '../../utils/database/ban';
+import { addEmptyUser, addExistingUser, userExists } from '../../utils/database/dbExistingUser';
 
 class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -68,13 +69,13 @@ class BanCommand extends Command {
       return;
     }
 
-    // Gets guildMember
-    const guildMember = guild.members.cache.get(user.id);
+    // Gets mod's GuildMember
+    const modGuildMember = guild.members.cache.get(mod.user.id);
 
     // Checks if guildMember is null
-    if (guildMember === undefined) {
+    if (modGuildMember === undefined) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching mod!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -86,24 +87,41 @@ class BanCommand extends Command {
       return;
     }
 
-    // Checks if the user is not restricted
-    if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
-    || guildMember.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
-      await interaction.reply({
-        content: `You need to restrict ${user} first!`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
+    // Check if mod is in database
+    if (!await userExists(modGuildMember.id)) {
+      await addExistingUser(modGuildMember);
     }
 
-    // Send DM for reason of ban
-    await guildMember.send(`You have been banned from ARA for: ${reason}`
-    + '\n\nhttps://vbcamp.org/ARA')
-      .catch(() => {});
+    // Gets guildMember
+    const guildMember = guild.members.cache.get(user.id);
 
-    // Ban the user
-    await guildMember.ban({ reason });
+    if (guildMember !== undefined) {
+      // Checks if the user is not restricted
+      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
+        || guildMember.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
+        await interaction.reply({
+          content: 'You need to restrict the user first!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+        return;
+      }
+
+      // Check if user and mod are on the database
+      if (!await userExists(guildMember.id)) {
+        await addExistingUser(guildMember);
+      }
+
+      // Send DM for reason of ban
+      await user.send(`You have been banned from ARA for: ${reason}`
+        + '\n\nhttps://vbcamp.org/ARA')
+        .catch(() => {});
+
+      // Ban the user
+      await guildMember.ban({ reason });
+    } else if (!await userExists(user.id)) {
+      await addEmptyUser(user.id);
+    }
 
     await interaction.reply({
       content: `${user} has been banned.`,
@@ -175,6 +193,11 @@ class BanCommand extends Command {
       return;
     }
 
+    // Check if mod is in database
+    if (!await userExists(mod.id)) {
+      await addExistingUser(mod);
+    }
+
     // Gets guildMember
     const guildMember = guild.members.cache.get(user.id);
 
@@ -189,6 +212,11 @@ class BanCommand extends Command {
         return;
       }
 
+      // Check if user and mod are on the database
+      if (!await userExists(guildMember.id)) {
+        await addExistingUser(guildMember);
+      }
+
       // Send DM for reason of ban
       await user.send(`You have been banned from ARA for: ${reason}`
         + '\n\nhttps://vbcamp.org/ARA')
@@ -196,6 +224,8 @@ class BanCommand extends Command {
 
       // Ban the user
       await guildMember.ban({ reason });
+    } else if (!await userExists(user.id)) {
+      await addEmptyUser(user.id);
     }
 
     // Add ban to database
