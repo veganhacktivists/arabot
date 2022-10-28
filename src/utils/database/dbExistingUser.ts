@@ -22,14 +22,14 @@ import { PrismaClient } from '@prisma/client';
 import IDs from '../ids';
 
 // Checks if the user exists on the database
-export async function userExists(user: GuildMember) {
+export async function userExists(userId: string) {
   // Initialises Prisma Client
   const prisma = new PrismaClient();
 
   // Counts if the user is on the database by their snowflake
   const userQuery = await prisma.user.count({
     where: {
-      id: user.id,
+      id: userId,
     },
   });
 
@@ -97,7 +97,7 @@ export async function addExistingUser(user: GuildMember) {
 
 export async function updateUser(user: GuildMember) {
   // Check if the user is already on the database
-  if (!(await userExists(user))) {
+  if (!(await userExists(user.id))) {
     await addExistingUser(user);
     return;
   }

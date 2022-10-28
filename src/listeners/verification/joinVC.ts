@@ -499,7 +499,7 @@ class VerificationJoinVCListener extends Listener {
           return;
         }
         // Add verifier to database if they're not on the database
-        if (!(await userExists(verifierGuildMember))) {
+        if (!(await userExists(verifierGuildMember.id))) {
           await addExistingUser(verifierGuildMember);
         }
 

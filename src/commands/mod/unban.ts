@@ -18,8 +18,12 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { User, Message, TextChannel } from 'discord.js';
-import { GuildBan } from 'discord.js';
+import type {
+  User,
+  Message,
+  TextChannel,
+  GuildBan,
+} from 'discord.js';
 import IDs from '../../utils/ids';
 import { removeBan, checkActive, addBan } from '../../utils/database/ban';
 
