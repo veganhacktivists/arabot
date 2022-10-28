@@ -92,6 +92,12 @@ let IDs = {
       potgm: '956224095509442600',
       disabilities: '933078769365823518',
     },
+    restricted: {
+      moderators: '928349536395604029',
+    },
+    logs: {
+      restricted: '920993034462715925',
+    },
   },
   categories: {
     verification: '797505409073676299',
