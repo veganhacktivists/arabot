@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message, TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
+import { addBan } from '../../utils/database/ban';
 
 class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -51,7 +52,6 @@ class BanCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
     const reason = interaction.options.getString('reason');
@@ -105,6 +105,9 @@ class BanCommand extends Command {
       ephemeral: true,
       fetchReply: true,
     });
+
+    // Add ban to database
+    await addBan(user.id, mod.user.id, reason);
 
     // Log the ban
     let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as TextChannel | undefined;
@@ -180,6 +183,9 @@ class BanCommand extends Command {
     await user.ban({ reason });
 
     await message.react('✅');
+
+    // Add ban to database
+    await addBan(user.id, mod.id, reason);
 
     // Log the ban
     let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as TextChannel | undefined;

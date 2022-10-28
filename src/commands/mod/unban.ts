@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
+import { removeBan } from '../../utils/database/ban';
 
 class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,7 +49,6 @@ class UnbanCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
     const mod = interaction.member;
@@ -72,6 +72,9 @@ class UnbanCommand extends Command {
       ephemeral: true,
       fetchReply: true,
     });
+
+    // Add unban to database
+    await removeBan(user.id, mod.user.id);
 
     // Log the ban
     let modRestrict = guild.channels.cache.get(IDs.channels.restricted.moderators) as TextChannel | undefined;
@@ -119,6 +122,9 @@ class UnbanCommand extends Command {
     await guild.members.unban(user);
 
     await message.react('✅');
+
+    // Add unban to database
+    await removeBan(user.id, mod.id);
 
     await message.reply({
       content: `${user} has been unbanned.`,
