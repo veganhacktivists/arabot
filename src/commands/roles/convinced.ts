@@ -108,7 +108,7 @@ class ConvincedCommand extends Command {
       + '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan '
       + 'and other parts of the server! :)'
       + '\n\nThank you for caring about the animals 💚')
-      .catch();
+      .catch(() => {});
   }
 
   public async messageRun(message: Message, args: Args) {
