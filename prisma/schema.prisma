@@ -43,6 +43,7 @@ model User {
   RestrictMod    Restrict[] @relation("restMod")
   BanUser        Ban[]      @relation("banUser")
   BanMod         Ban[]      @relation("banMod")
+  BanEndMod      Ban[]      @relation("endBanMod")
   TempBanUser    TempBan[]  @relation("tbanUser")
   TempBanMod     TempBan[]  @relation("tbanMod")
 }
@@ -99,14 +100,17 @@ model Restrict {
 }
 
 model Ban {
-  id     Int      @id @default(autoincrement())
-  user   User     @relation("banUser", fields: [userId], references: [id])
-  userId String
-  mod    User     @relation("banMod", fields: [modId], references: [id])
-  modId  String
-  time   DateTime @default(now())
-  active Boolean  @default(true)
-  reason String
+  id       Int       @id @default(autoincrement())
+  user     User      @relation("banUser", fields: [userId], references: [id])
+  userId   String
+  mod      User      @relation("banMod", fields: [modId], references: [id])
+  modId    String
+  time     DateTime  @default(now())
+  endMod   User?     @relation("endBanMod", fields: [endModId], references: [id])
+  endModId String?
+  endTime  DateTime?
+  active   Boolean   @default(true)
+  reason   String
 }
 
 model TempBan {
