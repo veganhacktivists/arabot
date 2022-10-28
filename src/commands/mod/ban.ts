@@ -28,7 +28,7 @@ class BanCommand extends Command {
       ...options,
       name: 'ban',
       description: 'Bans a user',
-      preconditions: ['ModOnly'],
+      preconditions: ['RestrictedAccessOnly'],
     });
   }
 

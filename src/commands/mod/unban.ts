@@ -28,7 +28,7 @@ class UnbanCommand extends Command {
       ...options,
       name: 'unban',
       description: 'Unbans a user',
-      preconditions: ['ModOnly'],
+      preconditions: ['RestrictedAccessOnly'],
     });
   }
 
