@@ -65,7 +65,16 @@ class UnbanCommand extends Command {
     }
 
     // Unban the user
-    await guild.members.unban(user);
+    try {
+      await guild.members.unban(user);
+    } catch {
+      await interaction.reply({
+        content: `${user} is not banned.`,
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
 
     await interaction.reply({
       content: `${user} has been unbanned.`,
@@ -119,7 +128,15 @@ class UnbanCommand extends Command {
     }
 
     // Unban the user
-    await guild.members.unban(user);
+    try {
+      await guild.members.unban(user);
+    } catch {
+      await message.react('❌');
+      await message.reply({
+        content: `${user} is not banned.`,
+      });
+      return;
+    }
 
     await message.react('✅');
 
