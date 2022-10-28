@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message, TextChannel } from 'discord.js';
+import type { User, Message, TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
 import { addBan } from '../../utils/database/ban';
 
@@ -68,7 +68,7 @@ class BanCommand extends Command {
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
+    // Gets guildMember
     const guildMember = guild.members.cache.get(user.id);
 
     // Checks if guildMember is null
@@ -126,9 +126,9 @@ class BanCommand extends Command {
   // Non Application Command method of banning a user
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
@@ -164,28 +164,33 @@ class BanCommand extends Command {
       return;
     }
 
-    // Checks if the user is not restricted
-    if (user.roles.cache.has(IDs.roles.vegan.vegan)
-      || user.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
-      await message.react('❌');
-      await message.reply({
-        content: 'You need to restrict the user first!',
-      });
-      return;
+    // Gets guildMember
+    const guildMember = guild.members.cache.get(user.id);
+
+    if (guildMember !== undefined) {
+      // Checks if the user is not restricted
+      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
+        || guildMember.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
+        await message.react('❌');
+        await message.reply({
+          content: 'You need to restrict the user first!',
+        });
+        return;
+      }
+
+      // Send DM for reason of ban
+      await user.send(`You have been banned from ARA for: ${reason}`
+        + '\n\nhttps://vbcamp.org/ARA')
+        .catch();
+
+      // Ban the user
+      await guildMember.ban({ reason });
     }
-
-    // Send DM for reason of ban
-    await user.send(`You have been banned from ARA for: ${reason}`
-      + '\n\nhttps://vbcamp.org/ARA')
-      .catch();
-
-    // Ban the user
-    await user.ban({ reason });
-
-    await message.react('✅');
 
     // Add ban to database
     await addBan(user.id, mod.id, reason);
+
+    await message.react('✅');
 
     // Log the ban
     let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as TextChannel | undefined;
