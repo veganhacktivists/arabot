@@ -111,7 +111,6 @@ class VerificationJoinVCListener extends Listener {
       await channel.setName('Verifier Meeting');
       verifier = true;
     } else {
-      await channel.setName(`${member.displayName} - Verification`);
       await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\n`
       + 'If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you\'d like to verify as a vegan again, you\'d have to contact a Mod, which could be done via ModMail.');
       // Adds to the database that the user joined verification
@@ -143,6 +142,7 @@ class VerificationJoinVCListener extends Listener {
       // TODO refactor this mess to circumvent
       //  "Contains words not allowed for servers in Server Discovery."
       let verificationText: TextChannel;
+      let bannedName = false;
       try {
         verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
           type: 'GUILD_TEXT',
@@ -193,6 +193,13 @@ class VerificationJoinVCListener extends Listener {
             },
           ],
         });
+        bannedName = true;
+      }
+
+      if (!bannedName) {
+        await channel.setName(`${member.displayName} - Verification`);
+      } else {
+        await channel.setName(`${member.id} - Verification`);
       }
 
       // Send a message that someone wants to be verified
