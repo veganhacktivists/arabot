@@ -140,30 +140,60 @@ class VerificationJoinVCListener extends Listener {
     // Create a text channel for verifiers only
     // Checks if there are more than 10 voice channels
     if (!verifier) {
-      const verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
-        type: 'GUILD_TEXT',
-        topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
-        parent: category.id,
-        userLimit: 1,
-        permissionOverwrites: [
-          {
-            id: guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-          },
-          {
-            id: IDs.roles.verifyBlock,
-            deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
-          },
-          {
-            id: IDs.roles.staff.verifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-          },
-          {
-            id: IDs.roles.staff.trialVerifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
-          },
-        ],
-      });
+      // TODO refactor this mess to circumvent
+      //  "Contains words not allowed for servers in Server Discovery."
+      let verificationText: TextChannel;
+      try {
+        verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
+          type: 'GUILD_TEXT',
+          topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
+          parent: category.id,
+          userLimit: 1,
+          permissionOverwrites: [
+            {
+              id: guild.roles.everyone,
+              deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+            {
+              id: IDs.roles.verifyBlock,
+              deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+            },
+            {
+              id: IDs.roles.staff.verifier,
+              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+            {
+              id: IDs.roles.staff.trialVerifier,
+              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+          ],
+        });
+      } catch {
+        verificationText = await guild.channels.create(`✅┃${member.id}-verification`, {
+          type: 'GUILD_TEXT',
+          topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
+          parent: category.id,
+          userLimit: 1,
+          permissionOverwrites: [
+            {
+              id: guild.roles.everyone,
+              deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+            {
+              id: IDs.roles.verifyBlock,
+              deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+            },
+            {
+              id: IDs.roles.staff.verifier,
+              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+            {
+              id: IDs.roles.staff.trialVerifier,
+              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            },
+          ],
+        });
+      }
 
       // Send a message that someone wants to be verified
       const userInfoEmbed = await this.getUserInfo(member, roles);
