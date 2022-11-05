@@ -100,6 +100,7 @@ let IDs = {
     },
   },
   categories: {
+    staff: '768685283583328257',
     verification: '797505409073676299',
     diversity: '933078380394459146',
   },
