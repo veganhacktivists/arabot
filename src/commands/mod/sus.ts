@@ -19,9 +19,13 @@
 
 import { Command, RegisterBehavior, Args } from '@sapphire/framework';
 import {
-  MessageEmbed, MessageActionRow, MessageButton, Constants, ButtonInteraction,
+  MessageEmbed,
+  MessageActionRow,
+  MessageButton,
+  Constants,
+  ButtonInteraction,
 } from 'discord.js';
-import type { Message, GuildMember } from 'discord.js';
+import type { Message, GuildMember, TextChannel } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser, userExists } from '../../utils/database/dbExistingUser';
 import {
@@ -31,6 +35,7 @@ import {
   deactivateNote,
   deactivateAllNotes,
 } from '../../utils/database/sus';
+import { checkStaff } from '../../utils/checker';
 import IDs from '../../utils/ids';
 
 // TODO add a check when they join the server to give the user the sus role again
@@ -186,6 +191,15 @@ class SusCommand extends Command {
       return;
     }
 
+    let staffChannel = false;
+    let { channel } = interaction;
+    if (channel !== null) {
+      if (channel.type === 'GUILD_TEXT') {
+        channel = channel as TextChannel;
+        staffChannel = checkStaff(channel);
+      }
+    }
+
     // Gets the sus notes from the database
     const notes = await findNotes(user.id, true);
 
@@ -223,7 +237,7 @@ class SusCommand extends Command {
     // Sends the notes to the user
     await interaction.reply({
       embeds: [noteEmbed],
-      ephemeral: true,
+      ephemeral: !staffChannel,
       fetchReply: true,
     });
   }
