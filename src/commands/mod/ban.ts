@@ -97,8 +97,7 @@ class BanCommand extends Command {
 
     if (guildMember !== undefined) {
       // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
-        || guildMember.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
+      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
         await interaction.reply({
           content: 'You need to restrict the user first!',
           ephemeral: true,
@@ -203,8 +202,7 @@ class BanCommand extends Command {
 
     if (guildMember !== undefined) {
       // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
-        || guildMember.roles.cache.has(IDs.roles.nonvegan.nonvegan)) {
+      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
         await message.react('❌');
         await message.reply({
           content: 'You need to restrict the user first!',
