@@ -208,7 +208,7 @@ class SusCommand extends Command {
       await interaction.reply({
         content: `${user} has no sus notes!`,
         ephemeral: true,
-        fetchReply: true,
+        fetchReply: !staffChannel,
       });
       return;
     }
