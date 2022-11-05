@@ -228,10 +228,10 @@ class SusCommand extends Command {
         mod = modGuildMember!.displayName;
       }
       // Add sus note to embed
-      noteEmbed.addField(
-        `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
-        notes[i].note,
-      );
+      noteEmbed.addFields({
+        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        value: notes[i].note,
+      });
     }
 
     // Sends the notes to the user
@@ -301,10 +301,10 @@ class SusCommand extends Command {
       .setColor('#ff0000')
       .setTitle(`Sus note for ${userName}`)
       .setThumbnail(user.avatarURL()!) // TODO avatar does not show when run
-      .addField(
-        `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note.time.getTime() / 1000)}>`,
-        note.note,
-      );
+      .addFields({
+        name: `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note.time.getTime() / 1000)}>`,
+        value: note.note,
+      });
 
     // Create buttons to delete or cancel the deletion
     const buttons = new MessageActionRow<MessageButton>()
@@ -423,10 +423,10 @@ class SusCommand extends Command {
         mod = modGuildMember.displayName;
       }
       // Add sus note to embed
-      noteEmbed.addField(
-        `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
-        notes[i].note,
-      );
+      noteEmbed.addFields({
+        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        value: notes[i].note,
+      });
     }
 
     // Create buttons to delete or cancel the deletion
