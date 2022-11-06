@@ -101,6 +101,7 @@ let IDs = {
   },
   categories: {
     staff: '768685283583328257',
+    modMail: '867077297664426006',
     verification: '797505409073676299',
     diversity: '933078380394459146',
   },

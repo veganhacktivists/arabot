@@ -32,8 +32,6 @@ export function checkStaff(channel: TextChannel) {
     return false;
   }
 
-  if (channel.parent.id === IDs.categories.staff) {
-    return true;
-  }
-  return false;
+  return channel.parent.id === IDs.categories.staff
+    || channel.parent.id === IDs.categories.modMail;
 }
