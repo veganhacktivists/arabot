@@ -94,6 +94,8 @@ let IDs = {
     },
     restricted: {
       moderators: '928349536395604029',
+      restricted: '847880218521632788',
+      tolerance: '856516474120962048',
     },
     logs: {
       restricted: '920993034462715925',

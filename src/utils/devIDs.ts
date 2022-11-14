@@ -91,6 +91,8 @@ const devIDs = {
     },
     restricted: {
       moderators: '999431679812845656',
+      restricted: '999431680295194684',
+      tolerance: '999431680295194685',
     },
     logs: {
       restricted: '999431681217937513',
