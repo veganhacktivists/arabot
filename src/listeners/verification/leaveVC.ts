@@ -132,7 +132,7 @@ class VerificationLeaveVCListener extends Listener {
         permissionOverwrites: [
           {
             id: guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
           },
           {
             id: IDs.roles.verifyBlock,

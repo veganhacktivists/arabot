@@ -88,7 +88,7 @@ class VerificationReady extends Listener {
         permissionOverwrites: [
           {
             id: category.guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
           },
           {
             id: IDs.roles.verifyBlock,
