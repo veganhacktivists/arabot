@@ -41,7 +41,7 @@ class RestrictedMessageTask extends ScheduledTask {
   }
 
   private message(id: string) {
-    return `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264>`
+    return `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264> `
       + 'to attempt to clear up the issue that lead to your restriction and rejoin the server.'
       + '\n\nJust let us know what got you restricted and why you’d like to avoid repeating that behaviour and we’ll try to sort it out.';
   }
