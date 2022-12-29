@@ -26,6 +26,8 @@ jobs:
     name: docker-build
     runs-on: ubuntu-latest
     steps:
+      - name: Check out Code
+        uses: actions/checkout@v3
       - name: Login to Registry
         uses: docker/login-action@v2
         with:
