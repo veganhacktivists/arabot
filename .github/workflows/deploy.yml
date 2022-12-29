@@ -21,7 +21,7 @@ jobs:
     env:
       REPO: git@github.com:veganhacktivists/arabot.git
       REGISTRY: registry.digitalocean.com/vh-registry
-      IMAGE: arabot
+      IMAGE: test
       TAG: latest
     name: docker-build
     runs-on: ubuntu-latest
