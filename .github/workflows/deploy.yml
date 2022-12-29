@@ -17,20 +17,21 @@ on:
     branches: [ "main" ]
 
 jobs:
-  deploy:
-    name: Deploy Bot
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      security-events: write
+  build:
     env:
-      DEPLOY_HOST: 206.189.96.198
-      DEPLOY_PRIVATE_KEY: ${{ secrets.DEPLOY_PRIVATE_KEY }}
       REPO: git@github.com:veganhacktivists/arabot.git
-      DEPLOY_USER: deploy
+      REGISTRY: registry.digitalocean.com/vh-registry
+      IMAGE: arabot
+      TAG: latest
+    name: docker-build
+    runs-on: ubuntu-latest
     steps:
-      - name: setup-ssh
-        run: |
-          eval `ssh-agent -s`
-          ssh-add - <<< "$DEPLOY_PRIVATE_KEY"
-          ssh -o StrictHostKeyChecking=no ${DEPLOY_USER}@${DEPLOY_HOST} -C "cd /tmp && (git clone git@github.com:${GITHUB_REPOSITORY}) || (cd arabot && git pull && git checkout ${GITHUB_REF_NAME}) && cd arabot && docker-compose build"
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DIGITAL_OCEAN_IMAGE_REPO_USER }}
+          password: ${{ secrets.DIGITAL_OCEAN_IMAGE_REPO_TOKEN }}
+      - name: build
+        run: docker build . -t ${REGISTRY}/${IMAGE}:${TAG}
+      - name: push
+        run: docker push ${REGISTRY}/${IMAGE}:${TAG}
