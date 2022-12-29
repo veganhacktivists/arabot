@@ -26,9 +26,10 @@ jobs:
     name: docker-build
     runs-on: ubuntu-latest
     steps:
-      - name: Login to Docker Hub
+      - name: Login to Registry
         uses: docker/login-action@v2
         with:
+          registry: registry.digitalocean.com
           username: ${{ secrets.DIGITAL_OCEAN_IMAGE_REPO_USER }}
           password: ${{ secrets.DIGITAL_OCEAN_IMAGE_REPO_TOKEN }}
       - name: build
