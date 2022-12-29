@@ -2,6 +2,7 @@ version: "3.7"
 services:
   postgres:
     image: postgres:14
+    profiles: ["standalone"]
     container_name: postgres
     restart: always
     env_file:
@@ -11,10 +12,11 @@ services:
 
   redis:
     image: redis:7
+    profiles: ["standalone", "prod"]
     container_name: redis
     restart: always
     env_file:
-      - .env
+      - .env.prod
     volumes:
       - redis:/data
 
@@ -22,11 +24,12 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    profiles: ["standalone", "prod"]
     depends_on:
       - postgres
       - redis
     env_file:
-      - .env
+      - .env.prod
 
 volumes:
   postgres:

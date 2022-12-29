@@ -17,7 +17,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  eslint:
+  deploy:
     name: Deploy Bot
     runs-on: ubuntu-latest
     permissions:
