@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Shrug } from '../../utils/gifs';
 
 class ShrugCommand extends Command {
@@ -44,7 +44,7 @@ class ShrugCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
     // TODO exception handling
     const member = interaction.member!.user;
@@ -52,7 +52,7 @@ class ShrugCommand extends Command {
 
     // Creates the embed for the shrug reaction
     const randomShrug = Shrug[Math.floor(Math.random() * Shrug.length)];
-    const shrugEmbed = new MessageEmbed()
+    const shrugEmbed = new EmbedBuilder()
       .setColor('#001980')
       .setTitle(`${memberGuildMember.displayName} shrugs`)
       .setImage(randomShrug);

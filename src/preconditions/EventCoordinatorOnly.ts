@@ -20,7 +20,7 @@
 import { AllFlowsPrecondition } from '@sapphire/framework';
 import type {
   CommandInteraction,
-  ContextMenuInteraction,
+  ContextMenuCommandInteraction,
   Message,
   GuildMember,
 } from 'discord.js';
@@ -37,7 +37,7 @@ class EventCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkEventCoordinator(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuInteraction) {
+  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
     // for context menu command
     return this.checkEventCoordinator(interaction.member! as GuildMember);
   }

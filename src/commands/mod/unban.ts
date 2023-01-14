@@ -54,7 +54,7 @@ class UnbanCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const mod = interaction.member;

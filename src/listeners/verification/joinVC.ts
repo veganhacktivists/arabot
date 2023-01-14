@@ -29,13 +29,15 @@ import type {
   User,
 } from 'discord.js';
 import {
+  time,
+  ChannelType,
+  PermissionsBitField,
+  ButtonBuilder,
   ButtonInteraction,
-  Constants,
-  MessageActionRow,
-  MessageButton,
-  MessageEmbed,
+  ButtonStyle,
+  ActionRowBuilder,
+  EmbedBuilder,
 } from 'discord.js';
-import { time } from '@discordjs/builders';
 import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
 import { findNotes } from '../../utils/database/sus';
@@ -88,7 +90,7 @@ class VerificationJoinVCListener extends Listener {
     // Check if a verifier joined a verification VC and update database
     if (channel.members.size === 2) {
       await channel.permissionOverwrites.edit(guild.roles.everyone, {
-        SEND_MESSAGES: true,
+        SendMessages: true,
       });
 
       if (!channel.name.includes(' - Verification')) {
@@ -134,7 +136,7 @@ class VerificationJoinVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
+    const listVoiceChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildVoice);
 
     // Create a text channel for verifiers only
     // Checks if there are more than 10 voice channels
@@ -144,52 +146,62 @@ class VerificationJoinVCListener extends Listener {
       let verificationText: TextChannel;
       let bannedName = false;
       try {
-        verificationText = await guild.channels.create(`✅┃${member.displayName}-verification`, {
-          type: 'GUILD_TEXT',
+        verificationText = await guild.channels.create({
+          name: `✅┃${member.displayName}-verification`,
+          type: ChannelType.GuildText,
           topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
           parent: category.id,
           userLimit: 1,
           permissionOverwrites: [
             {
               id: guild.roles.everyone,
-              deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              deny: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.verifyBlock,
-              deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+              deny: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.staff.verifier,
-              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              allow: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.staff.trialVerifier,
-              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              allow: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
           ],
         });
       } catch {
-        verificationText = await guild.channels.create(`✅┃${member.id}-verification`, {
-          type: 'GUILD_TEXT',
+        verificationText = await guild.channels.create({
+          name: `✅┃${member.displayName}-verification`,
+          type: ChannelType.GuildText,
           topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
           parent: category.id,
           userLimit: 1,
           permissionOverwrites: [
             {
               id: guild.roles.everyone,
-              deny: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              deny: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.verifyBlock,
-              deny: ['VIEW_CHANNEL', 'SEND_MESSAGES'],
+              deny: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.staff.verifier,
-              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              allow: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
             {
               id: IDs.roles.staff.trialVerifier,
-              allow: ['SEND_MESSAGES', 'VIEW_CHANNEL'],
+              allow: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel],
             },
           ],
         });
@@ -218,76 +230,99 @@ class VerificationJoinVCListener extends Listener {
 
     // Checks if there are more than 10 voice channels
     if (listVoiceChannels.size > maxVCs - 1) {
-      await guild.channels.create('Verification', {
-        type: 'GUILD_VOICE',
+      await guild.channels.create({
+        name: 'Verification',
+        type: ChannelType.GuildVoice,
         parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
             id: guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
+            deny: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Stream],
           },
           {
             id: IDs.roles.verifyBlock,
-            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
+            deny: [PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.SendMessages],
           },
           {
             id: IDs.roles.nonvegan.nonvegan,
-            allow: ['VIEW_CHANNEL'],
-            deny: ['CONNECT'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
+            deny: [PermissionsBitField.Flags.Connect],
           },
           {
             id: IDs.roles.vegan.vegan,
-            allow: ['VIEW_CHANNEL'],
-            deny: ['CONNECT'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
+            deny: [PermissionsBitField.Flags.Connect],
           },
           {
             id: IDs.roles.vegan.activist,
-            deny: ['VIEW_CHANNEL', 'CONNECT'],
+            deny: [PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect],
           },
           {
             id: IDs.roles.staff.verifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
           {
             id: IDs.roles.staff.trialVerifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
         ],
       });
     } else {
-      await guild.channels.create('Verification', {
-        type: 'GUILD_VOICE',
+      await guild.channels.create({
+        name: 'Verification',
+        type: ChannelType.GuildVoice,
         parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
             id: guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
+            deny: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages],
           },
           {
             id: IDs.roles.verifyBlock,
-            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
+            deny: [PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.SendMessages],
           },
           {
             id: IDs.roles.nonvegan.nonvegan,
-            allow: ['VIEW_CHANNEL'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
           },
           {
             id: IDs.roles.vegan.vegan,
-            allow: ['VIEW_CHANNEL'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
           },
           {
             id: IDs.roles.vegan.activist,
-            deny: ['VIEW_CHANNEL', 'CONNECT'],
+            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
           },
           {
             id: IDs.roles.staff.verifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
           {
             id: IDs.roles.staff.trialVerifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
         ],
       });
@@ -297,23 +332,33 @@ class VerificationJoinVCListener extends Listener {
     await currentChannel.permissionOverwrites.set([
       {
         id: guild.roles.everyone,
-        deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
+        deny: [PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.Stream],
       },
       {
         id: IDs.roles.verifyBlock,
-        deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
+        deny: [PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.SendMessages],
       },
       {
         id: IDs.roles.staff.verifier,
-        allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+        allow: [PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.MuteMembers],
       },
       {
         id: IDs.roles.staff.trialVerifier,
-        allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+        allow: [PermissionsBitField.Flags.SendMessages,
+          PermissionsBitField.Flags.ViewChannel,
+          PermissionsBitField.Flags.Connect,
+          PermissionsBitField.Flags.MuteMembers],
       },
       {
         id: member.id,
-        allow: ['VIEW_CHANNEL'],
+        allow: [PermissionsBitField.Flags.ViewChannel],
       },
     ]);
     await currentChannel.setUserLimit(0);
@@ -324,7 +369,7 @@ class VerificationJoinVCListener extends Listener {
     const joinTime = time(user.joinedAt!);
     const registerTime = time(user.user.createdAt);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(user.displayHexColor)
       .setTitle(`Information on ${user.user.username}`)
       .setThumbnail(user.user.avatarURL()!)
@@ -341,7 +386,7 @@ class VerificationJoinVCListener extends Listener {
   private async getSus(user: GuildMember, guild: Guild) {
     const notes = await findNotes(user.id, true);
 
-    const embed = new MessageEmbed()
+    const embed = new EmbedBuilder()
       .setColor(user.displayHexColor)
       .setTitle(`${notes.length} sus notes for ${user.user.username}`);
 
@@ -501,7 +546,7 @@ class VerificationJoinVCListener extends Listener {
         // Confirmation to give roles to the user being verified
         if (info.page === questionLength) {
           // Create embed with all the roles the user has
-          embed = new MessageEmbed()
+          embed = new EmbedBuilder()
             .setColor(embedColor)
             .setTitle(`Give these roles to ${user.displayName}?`)
             .setThumbnail(user.avatarURL()!)
@@ -510,16 +555,16 @@ class VerificationJoinVCListener extends Listener {
             );
 
           // Create buttons for input
-          buttons = [new MessageActionRow<MessageButton>()
+          buttons = [new ActionRowBuilder<ButtonBuilder>()
             .addComponents(
-              new MessageButton()
+              new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel('Yes')
-                .setStyle(Constants.MessageButtonStyles.SUCCESS),
-              new MessageButton()
+                .setStyle(ButtonStyle.Success),
+              new ButtonBuilder()
                 .setCustomId('cancel')
                 .setLabel('No')
-                .setStyle(Constants.MessageButtonStyles.DANGER),
+                .setStyle(ButtonStyle.Danger),
             )];
           await message.edit({
             embeds: [embed],
@@ -553,7 +598,7 @@ class VerificationJoinVCListener extends Listener {
           }, (info.roles.vegan || info.roles.convinced) ? 604800000 : 1814400000);
         }
         // Add embed saying verification completed
-        embed = new MessageEmbed()
+        embed = new EmbedBuilder()
           .setColor('#34c000')
           .setTitle(`Successfully verified ${user.displayName}!`)
           .setThumbnail(user.user.avatarURL()!)
@@ -586,7 +631,7 @@ class VerificationJoinVCListener extends Listener {
   }
 
   private async createEmbed(title: string, color: ColorResolvable) {
-    return new MessageEmbed()
+    return new EmbedBuilder()
       .setColor(color)
       .setTitle(title);
   }
@@ -597,14 +642,14 @@ class VerificationJoinVCListener extends Listener {
     for (let i = 0; i < buttons.length; i += 1) {
       // Check if it exceeds the maximum buttons in a ActionRow
       if (i % 5 === 0) {
-        buttonActions.push(new MessageActionRow<MessageButton>());
+        buttonActions.push(new ActionRowBuilder<ButtonBuilder>());
       }
       buttonActions[Math.floor(i / 5)]
         .addComponents(
-          new MessageButton()
+          new ButtonBuilder()
             .setCustomId(`button${i}`)
             .setLabel(buttons[i])
-            .setStyle(Constants.MessageButtonStyles.SECONDARY),
+            .setStyle(ButtonStyle.Secondary),
         );
     }
 

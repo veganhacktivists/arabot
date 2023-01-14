@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Poke } from '../../utils/gifs';
 
 class PokeCommand extends Command {
@@ -47,7 +47,7 @@ class PokeCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     // TODO exception handling
     const user = interaction.options.getUser('user')!;
@@ -56,7 +56,7 @@ class PokeCommand extends Command {
 
     // Creates the embed for the poke
     const randomPoke = Poke[Math.floor(Math.random() * Poke.length)];
-    const pokeEmbed = new MessageEmbed()
+    const pokeEmbed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle(`Poke from ${pokerGuildMember.displayName}`)
       .setImage(randomPoke);

@@ -18,7 +18,7 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import { Constants, MessageActionRow, MessageButton } from 'discord.js';
+import { ButtonStyle, ActionRowBuilder, ButtonBuilder } from 'discord.js';
 
 import type {
   Client,
@@ -56,12 +56,12 @@ class VerificationReady extends Listener {
       + 'You\'ll chat with one of our verifiers who will just ask you a few questions before approving your Vegan role. '
       + 'Vegans have access to more channels. Voice discussions may be recorded.';
 
-    const button = new MessageActionRow<MessageButton>()
+    const button = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId('welcomeJoin')
           .setLabel('Join')
-          .setStyle(Constants.MessageButtonStyles.SUCCESS),
+          .setStyle(ButtonStyle.Success),
       );
 
     if (message?.author.id !== botId) {

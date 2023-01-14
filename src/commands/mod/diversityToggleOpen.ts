@@ -18,6 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
+import { ChannelType, PermissionsBitField } from 'discord.js';
 import type { TextChannel } from 'discord.js';
 import IDs from '../../utils/ids';
 
@@ -46,7 +47,7 @@ class ToggleOpenCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const subcommand = interaction.options.getSubcommand(true);
 
     // Checks what subcommand was run
@@ -67,7 +68,7 @@ class ToggleOpenCommand extends Command {
   }
 
   // Command run
-  public async toggleOpen(interaction: Command.ChatInputInteraction) {
+  public async toggleOpen(interaction: Command.ChatInputCommandInteraction) {
     // Check if guild is not null
     if (interaction.guild === null) {
       await interaction.reply({
@@ -91,7 +92,7 @@ class ToggleOpenCommand extends Command {
     }
 
     // Check if channel is text
-    if (!channel.isText()) {
+    if (channel.type !== ChannelType.GuildText) {
       await interaction.reply({
         content: 'Channel is not a text channel!',
         ephemeral: true,
@@ -114,10 +115,10 @@ class ToggleOpenCommand extends Command {
     }
 
     // Checks if the channel is open
-    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!.has(['SEND_MESSAGES']);
+    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!.has([PermissionsBitField.Flags.SendMessages]);
 
     // Toggle send message in channel
-    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, { SEND_MESSAGES: !open });
+    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, { SendMessages: !open });
 
     await interaction.reply({
       content: `${!open ? 'Opened' : 'Closed'} this channel.`,

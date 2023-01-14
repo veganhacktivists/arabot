@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Kill } from '../../utils/gifs';
 
 class KillCommand extends Command {
@@ -46,7 +46,7 @@ class KillCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     // TODO exception handling
     const user = interaction.options.getUser('user')!;
@@ -55,7 +55,7 @@ class KillCommand extends Command {
 
     // Creates the embed for the kill
     const randomKill = Kill[Math.floor(Math.random() * Kill.length)];
-    const killEmbed = new MessageEmbed()
+    const killEmbed = new EmbedBuilder()
       .setColor('#ff0000')
       .setTitle(`Kill from ${killerGuildMember.displayName}`)
       .setImage(randomKill);

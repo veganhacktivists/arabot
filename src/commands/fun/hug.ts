@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Hugs } from '../../utils/gifs';
 
 class HugCommand extends Command {
@@ -46,7 +46,7 @@ class HugCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     // TODO exception handling
     const user = interaction.options.getUser('user')!;
@@ -55,7 +55,7 @@ class HugCommand extends Command {
 
     // Creates the embed for the hug
     const randomHug = Hugs[Math.floor(Math.random() * Hugs.length)];
-    const hugEmbed = new MessageEmbed()
+    const hugEmbed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle(`Hug from ${huggerGuildMember.displayName}`)
       .setImage(randomHug);

@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { Sad } from '../../utils/gifs';
 
 class SadCommand extends Command {
@@ -44,7 +44,7 @@ class SadCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
     // TODO exception handling
     const member = interaction.member!.user;
@@ -52,7 +52,7 @@ class SadCommand extends Command {
 
     // Creates the embed for the sad reaction
     const randomSad = Sad[Math.floor(Math.random() * Sad.length)];
-    const sadEmbed = new MessageEmbed()
+    const sadEmbed = new EmbedBuilder()
       .setColor('#001148')
       .setTitle(`${memberGuildMember.displayName} is sad...`)
       .setImage(randomSad);

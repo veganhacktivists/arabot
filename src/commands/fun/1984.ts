@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { MessageEmbed } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { N1984 } from '../../utils/gifs';
 
 class N1984Command extends Command {
@@ -44,7 +44,7 @@ class N1984Command extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
     // TODO exception handling
     const member = interaction.member!.user;
@@ -54,7 +54,7 @@ class N1984Command extends Command {
     // Add a 1 in 1000 chance of Dantas literally making ARA 1984
     const random1984 = Math.random() < 0.001 ? 'https://c.tenor.com/0BwU0BjWYX4AAAAC/arthuria-dantas.gif'
       : N1984[Math.floor(Math.random() * N1984.length)];
-    const n1984Embed = new MessageEmbed()
+    const n1984Embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(`${memberGuildMember.displayName} is happy!`)
       .setImage(random1984);

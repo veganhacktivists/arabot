@@ -19,11 +19,12 @@
 
 import { Command, RegisterBehavior, Args } from '@sapphire/framework';
 import {
-  MessageEmbed,
-  MessageActionRow,
-  MessageButton,
-  Constants,
+  ChannelType,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
+  ButtonStyle,
 } from 'discord.js';
 import type { Message, GuildMember, TextChannel } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
@@ -89,7 +90,7 @@ class SusCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const subcommand = interaction.options.getSubcommand(true);
 
     // Checks what subcommand was run
@@ -122,7 +123,7 @@ class SusCommand extends Command {
   }
 
   // Subcommand to add sus note
-  private async addNote(interaction: Command.ChatInputInteraction) {
+  private async addNote(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const note = interaction.options.getString('note');
@@ -176,7 +177,7 @@ class SusCommand extends Command {
     });
   }
 
-  private async listNote(interaction: Command.ChatInputInteraction) {
+  private async listNote(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild } = interaction;
@@ -194,7 +195,7 @@ class SusCommand extends Command {
     let staffChannel = false;
     let { channel } = interaction;
     if (channel !== null) {
-      if (channel.type === 'GUILD_TEXT') {
+      if (channel.type === ChannelType.GuildText) {
         channel = channel as TextChannel;
         staffChannel = checkStaff(channel);
       }
@@ -214,7 +215,7 @@ class SusCommand extends Command {
     }
 
     // Creates the embed to display the sus note
-    const noteEmbed = new MessageEmbed()
+    const noteEmbed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle(`${notes.length} sus notes for ${user.username}`)
       .setThumbnail(user.avatarURL()!);
@@ -242,7 +243,7 @@ class SusCommand extends Command {
     });
   }
 
-  private async removeNote(interaction: Command.ChatInputInteraction) {
+  private async removeNote(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const noteId = interaction.options.getInteger('id');
     const { guild, channel } = interaction;
@@ -297,7 +298,7 @@ class SusCommand extends Command {
     }
 
     // Create an embed for the note
-    const noteEmbed = new MessageEmbed()
+    const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
       .setTitle(`Sus note for ${userName}`)
       .setThumbnail(user.avatarURL()!) // TODO avatar does not show when run
@@ -307,16 +308,16 @@ class SusCommand extends Command {
       });
 
     // Create buttons to delete or cancel the deletion
-    const buttons = new MessageActionRow<MessageButton>()
+    const buttons = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId(`delete${noteId}`)
           .setLabel('Delete')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-        new MessageButton()
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
           .setCustomId(`cancel${noteId}`)
           .setLabel('Cancel')
-          .setStyle(Constants.MessageButtonStyles.SECONDARY),
+          .setStyle(ButtonStyle.Secondary),
       );
 
     // Sends the note to verify this note is to be deleted
@@ -367,7 +368,7 @@ class SusCommand extends Command {
     });
   }
 
-  private async removeAllNotes(interaction: Command.ChatInputInteraction) {
+  private async removeAllNotes(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
@@ -409,7 +410,7 @@ class SusCommand extends Command {
     }
 
     // Creates the embed to display the sus note
-    const noteEmbed = new MessageEmbed()
+    const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
       .setTitle(`Delete ${notes.length} sus notes for ${user.username}?`)
       .setThumbnail(user.avatarURL()!);
@@ -430,16 +431,16 @@ class SusCommand extends Command {
     }
 
     // Create buttons to delete or cancel the deletion
-    const buttons = new MessageActionRow<MessageButton>()
+    const buttons = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
-        new MessageButton()
+        new ButtonBuilder()
           .setCustomId(`delete${user.id}`)
           .setLabel('Delete')
-          .setStyle(Constants.MessageButtonStyles.DANGER),
-        new MessageButton()
+          .setStyle(ButtonStyle.Danger),
+        new ButtonBuilder()
           .setCustomId(`cancel${user.id}`)
           .setLabel('Cancel')
-          .setStyle(Constants.MessageButtonStyles.SECONDARY),
+          .setStyle(ButtonStyle.Secondary),
       );
 
     // Sends the note to verify this note is to be deleted

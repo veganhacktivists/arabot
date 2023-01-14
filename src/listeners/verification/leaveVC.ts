@@ -21,7 +21,7 @@ import { Listener } from '@sapphire/framework';
 import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
-import { time } from '@discordjs/builders';
+import {time, ChannelType, PermissionsBitField} from 'discord.js';
 import { maxVCs, leaveBan } from '../../utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '../../utils/database/verification';
 import { fetchRoles } from '../../utils/database/dbExistingUser';
@@ -101,7 +101,7 @@ class VerificationLeaveVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.filter((c) => c.type === 'GUILD_VOICE');
+    const listVoiceChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildVoice);
 
     // Check that it is not deleting the 'Verification' channel (in case bot crashes)
     if (channel.name !== 'Verification') {
@@ -112,7 +112,7 @@ class VerificationLeaveVCListener extends Listener {
     // Delete text channel
     if (!verifier) {
       // Gets a list of all the text channels in the verification category
-      const listTextChannels = category.children.filter((c) => c.type === 'GUILD_TEXT');
+      const listTextChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
       listTextChannels.forEach((c) => {
         const textChannel = c as TextChannel;
         // Checks if the channel topic has the user's snowflake
@@ -125,38 +125,49 @@ class VerificationLeaveVCListener extends Listener {
     // If there are no VCs left in verification after having the channel deleted
     if (listVoiceChannels.size - 1 === 0) {
       // Create a verification channel
-      await guild.channels.create('Verification', {
-        type: 'GUILD_VOICE',
-        parent: IDs.categories.verification,
+      await guild.channels.create({
+        name: 'Verification',
+        type: ChannelType.GuildVoice,
+        parent: category.id,
         userLimit: 1,
         permissionOverwrites: [
           {
             id: guild.roles.everyone,
-            deny: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'STREAM'],
+            deny: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.SendMessages],
           },
           {
             id: IDs.roles.verifyBlock,
-            deny: ['VIEW_CHANNEL', 'CONNECT', 'SEND_MESSAGES'],
+            deny: [PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.SendMessages],
           },
           {
             id: IDs.roles.nonvegan.nonvegan,
-            allow: ['VIEW_CHANNEL'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
           },
           {
             id: IDs.roles.vegan.vegan,
-            allow: ['VIEW_CHANNEL'],
+            allow: [PermissionsBitField.Flags.ViewChannel],
           },
           {
             id: IDs.roles.vegan.activist,
-            deny: ['VIEW_CHANNEL', 'CONNECT'],
+            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
           },
           {
             id: IDs.roles.staff.verifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
           {
             id: IDs.roles.staff.trialVerifier,
-            allow: ['SEND_MESSAGES', 'VIEW_CHANNEL', 'CONNECT', 'MUTE_MEMBERS'],
+            allow: [PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+              PermissionsBitField.Flags.Connect,
+              PermissionsBitField.Flags.MuteMembers],
           },
         ],
       });
@@ -175,10 +186,10 @@ class VerificationLeaveVCListener extends Listener {
     }
 
     await verification.permissionOverwrites.edit(IDs.roles.nonvegan.nonvegan, {
-      VIEW_CHANNEL: true,
+      ViewChannel: true,
     });
     await verification.permissionOverwrites.edit(IDs.roles.vegan.vegan, {
-      VIEW_CHANNEL: true,
+      ViewChannel: true,
     });
   }
 }

@@ -37,7 +37,7 @@ class PingCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputInteraction) {
+  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const msg = await interaction.reply({ content: 'Ping?', ephemeral: true, fetchReply: true });
 
     if (isMessageInstance(msg)) {
