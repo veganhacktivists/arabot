@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2022, 2023  Anthony Berg
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,7 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Command, RegisterBehavior } from '@sapphire/framework';
+import { Args, Command, RegisterBehavior } from '@sapphire/framework';
+import type { GuildMember, Message } from 'discord.js';
 import IDs from '../../../utils/ids';
 
 class StageHostCommand extends Command {
@@ -92,6 +93,61 @@ class StageHostCommand extends Command {
       content: `Gave ${user} the ${stageHost.name} role!`,
       fetchReply: true,
     });
+  }
+
+  public async messageRun(message: Message, args: Args) {
+    // Get arguments
+    let user: GuildMember;
+    try {
+      user = await args.pick('member');
+    } catch {
+      await message.react('❌');
+      await message.reply('User was not provided!');
+      return;
+    }
+
+    const mod = message.member;
+
+    if (mod === null) {
+      await message.react('❌');
+      await message.reply('Event coordinator not found! Try again or contact a developer!');
+      return;
+    }
+
+    const { guild } = message;
+
+    if (guild === null) {
+      await message.react('❌');
+      await message.reply('Guild not found! Try again or contact a developer!');
+      return;
+    }
+
+    const stageHost = guild.roles.cache.get(IDs.roles.stageHost);
+
+    if (stageHost === undefined) {
+      await message.react('❌');
+      await message.reply('Role not found! Try again or contact a developer!');
+      return;
+    }
+
+    // Checks if the user has Stage Host and to give them or remove them based on if they have it
+    if (user.roles.cache.has(IDs.roles.stageHost)) {
+      // Remove the Stage Host role from the user
+      await user.roles.remove(stageHost);
+      await message.reply({
+        content: `Removed the ${stageHost.name} role from ${user}`,
+      });
+    } else {
+      // Give Stage Host role to the user
+      await user.roles.add(stageHost);
+      await message.reply({
+        content: `Gave ${user} the ${stageHost.name} role!`,
+      });
+      await user.send(`You have been given the ${stageHost.name} role by ${mod}!`)
+        .catch(() => {});
+    }
+
+    await message.react('✅');
   }
 }
 
