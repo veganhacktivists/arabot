@@ -25,7 +25,7 @@ class VerifierCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'mod',
+      name: 'verifier',
       description: 'Gives/removes the verifier role',
       preconditions: ['VerifierCoordinatorOnly'],
     });
