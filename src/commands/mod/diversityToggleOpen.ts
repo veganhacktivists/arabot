@@ -20,7 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { ChannelType, PermissionsBitField } from 'discord.js';
 import type { TextChannel } from 'discord.js';
-import IDs from '../../utils/ids';
+import IDs from '@utils/ids';
 
 class ToggleOpenCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

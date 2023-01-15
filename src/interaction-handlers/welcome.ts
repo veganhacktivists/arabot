@@ -19,7 +19,7 @@
 
 import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
 import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
-import IDs from '../utils/ids';
+import IDs from '@utils/ids';
 
 class WelcomeButtonHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {

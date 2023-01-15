@@ -15,11 +15,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import { Shrug } from '../../utils/gifs';
+import { Shrug } from '@utils/gifs';
 
 class ShrugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

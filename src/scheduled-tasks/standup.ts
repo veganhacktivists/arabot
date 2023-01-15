@@ -15,12 +15,12 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
-import IDs from '../utils/ids';
+import IDs from '@utils/ids';
 
 class StandupTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
