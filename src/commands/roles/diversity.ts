@@ -25,10 +25,10 @@ class TrustedCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'trusted',
-      aliases: ['t', 'trust'],
-      description: 'Gives/removes the trusted role',
-      preconditions: [['VerifierOnly', 'ModOnly']],
+      name: 'diversity',
+      aliases: ['di', 'div'],
+      description: 'Gives/removes the diversity role',
+      preconditions: ['DiversityCoordinatorOnly'],
     });
   }
 
@@ -39,7 +39,7 @@ class TrustedCommand extends Command {
         .setName(this.name)
         .setDescription(this.description)
         .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove trusted to')
+          .setDescription('User to give/remove diversity to')
           .setRequired(true)),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
@@ -67,10 +67,10 @@ class TrustedCommand extends Command {
 
     // Gets guildMember whilst removing the ability of each other variables being null
     const guildMember = guild.members.cache.get(user.id);
-    const trusted = guild.roles.cache.get(IDs.roles.trusted);
+    const diversity = guild.roles.cache.get(IDs.roles.staff.diversity);
 
     // Checks if guildMember is null
-    if (guildMember === undefined || trusted === undefined) {
+    if (guildMember === undefined || diversity === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -79,26 +79,23 @@ class TrustedCommand extends Command {
       return;
     }
 
-    // Checks if the user has Trusted and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.trusted)) {
-      // Remove the Trusted role from the user
-      await guildMember.roles.remove(trusted);
+    // Checks if the user has Diversity and to give them or remove them based on if they have it
+    if (guildMember.roles.cache.has(IDs.roles.staff.diversity)) {
+      // Remove the Veg Curious role from the user
+      await guildMember.roles.remove(diversity);
       await interaction.reply({
-        content: `Removed the ${trusted.name} role from ${user}`,
+        content: `Removed the ${diversity.name} role from ${user}`,
         fetchReply: true,
       });
       return;
     }
-    // Add Trusted role to the user
-    await guildMember.roles.add(trusted);
+    // Add Diversity Team role to the user
+    await guildMember.roles.add(diversity);
     await interaction.reply({
-      content: `Gave ${user} the ${trusted.name} role!`,
+      content: `Gave ${user} the ${diversity.name} role!`,
       fetchReply: true,
     });
-    await user.send(`You have been given the ${trusted.name} role by ${mod}!`
-      + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
-      + '\nMake sure that you follow the rules, don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
-      + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
+    await user.send(`You have been given the ${diversity.name} role by ${mod}!`)
       .catch(() => {});
   }
 
@@ -117,7 +114,7 @@ class TrustedCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply('Diversity coordinator not found! Try again or contact a developer!');
       return;
     }
 
@@ -129,31 +126,28 @@ class TrustedCommand extends Command {
       return;
     }
 
-    const trusted = guild.roles.cache.get(IDs.roles.trusted);
+    const diversity = guild.roles.cache.get(IDs.roles.staff.diversity);
 
-    if (trusted === undefined) {
+    if (diversity === undefined) {
       await message.react('❌');
       await message.reply('Role not found! Try again or contact a developer!');
       return;
     }
 
-    // Checks if the user has Trusted and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.trusted)) {
-      // Remove the Veg Curious role from the user
-      await user.roles.remove(trusted);
+    // Checks if the user has Diversity and to give them or remove them based on if they have it
+    if (user.roles.cache.has(IDs.roles.staff.diversity)) {
+      // Remove the Diversity Team role from the user
+      await user.roles.remove(diversity);
       await message.reply({
-        content: `Removed the ${trusted.name} role from ${user}`,
+        content: `Removed the ${diversity.name} role from ${user}`,
       });
     } else {
-      // Give Trusted role to the user
-      await user.roles.add(trusted);
+      // Give Diversity Team role to the user
+      await user.roles.add(diversity);
       await message.reply({
-        content: `Gave ${user} the ${trusted.name} role!`,
+        content: `Gave ${user} the ${diversity.name} role!`,
       });
-      await user.send(`You have been given the ${trusted.name} role by ${mod}!`
-        + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
-        + '\nMake sure that you follow the rules, and don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
-        + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
+      await user.send(`You have been given the ${diversity.name} role by ${mod}!`)
         .catch(() => {});
     }
 
