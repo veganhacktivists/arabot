@@ -18,13 +18,13 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
+import type { Guild, TextChannel } from 'discord.js';
 import {
   CategoryChannel,
   ChannelType,
   EmbedBuilder,
   GuildMember,
-  PermissionsBitField,
+  PermissionsBitField, Snowflake,
   time,
 } from 'discord.js';
 import IDs from '../../utils/ids';
@@ -115,6 +115,15 @@ class PrivateCommand extends Command {
     }
 
     const [name, coordinator] = this.getCoordinator(modGuildMember);
+
+    if (this.checkPrivate(guildMember.id, coordinator, guild)) {
+      await interaction.reply({
+        content: 'A private channel already exists!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
 
     const voiceChannel = await guild.channels.create({
       name: 'Private Voice Channel',
@@ -352,6 +361,25 @@ class PrivateCommand extends Command {
       id = IDs.roles.staff.coordinator;
     }
     return [name, id];
+  }
+
+  private checkPrivate(user: Snowflake, coordinator: string, guild: Guild) {
+    const category = guild.channels.cache.get(IDs.categories.private) as CategoryChannel | undefined;
+
+    if (category === undefined) {
+      return true;
+    }
+
+    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    let exists = false;
+    textChannels.forEach((c) => {
+      const textChannel = c as TextChannel;
+      // Checks if the channel topic has the user's snowflake
+      if (textChannel.topic?.includes(user) && textChannel.topic?.includes(coordinator)) {
+        exists = true;
+      }
+    });
+    return exists;
   }
 }
 
