@@ -29,7 +29,7 @@ import {
 } from 'discord.js';
 import IDs from '../../utils/ids';
 
-class BanCommand extends Command {
+class PrivateCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -355,4 +355,4 @@ class BanCommand extends Command {
   }
 }
 
-export default BanCommand;
+export default PrivateCommand;
