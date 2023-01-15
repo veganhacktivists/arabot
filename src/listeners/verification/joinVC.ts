@@ -766,10 +766,6 @@ class VerificationJoinVCListener extends Listener {
 
     // Activist role
     if (roles.activist) {
-      const activist = this.container.client.channels.cache.get(IDs.channels.activism.activism) as TextChannel | undefined;
-      if (activist === undefined) {
-        return;
-      }
       const activistMsg = `${user} you have been given the activist role! This means that if you'd wish to engage with non-vegans in `
         + `<#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
         + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
@@ -777,7 +773,7 @@ class VerificationJoinVCListener extends Listener {
         + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
         + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
         + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
-      await activist.send(activistMsg);
+      await user.send(activistMsg);
     }
   }
 
