@@ -43,6 +43,7 @@ const client = new SapphireClient({
     GatewayIntentBits.GuildMessageReactions,
     GatewayIntentBits.DirectMessages,
     GatewayIntentBits.DirectMessageReactions,
+    GatewayIntentBits.MessageContent,
   ],
   tasks: {
     // Scheduler with redis
