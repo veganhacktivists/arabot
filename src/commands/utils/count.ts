@@ -44,11 +44,8 @@ class RenameUserCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
-    // Get the arguments
     const { guild } = interaction;
 
-    // Checks if all the variables are of the right type
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
