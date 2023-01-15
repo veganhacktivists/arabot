@@ -63,6 +63,7 @@ let IDs = {
     verifyBlock: '1032765019269640203',
     bookClub: '955516408249352212',
     debateHost: '935508325615931443',
+    gameNightHost: '952779915701415966',
   },
   channels: {
     information: {
