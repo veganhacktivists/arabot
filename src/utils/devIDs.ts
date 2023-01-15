@@ -110,6 +110,7 @@ const devIDs = {
     verification: '999431677006860409',
     diversity: '999431679053660185',
     private: '999431679527628818',
+    restricted: '999431679812845654',
   },
 };
 
