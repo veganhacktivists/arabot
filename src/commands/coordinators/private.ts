@@ -20,8 +20,10 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import {
+  CategoryChannel,
   ChannelType,
   EmbedBuilder,
+  GuildMember,
   PermissionsBitField,
   time,
 } from 'discord.js';
@@ -32,7 +34,7 @@ class BanCommand extends Command {
     super(context, {
       ...options,
       name: 'private',
-      description: 'Creates a private channel for a user',
+      description: 'Creates/deletes private channels for a user',
       preconditions: ['CoordinatorOnly'],
     });
   }
@@ -43,9 +45,15 @@ class BanCommand extends Command {
       (builder) => builder
         .setName(this.name)
         .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to create a private channel with')
-          .setRequired(true)),
+        .addSubcommand((command) => command.setName('create')
+          .setDescription('Create a private channel')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to create a private channel with')
+            .setRequired(true)))
+        .addSubcommand((command) => command.setName('delete')
+          .setDescription('Delete a private channel')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to delete a private channel from'))),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -54,6 +62,30 @@ class BanCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
+    const subcommand = interaction.options.getSubcommand(true);
+
+    // Checks what subcommand was run
+    switch (subcommand) {
+      case 'create': {
+        await this.create(interaction);
+        return;
+      }
+      case 'delete': {
+        await this.delete(interaction);
+        return;
+      }
+      default: {
+        // If subcommand is invalid
+        await interaction.reply({
+          content: 'Invalid sub command!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+      }
+    }
+  }
+
+  private async create(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const mod = interaction.member;
@@ -82,30 +114,7 @@ class BanCommand extends Command {
       return;
     }
 
-    let name: string;
-    let coordinator: string;
-    if (modGuildMember.roles.cache.has(IDs.roles.staff.devCoordinator)) {
-      name = 'dev';
-      coordinator = IDs.roles.staff.devCoordinator;
-    } else if (modGuildMember.roles.cache.has(IDs.roles.staff.modCoordinator)) {
-      name = 'mod';
-      coordinator = IDs.roles.staff.modCoordinator;
-    } else if (modGuildMember.roles.cache.has(IDs.roles.staff.diversityCoordinator)) {
-      name = 'diversity';
-      coordinator = IDs.roles.staff.diversityCoordinator;
-    } else if (modGuildMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
-      name = 'mentor';
-      coordinator = IDs.roles.staff.mentorCoordinator;
-    } else if (modGuildMember.roles.cache.has(IDs.roles.staff.verifierCoordinator)) {
-      name = 'verifier';
-      coordinator = IDs.roles.staff.verifierCoordinator;
-    } else if (modGuildMember.roles.cache.has(IDs.roles.staff.eventCoordinator)) {
-      name = 'event';
-      coordinator = IDs.roles.staff.eventCoordinator;
-    } else {
-      name = 'coordinator';
-      coordinator = IDs.roles.staff.coordinator;
-    }
+    const [name, coordinator] = this.getCoordinator(modGuildMember);
 
     const voiceChannel = await guild.channels.create({
       name: 'Private Voice Channel',
@@ -136,7 +145,7 @@ class BanCommand extends Command {
       privateChannel = await guild.channels.create({
         name: `🍂┃${guildMember.user.username}-private-${name}`,
         type: ChannelType.GuildText,
-        topic: `Private channel. ${user.id} ${voiceChannel.id} (Please do not change this)`,
+        topic: `Private channel. ${user.id} ${coordinator} ${voiceChannel.id} (Please do not change this)`,
         parent: IDs.categories.private,
         permissionOverwrites: [
           {
@@ -159,7 +168,7 @@ class BanCommand extends Command {
       privateChannel = await guild.channels.create({
         name: `🍂┃${guildMember.user.id}-private-${name}`,
         type: ChannelType.GuildText,
-        topic: `Private channel. ${user.id} ${voiceChannel.id} (Please do not change this)`,
+        topic: `Private channel. ${user.id} ${coordinator} ${voiceChannel.id} (Please do not change this)`,
         parent: IDs.categories.private,
         permissionOverwrites: [
           {
@@ -209,42 +218,141 @@ class BanCommand extends Command {
     });
   }
 
-  /*
-  // Non Application Command method of banning a user
-  public async messageRun(message: Message, args: Args) {
-    // Get arguments
-    let user: User;
-    try {
-      user = await args.pick('user');
-    } catch {
-      await message.react('❌');
-      await message.reply('User was not provided!');
-      return;
-    }
-    const reason = args.finished ? null : await args.rest('string');
-    const mod = message.member;
+  private async delete(interaction: Command.ChatInputCommandInteraction) {
+    // Get the arguments
+    const user = interaction.options.getUser('user');
+    const mod = interaction.member;
+    const { guild, channel } = interaction;
 
-    if (reason === null) {
-      await message.react('❌');
-      await message.reply('Ban reason was not provided!');
+    // Checks if all the variables are of the right type
+    if (mod === null || guild === null || channel === null) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
       return;
     }
 
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+    const modGuildMember = guild.members.cache.get(mod.user.id);
+
+    // Checks if guildMember is null
+    if (modGuildMember === undefined) {
+      await interaction.reply({
+        content: 'Error fetching users!',
+        ephemeral: true,
+        fetchReply: true,
+      });
       return;
     }
 
-    const { guild } = message;
+    const coordinatorInfo = this.getCoordinator(modGuildMember);
+    const coordinator = coordinatorInfo[1];
+    let topic: string[];
 
-    if (guild === null) {
-      await message.react('❌');
-      await message.reply('Guild not found! Try again or contact a developer!');
+    if (user === null) {
+      if (channel.type !== ChannelType.GuildText) {
+        await interaction.reply({
+          content: 'Please make sure you ran this command in the original private text channel!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+        return;
+      }
+
+      if (channel.parentId !== IDs.categories.private) {
+        await interaction.reply({
+          content: 'Please make sure you ran this command in the original private text channel!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+        return;
+      }
+
+      if (channel.topic === null) {
+        await interaction.reply({
+          content: 'There was an error with this channel\'s topic!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+        return;
+      }
+
+      topic = channel.topic.split(' ');
+      await channel.delete();
+
+      const vcId = topic[topic.indexOf(coordinator) + 1];
+      const voiceChannel = guild.channels.cache.get(vcId);
+
+      if (voiceChannel !== undefined
+        && voiceChannel.parentId === IDs.categories.private) {
+        await voiceChannel.delete();
+      }
+
       return;
     }
+    const category = guild.channels.cache.get(IDs.categories.private) as CategoryChannel | undefined;
+
+    if (category === undefined) {
+      await interaction.reply({
+        content: 'Could not find category!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    textChannels.forEach((c) => {
+      const textChannel = c as TextChannel;
+      // Checks if the channel topic has the user's snowflake
+      if (textChannel.topic?.includes(user?.id)) {
+        topic = textChannel.topic.split(' ');
+        const vcId = topic[topic.indexOf(coordinator) + 1];
+        const voiceChannel = guild.channels.cache.get(vcId);
+
+        if (voiceChannel !== undefined
+          && voiceChannel.parentId === IDs.categories.private) {
+          voiceChannel.delete();
+        }
+        textChannel.delete();
+      }
+    });
+
+    await interaction.reply({
+      content: `Successfully deleted the channel for ${user}`,
+      fetchReply: true,
+      ephemeral: true,
+    });
   }
-   */
+
+  private getCoordinator(user: GuildMember) {
+    let name: string;
+    let id: string;
+    if (user.roles.cache.has(IDs.roles.staff.devCoordinator)) {
+      name = 'dev';
+      id = IDs.roles.staff.devCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.modCoordinator)) {
+      name = 'mod';
+      id = IDs.roles.staff.modCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.diversityCoordinator)) {
+      name = 'diversity';
+      id = IDs.roles.staff.diversityCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
+      name = 'mentor';
+      id = IDs.roles.staff.mentorCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.verifierCoordinator)) {
+      name = 'verifier';
+      id = IDs.roles.staff.verifierCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.eventCoordinator)) {
+      name = 'event';
+      id = IDs.roles.staff.eventCoordinator;
+    } else {
+      name = 'coordinator';
+      id = IDs.roles.staff.coordinator;
+    }
+    return [name, id];
+  }
 }
 
 export default BanCommand;
