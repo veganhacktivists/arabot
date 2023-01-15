@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '../../utils/ids';
 
-class TrustedCommand extends Command {
+class DiversityCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -155,4 +155,4 @@ class TrustedCommand extends Command {
   }
 }
 
-export default TrustedCommand;
+export default DiversityCommand;
