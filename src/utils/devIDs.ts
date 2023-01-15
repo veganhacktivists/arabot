@@ -59,6 +59,7 @@ const devIDs = {
     patreon: '999431675098447936',
     verifyBlock: '1007477161835372574',
     bookClub: '999431675140382803',
+    debateHost: '999431675140382805',
   },
   channels: {
     information: {

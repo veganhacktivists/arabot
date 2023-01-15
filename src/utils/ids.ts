@@ -62,6 +62,7 @@ let IDs = {
     patreon: '993848684640997406',
     verifyBlock: '1032765019269640203',
     bookClub: '955516408249352212',
+    debateHost: '935508325615931443',
   },
   channels: {
     information: {
