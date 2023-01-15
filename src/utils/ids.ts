@@ -44,6 +44,7 @@ let IDs = {
     staff: {
       coordinator: '993636242019323904',
       devCoordinator: '966031741099855973',
+      modCoordinator: '974144947613728818',
       diversityCoordinator: '948284375827640321',
       mentorCoordinator: '947905630939807785',
       verifierCoordinator: '940721280376778822',

@@ -41,6 +41,7 @@ const devIDs = {
     staff: {
       coordinator: '999431675165556822',
       devCoordinator: '999431675165556818',
+      modCoordinator: '999431675140382806',
       diversityCoordinator: '999431675140382808',
       mentorCoordinator: '999431675140382809',
       verifierCoordinator: '999431675140382810',
