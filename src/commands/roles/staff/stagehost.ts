@@ -18,7 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import IDs from '../../utils/ids';
+import IDs from '../../../utils/ids';
 
 class StageHostCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
