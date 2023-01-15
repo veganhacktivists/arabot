@@ -51,10 +51,11 @@ class GameNightHostCommand extends Command {
     // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
+    const mod = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null) {
+    if (user === null || mod === null || guild === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -93,6 +94,9 @@ class GameNightHostCommand extends Command {
       content: `Gave ${user} the ${game.name} role!`,
       fetchReply: true,
     });
+
+    await user.send(`You have been given the ${game.name} role by ${mod}!`)
+      .catch(() => {});
   }
 
   public async messageRun(message: Message, args: Args) {
