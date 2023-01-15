@@ -20,7 +20,7 @@
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
-import IDs from '@utils/ids';
+import IDs from '../utils/ids';
 
 class DiversityMonMessageTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {

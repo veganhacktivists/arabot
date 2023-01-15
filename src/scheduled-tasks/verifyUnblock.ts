@@ -18,7 +18,7 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import IDs from '@utils/ids';
+import IDs from '../utils/ids';
 
 export class VerifyUnblock extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {

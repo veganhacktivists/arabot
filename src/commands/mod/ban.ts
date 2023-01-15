@@ -19,9 +19,9 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, TextChannel } from 'discord.js';
-import IDs from '@utils/ids';
-import { addBan, checkActive } from '@utils/database/ban';
-import { addEmptyUser, addExistingUser, userExists } from '@utils/database/dbExistingUser';
+import IDs from '../../utils/ids';
+import { addBan, checkActive } from '../../utils/database/ban';
+import { addEmptyUser, addExistingUser, userExists } from '../../utils/database/dbExistingUser';
 
 class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

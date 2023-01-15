@@ -15,11 +15,11 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
-import IDs from '@utils/ids';
+import IDs from '../../utils/ids';
 
 class VegCuriousCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
