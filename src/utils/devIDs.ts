@@ -61,6 +61,7 @@ const devIDs = {
     bookClub: '999431675140382803',
     debateHost: '999431675140382805',
     gameNightHost: '999431675140382804',
+    guest: '999431674997788672',
   },
   channels: {
     information: {

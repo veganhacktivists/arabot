@@ -64,6 +64,7 @@ let IDs = {
     bookClub: '955516408249352212',
     debateHost: '935508325615931443',
     gameNightHost: '952779915701415966',
+    guest: '866015159658217552',
   },
   channels: {
     information: {
