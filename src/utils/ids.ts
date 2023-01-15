@@ -61,6 +61,7 @@ let IDs = {
     patron: '765370219207852055',
     patreon: '993848684640997406',
     verifyBlock: '1032765019269640203',
+    bookClub: '955516408249352212',
   },
   channels: {
     information: {
