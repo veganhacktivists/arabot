@@ -28,7 +28,7 @@ class VegCuriousCommand extends Command {
       name: 'vegcurious',
       aliases: ['veg', 'vegancurious'],
       description: 'Gives the veg curious role for vegans only',
-      preconditions: ['MentorOnly'],
+      preconditions: [['MentorOnly', 'VerifierOnly', 'ModOnly']],
     });
   }
 
@@ -87,7 +87,7 @@ class VegCuriousCommand extends Command {
     }
 
     // Checks if the user is vegan
-    if (!guildMember.roles.cache.has(IDs.roles.vegan.vegan)
+    if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
       && !mentorMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
       await interaction.reply({
         content: `${user} is vegan, only ${mentorCoordinator.name} can run this!`,
@@ -161,7 +161,7 @@ class VegCuriousCommand extends Command {
     }
 
     // Checks if the user is vegan
-    if (!user.roles.cache.has(IDs.roles.vegan.vegan)
+    if (user.roles.cache.has(IDs.roles.vegan.vegan)
       && !mentor.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
       await message.reply({
         content: `${user} is vegan, only ${mentorCoordinator.name} can run this!`,
