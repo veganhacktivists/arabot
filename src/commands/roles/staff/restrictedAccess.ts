@@ -25,7 +25,8 @@ class RestrictedAccessCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'mod',
+      name: 'restrictedaccess',
+      aliases: ['ra'],
       description: 'Gives/removes the restricted access role',
       preconditions: ['ModCoordinatorOnly'],
     });
