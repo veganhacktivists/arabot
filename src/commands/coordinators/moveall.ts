@@ -24,7 +24,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { ChannelType } from 'discord.js';
 
-class AnonymousCommand extends Command {
+class MoveAllCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -179,4 +179,4 @@ class AnonymousCommand extends Command {
   }
 }
 
-export default AnonymousCommand;
+export default MoveAllCommand;
