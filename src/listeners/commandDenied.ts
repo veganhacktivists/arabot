@@ -24,7 +24,6 @@ class OldCommandDeniedListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
-      once: false,
       event: 'messageCommandDenied',
     });
   }

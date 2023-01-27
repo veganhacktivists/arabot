@@ -25,7 +25,6 @@ class BanJoin extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
-      once: true,
       event: 'guildMemberAdd',
     });
   }
