@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2023  Anthony Berg
+    Copyright (C) 2022  Anthony Berg
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -17,9 +17,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
-import IDs from '../../../utils/ids';
+import {
+  Args,
+  Command,
+  container,
+  RegisterBehavior,
+} from '@sapphire/framework';
+import {
+  ChannelType,
+  GuildMember,
+  Message,
+  PermissionsBitField,
+  Snowflake,
+} from 'discord.js';
+import type { TextChannel } from 'discord.js';
+import IDs from '../../utils/ids';
 
 class DiversityCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -27,7 +39,7 @@ class DiversityCommand extends Command {
       ...options,
       name: 'diversity',
       aliases: ['di', 'div'],
-      description: 'Gives/removes the diversity role',
+      description: 'Commands for the Diversity Coordinators',
       preconditions: ['DiversityCoordinatorOnly'],
     });
   }
@@ -38,9 +50,13 @@ class DiversityCommand extends Command {
       (builder) => builder
         .setName(this.name)
         .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove diversity to')
-          .setRequired(true)),
+        .addSubcommand((command) => command.setName('toggleopen')
+          .setDescription('Toggles read-only for vegans in diversity section'))
+        .addSubcommand((command) => command.setName('role')
+          .setDescription('Gives/removes the diversity role')
+          .addUserOption((option) => option.setName('user')
+            .setDescription('User to give/remove diversity to')
+            .setRequired(true))),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -49,6 +65,89 @@ class DiversityCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
+    const subcommand = interaction.options.getSubcommand(true);
+
+    // Checks what subcommand was run
+    switch (subcommand) {
+      case 'toggleopen': {
+        await this.toggleOpen(interaction);
+        return;
+      }
+      case 'role': {
+        await this.roleCommand(interaction);
+        return;
+      }
+      default: {
+        // If subcommand is invalid
+        await interaction.reply({
+          content: 'Invalid sub command!',
+          ephemeral: true,
+          fetchReply: true,
+        });
+      }
+    }
+  }
+
+  // Command run
+  public async toggleOpen(interaction: Command.ChatInputCommandInteraction) {
+    // Check if guild is not null
+    if (interaction.guild === null) {
+      await interaction.reply({
+        content: 'Guild not found!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Get the channel
+    const channel = interaction.guild.channels.cache.get(interaction.channelId);
+    // Check if channel is not undefined
+    if (channel === undefined) {
+      await interaction.reply({
+        content: 'Channel not found!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Check if channel is text
+    if (channel.type !== ChannelType.GuildText) {
+      await interaction.reply({
+        content: 'Channel is not a text channel!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Converts GuildBasedChannel to TextChannel
+    const channelText = channel as TextChannel;
+
+    // Check if the command was run in the diversity section
+    if (channel.parentId !== IDs.categories.diversity) {
+      await interaction.reply({
+        content: 'Command was not run in the Diversity section!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
+
+    // Checks if the channel is open
+    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!.has([PermissionsBitField.Flags.SendMessages]);
+
+    // Toggle send message in channel
+    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, { SendMessages: !open });
+
+    await interaction.reply({
+      content: `${!open ? 'Opened' : 'Closed'} this channel.`,
+      fetchReply: true,
+    });
+  }
+
+  public async roleCommand(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
@@ -81,8 +180,9 @@ class DiversityCommand extends Command {
 
     // Checks if the user has Diversity and to give them or remove them based on if they have it
     if (guildMember.roles.cache.has(IDs.roles.staff.diversity)) {
-      // Remove the Veg Curious role from the user
+      // Remove the Diversity role from the user
       await guildMember.roles.remove(diversity);
+      await this.threadManager(guildMember.id, false);
       await interaction.reply({
         content: `Removed the ${diversity.name} role from ${user}`,
         fetchReply: true,
@@ -91,6 +191,7 @@ class DiversityCommand extends Command {
     }
     // Add Diversity Team role to the user
     await guildMember.roles.add(diversity);
+    await this.threadManager(guildMember.id, true);
     await interaction.reply({
       content: `Gave ${user} the ${diversity.name} role!`,
       fetchReply: true,
@@ -138,12 +239,14 @@ class DiversityCommand extends Command {
     if (user.roles.cache.has(IDs.roles.staff.diversity)) {
       // Remove the Diversity Team role from the user
       await user.roles.remove(diversity);
+      await this.threadManager(user.id, false);
       await message.reply({
         content: `Removed the ${diversity.name} role from ${user}`,
       });
     } else {
       // Give Diversity Team role to the user
       await user.roles.add(diversity);
+      await this.threadManager(user.id, true);
       await message.reply({
         content: `Gave ${user} the ${diversity.name} role!`,
       });
@@ -152,6 +255,24 @@ class DiversityCommand extends Command {
     }
 
     await message.react('✅');
+  }
+
+  private async threadManager(member: Snowflake, add: boolean) {
+    const thread = await container.client.channels.fetch(IDs.channels.diversity.diversity);
+    if (thread === null) {
+      return;
+    }
+
+    if (!thread.isThread()) {
+      return;
+    }
+
+    if (add) {
+      await thread.members.add(member);
+      return;
+    }
+
+    await thread.members.remove(member);
   }
 }
 
