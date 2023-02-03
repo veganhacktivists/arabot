@@ -28,7 +28,7 @@ class VeganCommand extends Command {
       name: 'vegan',
       aliases: ['v'],
       description: 'Gives the vegan role',
-      preconditions: [['ModCoordinatorOnly', 'VerifierOnly']],
+      preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
     });
   }
 
@@ -86,8 +86,8 @@ class VeganCommand extends Command {
 
     // Checks if the user is vegan
     if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
-      && !modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)
-      && !modMember.roles.cache.has(IDs.roles.staff.modCoordinator)) {
+      && !(modMember.roles.cache.has(IDs.roles.staff.verifierCoordinator)
+      || modMember.roles.cache.has(IDs.roles.staff.modCoordinator))) {
       await interaction.reply({
         content: `${user} is vegan, only ${verCoordinator.name} can run this!`,
         ephemeral: true,
@@ -160,8 +160,8 @@ class VeganCommand extends Command {
 
     // Checks if the user is vegan
     if (user.roles.cache.has(IDs.roles.vegan.vegan)
-      && !mod.roles.cache.has(IDs.roles.staff.mentorCoordinator)
-      && !mod.roles.cache.has(IDs.roles.staff.modCoordinator)) {
+      || !(mod.roles.cache.has(IDs.roles.staff.verifierCoordinator)
+      || mod.roles.cache.has(IDs.roles.staff.modCoordinator))) {
       await message.reply({
         content: `${user} is vegan, only ${verCoordinator.name} can run this!`,
       });

@@ -28,7 +28,7 @@ class ActivistCommand extends Command {
       name: 'activist',
       aliases: ['a'],
       description: 'Gives the activist role',
-      preconditions: [['ModCoordinatorOnly', 'VerifierOnly']],
+      preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
     });
   }
 
@@ -86,8 +86,8 @@ class ActivistCommand extends Command {
 
     // Checks if the user is an activist
     if (guildMember.roles.cache.has(IDs.roles.vegan.activist)
-      && !modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)
-      && !modMember.roles.cache.has(IDs.roles.staff.modCoordinator)) {
+      && !(modMember.roles.cache.has(IDs.roles.staff.verifierCoordinator)
+      || modMember.roles.cache.has(IDs.roles.staff.modCoordinator))) {
       await interaction.reply({
         content: `${user} is an activist, only ${verCoordinator.name} can run this!`,
         ephemeral: true,
@@ -167,8 +167,8 @@ class ActivistCommand extends Command {
 
     // Checks if the user is an activist
     if (user.roles.cache.has(IDs.roles.vegan.activist)
-      && !mod.roles.cache.has(IDs.roles.staff.mentorCoordinator)
-      && !mod.roles.cache.has(IDs.roles.staff.modCoordinator)) {
+      && !(mod.roles.cache.has(IDs.roles.staff.verifierCoordinator)
+      || mod.roles.cache.has(IDs.roles.staff.modCoordinator))) {
       await message.reply({
         content: `${user} is an activist, only ${verCoordinator.name} can run this!`,
       });
