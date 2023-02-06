@@ -25,7 +25,7 @@ import type {
   VoiceChannel,
 } from 'discord.js';
 import { ChannelType, PermissionsBitField } from 'discord.js';
-import IDs from '../../utils/ids';
+import IDs from '@utils/ids';
 
 class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {

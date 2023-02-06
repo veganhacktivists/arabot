@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import { Kill } from '../../utils/gifs';
+import { Kill } from '@utils/gifs';
 
 class KillCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

@@ -24,9 +24,9 @@ import type {
   TextChannel,
   GuildBan,
 } from 'discord.js';
-import IDs from '../../utils/ids';
-import { removeBan, checkActive, addBan } from '../../utils/database/ban';
-import { addEmptyUser, addExistingUser, userExists } from '../../utils/database/dbExistingUser';
+import IDs from '@utils/ids';
+import { removeBan, checkActive, addBan } from '@utils/database/ban';
+import { addEmptyUser, addExistingUser, userExists } from '@utils/database/dbExistingUser';
 
 class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
