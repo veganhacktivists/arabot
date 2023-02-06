@@ -99,7 +99,11 @@ class VeganCommand extends Command {
     // Checks if the user has Vegan and to give them or remove them based on if they have it
     if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
       // Remove the Vegan role from the user
-      await guildMember.roles.remove(vegan);
+      await guildMember.roles.add(IDs.roles.nonvegan.nonvegan);
+      await guildMember.roles.remove([
+        vegan,
+        IDs.roles.vegan.activist,
+      ]);
       await interaction.reply({
         content: `Removed the ${vegan.name} role from ${user}`,
         ephemeral: true,
@@ -110,6 +114,11 @@ class VeganCommand extends Command {
 
     // Add Vegan role to the user
     await guildMember.roles.add(vegan);
+    await guildMember.roles.remove([
+      IDs.roles.nonvegan.nonvegan,
+      IDs.roles.nonvegan.convinced,
+      IDs.roles.nonvegan.vegCurious,
+    ]);
     await interaction.reply({
       content: `Gave ${user} the ${vegan.name} role!`,
       ephemeral: true,
@@ -172,13 +181,22 @@ class VeganCommand extends Command {
     // Checks if the user has Vegan and to give them or remove them based on if they have it
     if (user.roles.cache.has(IDs.roles.vegan.vegan)) {
       // Remove the Veg Curious role from the user
-      await user.roles.remove(vegan);
+      await user.roles.add(IDs.roles.nonvegan.nonvegan);
+      await user.roles.remove([
+        vegan,
+        IDs.roles.vegan.activist,
+      ]);
       await message.react('✅');
       return;
     }
 
     // Add Vegan role to the user
     await user.roles.add(vegan);
+    await user.roles.remove([
+      IDs.roles.nonvegan.nonvegan,
+      IDs.roles.nonvegan.convinced,
+      IDs.roles.nonvegan.vegCurious,
+    ]);
     await message.react('✅');
 
     await user.send(`You have been given the ${vegan.name} role by ${mod.user}!`)
