@@ -57,6 +57,12 @@ export class Suggestions extends Listener {
 
     await sent.react('👍');
     await sent.react('👎');
-    await sent.react('<:catshrug:917505035196313671>');
+    await sent.react('<:catshrug:917505035196313671>')
+      .catch(() => { sent.react('🤷'); });
+
+    await message.author.send({
+      content: 'Your suggestion has been received!',
+      embeds: [suggestion],
+    }).catch(() => {});
   }
 }
