@@ -23,6 +23,8 @@
 import { GatewayIntentBits } from 'discord.js';
 import { LogLevel, SapphireClient } from '@sapphire/framework';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import '@sapphire/plugin-logger/register';
 
 require('dotenv').config();
 

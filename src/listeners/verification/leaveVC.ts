@@ -52,14 +52,14 @@ export class VerificationLeaveVCListener extends Listener {
     const { guild } = newState;
 
     if (channel === null || guild === undefined) {
-      console.error('Verification channel not found');
+      this.container.logger.error('Verification channel not found');
       return;
     }
 
     // Get the category
     const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
     if (categoryGuild === null) {
-      console.error('Verification channel not found');
+      this.container.logger.error('Verification channel not found');
       return;
     }
     const category = categoryGuild as CategoryChannel;
@@ -81,7 +81,7 @@ export class VerificationLeaveVCListener extends Listener {
         const roles = await fetchRoles(user.id);
         roles.push(IDs.roles.verifyBlock);
         await user.roles.add(roles)
-          .catch(() => console.error('Verification: User left but bot still tried to add roles'));
+          .catch(() => this.container.logger.error('Verification: User left but bot still tried to add roles'));
         // Create timeout block for user
         // Counts the recent times they have incomplete verifications
         const incompleteCount = await countIncomplete(user.id) % (leaveBan + 1);
@@ -96,7 +96,7 @@ export class VerificationLeaveVCListener extends Listener {
 
         await user.user.send('You have been timed out as a verifier had not joined for 15 minutes or you disconnected from verification.\n\n'
           + `You can verify again at: ${time(Math.round(Date.now() / 1000) + (banLength / 1000))}`)
-          .catch(() => console.error('Verification: Closed DMs'));
+          .catch(() => this.container.logger.error('Verification: Closed DMs'));
       }
     }
 
@@ -183,7 +183,7 @@ export class VerificationLeaveVCListener extends Listener {
     const verification = listVoiceChannels.last() as VoiceChannel | undefined;
 
     if (verification === undefined) {
-      console.error('Verification: Verification channel not found.');
+      this.container.logger.error('Verification: Verification channel not found.');
       return;
     }
 

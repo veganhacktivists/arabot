@@ -138,7 +138,7 @@ export class UnbanCommand extends Command {
       modRestrict = await guild.channels
         .fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
       if (modRestrict === undefined) {
-        console.error('Unban Error: Could not fetch mod channel');
+        this.container.logger.error('Unban Error: Could not fetch mod channel');
         return;
       }
     }
@@ -230,7 +230,7 @@ export class UnbanCommand extends Command {
       modRestrict = await guild.channels
         .fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
       if (modRestrict === undefined) {
-        console.error('Unban Error: Could not fetch mod channel');
+        this.container.logger.error('Unban Error: Could not fetch mod channel');
         return;
       }
     }

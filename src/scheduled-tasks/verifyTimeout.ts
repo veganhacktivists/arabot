@@ -33,7 +33,7 @@ export class VerifyTimeout extends ScheduledTask {
       channel = await this.container.client.channels
         .fetch(payload.channelId) as VoiceChannel | undefined;
       if (channel === undefined) {
-        console.error('verifyTimeout: Channel not found!');
+        this.container.logger.error('verifyTimeout: Channel not found!');
         return;
       }
     }
@@ -41,7 +41,7 @@ export class VerifyTimeout extends ScheduledTask {
     if (channel.members.size < 2 && channel.members.has(payload.userId)) {
       const user = channel.members.get(payload.userId);
       if (user === undefined) {
-        console.error('verifyTimeout: GuildMember not found!');
+        this.container.logger.error('verifyTimeout: GuildMember not found!');
         return;
       }
       await user.voice.disconnect();

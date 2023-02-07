@@ -44,7 +44,7 @@ export class VerificationReady extends Listener {
       category = await client.channels
         .fetch(IDs.categories.verification) as CategoryChannel | undefined;
       if (category === undefined) {
-        console.error('verifyStart: Channel not found');
+        this.container.logger.error('verifyStart: Channel not found');
         return;
       }
     }

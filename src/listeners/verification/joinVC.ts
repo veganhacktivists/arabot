@@ -71,7 +71,7 @@ export class VerificationJoinVCListener extends Listener {
     const guild = client.guilds.cache.get(newState.guild.id);
 
     if (channel === null || member === null || guild === undefined) {
-      console.error('Verification channel not found');
+      this.container.logger.error('Verification channel not found');
       return;
     }
 
@@ -79,7 +79,7 @@ export class VerificationJoinVCListener extends Listener {
     const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
     const currentChannelGuild = guild.channels.cache.get(channel.id);
     if (currentChannelGuild === undefined || categoryGuild === undefined) {
-      console.error('Verification channel not found');
+      this.container.logger.error('Verification channel not found');
       return;
     }
     const currentChannel = currentChannelGuild as VoiceChannel;
@@ -530,7 +530,7 @@ export class VerificationJoinVCListener extends Listener {
             break;
           }
           default: {
-            console.error('Button clicked out of range');
+            this.container.logger.error('Button clicked out of range');
             return;
           }
         }
@@ -739,7 +739,7 @@ export class VerificationJoinVCListener extends Listener {
   }) {
     // Send a DM with when their verification is finished
     await this.finishDM(user, roles)
-      .catch(() => console.error('Verification: Closed DMs'));
+      .catch(() => this.container.logger.error('Verification: Closed DMs'));
 
     // Not vegan
     if (!roles.vegan) {

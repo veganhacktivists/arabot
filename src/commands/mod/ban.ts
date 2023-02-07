@@ -139,7 +139,7 @@ export class BanCommand extends Command {
       logChannel = await guild.channels
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
-        console.error('Ban Error: Could not fetch log channel');
+        this.container.logger.error('Ban Error: Could not fetch log channel');
         return;
       }
     }
@@ -241,7 +241,7 @@ export class BanCommand extends Command {
       logChannel = await guild.channels
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
-        console.error('Ban Error: Could not fetch log channel');
+        this.container.logger.error('Ban Error: Could not fetch log channel');
         return;
       }
     }

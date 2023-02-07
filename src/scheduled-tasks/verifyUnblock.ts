@@ -31,7 +31,7 @@ export class VerifyUnblock extends ScheduledTask {
     if (guild === undefined) {
       guild = await this.container.client.guilds.fetch(payload.guildId);
       if (guild === undefined) {
-        console.error('verifyUnblock: Guild not found!');
+        this.container.logger.error('verifyUnblock: Guild not found!');
         return;
       }
     }
@@ -41,7 +41,7 @@ export class VerifyUnblock extends ScheduledTask {
     if (user === undefined) {
       user = await guild.members.fetch(payload.userId);
       if (user === undefined) {
-        console.error('verifyUnblock: GuildMember not found!');
+        this.container.logger.error('verifyUnblock: GuildMember not found!');
         return;
       }
     }
