@@ -21,7 +21,7 @@ import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import { checkActive, getReason } from '#utils/database/ban';
 
-class BanJoin extends Listener {
+export class BanJoin extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -47,5 +47,3 @@ class BanJoin extends Listener {
     await user.ban({ reason });
   }
 }
-
-export default BanJoin;

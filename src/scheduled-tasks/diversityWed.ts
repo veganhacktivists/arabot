@@ -22,7 +22,7 @@ import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class DiversityWedMessageTask extends ScheduledTask {
+export class DiversityWedMessageTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
@@ -44,7 +44,8 @@ class DiversityWedMessageTask extends ScheduledTask {
       + '🧡  Actively seek to include others, especially moderators, in heated discourse for the purpose of de-escalation.';
 
     const women = client.channels.cache.get(IDs.channels.diversity.women) as TextChannel;
-    const disabilities = client.channels.cache.get(IDs.channels.diversity.disabilities) as TextChannel;
+    const disabilities = client.channels.cache
+      .get(IDs.channels.diversity.disabilities) as TextChannel;
 
     await women.send(message);
     await disabilities.send(message);
@@ -56,5 +57,3 @@ declare module '@sapphire/plugin-scheduled-tasks' {
     cron: never;
   }
 }
-
-export default DiversityWedMessageTask;

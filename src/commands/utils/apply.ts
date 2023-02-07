@@ -20,7 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 
-class ApplyCommand extends Command {
+export class ApplyCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -57,5 +57,3 @@ class ApplyCommand extends Command {
     await message.reply(this.message);
   }
 }
-
-export default ApplyCommand;

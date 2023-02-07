@@ -45,7 +45,7 @@ import { userExists, addExistingUser } from '#utils/database/dbExistingUser';
 import { rolesToString } from '#utils/formatter';
 import IDs from '#utils/ids';
 
-class VerificationJoinVCListener extends Listener {
+export class VerificationJoinVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -136,7 +136,8 @@ class VerificationJoinVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildVoice);
+    const listVoiceChannels = category.children.cache
+      .filter((c) => c.type === ChannelType.GuildVoice);
 
     // Create a text channel for verifiers only
     // Checks if there are more than 10 voice channels
@@ -742,7 +743,8 @@ class VerificationJoinVCListener extends Listener {
 
     // Not vegan
     if (!roles.vegan) {
-      const general = this.container.client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel | undefined;
+      const general = this.container.client.channels.cache
+        .get(IDs.channels.nonVegan.general) as TextChannel | undefined;
       if (general === undefined) {
         return;
       }
@@ -757,7 +759,8 @@ class VerificationJoinVCListener extends Listener {
     }
 
     // Vegan
-    const general = this.container.client.channels.cache.get(IDs.channels.vegan.general) as TextChannel | undefined;
+    const general = this.container.client.channels.cache
+      .get(IDs.channels.vegan.general) as TextChannel | undefined;
     if (general === undefined) {
       return;
     }
@@ -766,7 +769,8 @@ class VerificationJoinVCListener extends Listener {
 
     // Activist role
     if (roles.activist) {
-      const activist = this.container.client.channels.cache.get(IDs.channels.activism.activism) as TextChannel | undefined;
+      const activist = this.container.client.channels.cache
+        .get(IDs.channels.activism.activism) as TextChannel | undefined;
       if (activist === undefined) {
         return;
       }
@@ -808,5 +812,3 @@ class VerificationJoinVCListener extends Listener {
     }
   }
 }
-
-export default VerificationJoinVCListener;

@@ -21,7 +21,7 @@ import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapp
 import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class WelcomeButtonHandler extends InteractionHandler {
+export class WelcomeButtonHandler extends InteractionHandler {
   public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
     super(ctx, {
       ...options,
@@ -37,7 +37,8 @@ class WelcomeButtonHandler extends InteractionHandler {
 
   public async run(interaction: ButtonInteraction) {
     let { member } = interaction;
-    const general = this.container.client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel | undefined;
+    const general = this.container.client.channels.cache
+      .get(IDs.channels.nonVegan.general) as TextChannel | undefined;
     if (general === undefined) {
       return;
     }
@@ -75,5 +76,3 @@ class WelcomeButtonHandler extends InteractionHandler {
     }
   }
 }
-
-export default WelcomeButtonHandler;

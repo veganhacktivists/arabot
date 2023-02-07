@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { N1984 } from '#utils/gifs';
 
-class N1984Command extends Command {
+export class N1984Command extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -63,5 +63,3 @@ class N1984Command extends Command {
     await interaction.reply({ embeds: [n1984Embed], fetchReply: true });
   }
 }
-
-export default N1984Command;

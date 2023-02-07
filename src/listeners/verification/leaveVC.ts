@@ -28,7 +28,7 @@ import { fetchRoles } from '#utils/database/dbExistingUser';
 import { fibonacci } from '#utils/mathsSeries';
 import IDs from '#utils/ids';
 
-class VerificationLeaveVCListener extends Listener {
+export class VerificationLeaveVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -101,7 +101,8 @@ class VerificationLeaveVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildVoice);
+    const listVoiceChannels = category.children.cache
+      .filter((c) => c.type === ChannelType.GuildVoice);
 
     // Check that it is not deleting the 'Verification' channel (in case bot crashes)
     if (channel.name !== 'Verification') {
@@ -112,7 +113,8 @@ class VerificationLeaveVCListener extends Listener {
     // Delete text channel
     if (!verifier) {
       // Gets a list of all the text channels in the verification category
-      const listTextChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+      const listTextChannels = category.children.cache
+        .filter((c) => c.type === ChannelType.GuildText);
       listTextChannels.forEach((c) => {
         const textChannel = c as TextChannel;
         // Checks if the channel topic has the user's snowflake
@@ -193,5 +195,3 @@ class VerificationLeaveVCListener extends Listener {
     });
   }
 }
-
-export default VerificationLeaveVCListener;

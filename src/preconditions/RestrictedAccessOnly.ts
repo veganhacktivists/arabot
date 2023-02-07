@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '#utils/ids';
 
-class RestrictedAccessOnlyPrecondition extends AllFlowsPrecondition {
+export class RestrictedAccessOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
     return this.checkRestrictedAccess(message.member!);
@@ -54,5 +54,3 @@ declare module '@sapphire/framework' {
     RestrictedAccessOnly: never;
   }
 }
-
-export default RestrictedAccessOnlyPrecondition;

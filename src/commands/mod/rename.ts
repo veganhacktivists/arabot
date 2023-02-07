@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 
-class RenameUserCommand extends Command {
+export class RenameUserCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -113,5 +113,3 @@ class RenameUserCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default RenameUserCommand;

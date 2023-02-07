@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VerifierCommand extends Command {
+export class VerifierCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -161,5 +161,3 @@ class VerifierCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default VerifierCommand;

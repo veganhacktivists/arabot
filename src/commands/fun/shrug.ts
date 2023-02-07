@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Shrug } from '#utils/gifs';
 
-class ShrugCommand extends Command {
+export class ShrugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -61,5 +61,3 @@ class ShrugCommand extends Command {
     await interaction.reply({ embeds: [shrugEmbed], fetchReply: true });
   }
 }
-
-export default ShrugCommand;

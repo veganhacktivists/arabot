@@ -20,7 +20,7 @@
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
 
-class PingCommand extends Command {
+export class PingCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -49,5 +49,3 @@ class PingCommand extends Command {
     return interaction.editReply('Failed to retrieve ping :(');
   }
 }
-
-export default PingCommand;

@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class StageHostCommand extends Command {
+export class StageHostCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -154,5 +154,3 @@ class StageHostCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default StageHostCommand;

@@ -41,7 +41,7 @@ import IDs from '#utils/ids';
 
 // TODO add a check when they join the server to give the user the sus role again
 
-class SusCommand extends Command {
+export class SusCommand extends Command {
   public constructor(context: Command.Context) {
     super(context, {
       name: 'sus',
@@ -535,5 +535,3 @@ class SusCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default SusCommand;

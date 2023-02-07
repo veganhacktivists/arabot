@@ -23,7 +23,7 @@ import type { GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
 import { blockTime } from '#utils/database/verification';
 
-class VerificationReady extends Listener {
+export class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -48,5 +48,3 @@ class VerificationReady extends Listener {
     await user.roles.add(roles);
   }
 }
-
-export default VerificationReady;

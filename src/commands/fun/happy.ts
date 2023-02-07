@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Happy } from '#utils/gifs';
 
-class HappyCommand extends Command {
+export class HappyCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -61,5 +61,3 @@ class HappyCommand extends Command {
     await interaction.reply({ embeds: [happyEmbed], fetchReply: true });
   }
 }
-
-export default HappyCommand;

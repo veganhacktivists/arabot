@@ -28,7 +28,7 @@ import IDs from '#utils/ids';
 import { removeBan, checkActive, addBan } from '#utils/database/ban';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
-class UnbanCommand extends Command {
+export class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -131,10 +131,12 @@ class UnbanCommand extends Command {
     });
 
     // Log the ban
-    let modRestrict = guild.channels.cache.get(IDs.channels.restricted.moderators) as TextChannel | undefined;
+    let modRestrict = guild.channels.cache
+      .get(IDs.channels.restricted.moderators) as TextChannel | undefined;
 
     if (modRestrict === undefined) {
-      modRestrict = await guild.channels.fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
+      modRestrict = await guild.channels
+        .fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
       if (modRestrict === undefined) {
         console.error('Unban Error: Could not fetch mod channel');
         return;
@@ -221,10 +223,12 @@ class UnbanCommand extends Command {
     });
 
     // Log the ban
-    let modRestrict = guild.channels.cache.get(IDs.channels.restricted.moderators) as TextChannel | undefined;
+    let modRestrict = guild.channels.cache
+      .get(IDs.channels.restricted.moderators) as TextChannel | undefined;
 
     if (modRestrict === undefined) {
-      modRestrict = await guild.channels.fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
+      modRestrict = await guild.channels
+        .fetch(IDs.channels.restricted.moderators) as TextChannel | undefined;
       if (modRestrict === undefined) {
         console.error('Unban Error: Could not fetch mod channel');
         return;
@@ -234,5 +238,3 @@ class UnbanCommand extends Command {
     await modRestrict.send(`${user} was unbanned by ${mod}`);
   }
 }
-
-export default UnbanCommand;

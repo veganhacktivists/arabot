@@ -27,7 +27,7 @@ import type {
 import { ChannelType, PermissionsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VerificationReady extends Listener {
+export class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -38,9 +38,11 @@ class VerificationReady extends Listener {
 
   public async run(client: Client) {
     // Get verification category
-    let category = client.channels.cache.get(IDs.categories.verification) as CategoryChannel | undefined;
+    let category = client.channels.cache
+      .get(IDs.categories.verification) as CategoryChannel | undefined;
     if (category === undefined) {
-      category = await client.channels.fetch(IDs.categories.verification) as CategoryChannel | undefined;
+      category = await client.channels
+        .fetch(IDs.categories.verification) as CategoryChannel | undefined;
       if (category === undefined) {
         console.error('verifyStart: Channel not found');
         return;
@@ -131,5 +133,3 @@ class VerificationReady extends Listener {
     }
   }
 }
-
-export default VerificationReady;

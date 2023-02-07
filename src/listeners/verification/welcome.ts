@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VerificationReady extends Listener {
+export class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -78,5 +78,3 @@ class VerificationReady extends Listener {
     }
   }
 }
-
-export default VerificationReady;

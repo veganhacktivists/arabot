@@ -22,7 +22,7 @@ import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VerifyReminder extends ScheduledTask {
+export class VerifyReminder extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
@@ -46,5 +46,3 @@ declare module '@sapphire/plugin-scheduled-tasks' {
     cron: never;
   }
 }
-
-export default VerifyReminder;

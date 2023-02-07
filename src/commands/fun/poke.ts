@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Poke } from '#utils/gifs';
 
-class PokeCommand extends Command {
+export class PokeCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -65,5 +65,3 @@ class PokeCommand extends Command {
     await interaction.reply({ content: `<@${user.id}>`, embeds: [pokeEmbed], fetchReply: true });
   }
 }
-
-export default PokeCommand;

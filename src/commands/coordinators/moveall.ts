@@ -24,7 +24,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { ChannelType } from 'discord.js';
 
-class MoveAllCommand extends Command {
+export class MoveAllCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -178,5 +178,3 @@ class MoveAllCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default MoveAllCommand;

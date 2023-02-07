@@ -19,6 +19,7 @@
     ],
     "rules": {
         "import/no-unresolved": "error",
+        "import/prefer-default-export": "off",
         "class-methods-use-this": "off"
     },
     "settings": {

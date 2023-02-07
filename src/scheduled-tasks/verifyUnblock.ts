@@ -56,5 +56,3 @@ declare module '@sapphire/plugin-scheduled-tasks' {
     verifyUnblock: never;
   }
 }
-
-export default VerifyUnblock;

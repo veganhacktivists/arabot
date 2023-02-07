@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Kill } from '#utils/gifs';
 
-class KillCommand extends Command {
+export class KillCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -64,5 +64,3 @@ class KillCommand extends Command {
     await interaction.reply({ content: `<@${user.id}>`, embeds: [killEmbed], fetchReply: true });
   }
 }
-
-export default KillCommand;

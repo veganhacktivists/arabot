@@ -27,9 +27,11 @@ export class VerifyTimeout extends ScheduledTask {
 
   public async run(payload: { channelId: string, userId: string }) {
     // Get the guild where the user is in
-    let channel = this.container.client.channels.cache.get(payload.channelId) as VoiceChannel | undefined;
+    let channel = this.container.client.channels.cache
+      .get(payload.channelId) as VoiceChannel | undefined;
     if (channel === undefined) {
-      channel = await this.container.client.channels.fetch(payload.channelId) as VoiceChannel | undefined;
+      channel = await this.container.client.channels
+        .fetch(payload.channelId) as VoiceChannel | undefined;
       if (channel === undefined) {
         console.error('verifyTimeout: Channel not found!');
         return;
@@ -52,5 +54,3 @@ declare module '@sapphire/plugin-scheduled-tasks' {
     verifyUnblock: never;
   }
 }
-
-export default VerifyTimeout;

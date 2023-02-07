@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VegCuriousCommand extends Command {
+export class VegCuriousCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -186,5 +186,3 @@ class VegCuriousCommand extends Command {
       + `which gives you access to ${dietSupport}`).catch(() => {});
   }
 }
-
-export default VegCuriousCommand;

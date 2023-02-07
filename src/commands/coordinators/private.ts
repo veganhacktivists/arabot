@@ -29,7 +29,7 @@ import {
 } from 'discord.js';
 import IDs from '#utils/ids';
 
-class PrivateCommand extends Command {
+export class PrivateCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -300,7 +300,8 @@ class PrivateCommand extends Command {
 
       return;
     }
-    const category = guild.channels.cache.get(IDs.categories.private) as CategoryChannel | undefined;
+    const category = guild.channels.cache
+      .get(IDs.categories.private) as CategoryChannel | undefined;
 
     if (category === undefined) {
       await interaction.reply({
@@ -364,7 +365,8 @@ class PrivateCommand extends Command {
   }
 
   private checkPrivate(user: Snowflake, coordinator: string, guild: Guild) {
-    const category = guild.channels.cache.get(IDs.categories.private) as CategoryChannel | undefined;
+    const category = guild.channels.cache
+      .get(IDs.categories.private) as CategoryChannel | undefined;
 
     if (category === undefined) {
       return true;
@@ -382,5 +384,3 @@ class PrivateCommand extends Command {
     return exists;
   }
 }
-
-export default PrivateCommand;

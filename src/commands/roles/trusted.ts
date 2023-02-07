@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class TrustedCommand extends Command {
+export class TrustedCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -160,5 +160,3 @@ class TrustedCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default TrustedCommand;

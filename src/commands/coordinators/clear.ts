@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 
-class ClearCommand extends Command {
+export class ClearCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -103,5 +103,3 @@ class ClearCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default ClearCommand;

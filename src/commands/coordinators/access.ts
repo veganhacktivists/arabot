@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { ChannelType, TextChannel, VoiceChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class AccessCommand extends Command {
+export class AccessCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -234,5 +234,3 @@ class AccessCommand extends Command {
     });
   }
 }
-
-export default AccessCommand;

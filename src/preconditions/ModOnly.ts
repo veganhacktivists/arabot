@@ -26,7 +26,7 @@ import type {
 } from 'discord.js';
 import IDs from '#utils/ids';
 
-class ModOnlyPrecondition extends AllFlowsPrecondition {
+export class ModOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
     // for message command
     return this.checkMod(message.member!);
@@ -55,5 +55,3 @@ declare module '@sapphire/framework' {
     ModOnly: never;
   }
 }
-
-export default ModOnlyPrecondition;

@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
 import { ChannelType, TextChannel } from 'discord.js';
 
-class AnonymousCommand extends Command {
+export class AnonymousCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -125,5 +125,3 @@ class AnonymousCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default AnonymousCommand;

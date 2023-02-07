@@ -33,7 +33,7 @@ import {
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class DiversityCommand extends Command {
+export class DiversityCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -136,7 +136,8 @@ class DiversityCommand extends Command {
     }
 
     // Checks if the channel is open
-    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!.has([PermissionsBitField.Flags.SendMessages]);
+    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!
+      .has([PermissionsBitField.Flags.SendMessages]);
 
     // Toggle send message in channel
     await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, { SendMessages: !open });
@@ -275,5 +276,3 @@ class DiversityCommand extends Command {
     await thread.members.remove(member);
   }
 }
-
-export default DiversityCommand;

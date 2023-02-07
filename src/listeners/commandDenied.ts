@@ -20,7 +20,7 @@
 import type { UserError, MessageCommandDeniedPayload } from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 
-class OldCommandDeniedListener extends Listener {
+export class OldCommandDeniedListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -33,5 +33,3 @@ class OldCommandDeniedListener extends Listener {
     return message.reply(error.message);
   }
 }
-
-export default OldCommandDeniedListener;

@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class ModCommand extends Command {
+export class ModCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -153,5 +153,3 @@ class ModCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default ModCommand;

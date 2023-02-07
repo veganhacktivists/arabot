@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class TrialVerifierCommand extends Command {
+export class TrialVerifierCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -153,5 +153,3 @@ class TrialVerifierCommand extends Command {
     await message.react('✅');
   }
 }
-
-export default TrialVerifierCommand;

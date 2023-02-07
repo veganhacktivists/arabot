@@ -23,7 +23,7 @@ import IDs from '#utils/ids';
 import { addBan, checkActive } from '#utils/database/ban';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
-class BanCommand extends Command {
+export class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -132,10 +132,12 @@ class BanCommand extends Command {
     await addBan(user.id, mod.user.id, reason);
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache
+      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels.fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = await guild.channels
+        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
         console.error('Ban Error: Could not fetch log channel');
         return;
@@ -232,10 +234,12 @@ class BanCommand extends Command {
     await message.react('✅');
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache
+      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels.fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = await guild.channels
+        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
         console.error('Ban Error: Could not fetch log channel');
         return;
@@ -245,5 +249,3 @@ class BanCommand extends Command {
     await logChannel.send(`${user} was banned for: ${reason} by ${mod}`);
   }
 }
-
-export default BanCommand;

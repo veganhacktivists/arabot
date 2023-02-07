@@ -22,7 +22,7 @@ import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-class DiversityMonMessageTask extends ScheduledTask {
+export class DiversityMonMessageTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
@@ -56,5 +56,3 @@ declare module '@sapphire/plugin-scheduled-tasks' {
     cron: never;
   }
 }
-
-export default DiversityMonMessageTask;

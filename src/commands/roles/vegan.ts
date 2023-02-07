@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
-class VeganCommand extends Command {
+export class VeganCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
@@ -203,5 +203,3 @@ class VeganCommand extends Command {
       .catch(() => {});
   }
 }
-
-export default VeganCommand;
