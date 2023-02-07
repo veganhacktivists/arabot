@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import { Hugs } from '../../utils/gifs';
+import { Hugs } from '#utils/gifs';
 
 class HugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

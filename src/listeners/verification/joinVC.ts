@@ -38,12 +38,12 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
 } from 'discord.js';
-import { maxVCs, questionInfo, serverFind } from '../../utils/verificationConfig';
-import { joinVerification, startVerification, finishVerification } from '../../utils/database/verification';
-import { findNotes } from '../../utils/database/sus';
-import { userExists, addExistingUser } from '../../utils/database/dbExistingUser';
-import { rolesToString } from '../../utils/formatter';
-import IDs from '../../utils/ids';
+import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
+import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
+import { findNotes } from '#utils/database/sus';
+import { userExists, addExistingUser } from '#utils/database/dbExistingUser';
+import { rolesToString } from '#utils/formatter';
+import IDs from '#utils/ids';
 
 class VerificationJoinVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {

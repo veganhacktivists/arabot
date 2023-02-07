@@ -19,9 +19,9 @@
 
 import type { GuildMember } from 'discord.js';
 import { PrismaClient } from '@prisma/client';
-import { updateUser } from './dbExistingUser';
-import { leaveBan } from '../verificationConfig';
-import { fibonacci } from '../mathsSeries';
+import { updateUser } from '#utils/database/dbExistingUser';
+import { leaveBan } from '#utils/verificationConfig';
+import { fibonacci } from '#utils/mathsSeries';
 
 export async function joinVerification(channelId: string, user: GuildMember) {
   // Update the user on the database with the current roles they have

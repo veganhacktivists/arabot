@@ -24,7 +24,7 @@ import type {
   Client,
   TextChannel,
 } from 'discord.js';
-import IDs from '../../utils/ids';
+import IDs from '#utils/ids';
 
 class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {

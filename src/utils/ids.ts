@@ -17,7 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import devIDs from './devIDs';
+import devIDs from '#utils/devIDs';
 
 // eslint-disable-next-line import/no-mutable-exports
 let IDs = {

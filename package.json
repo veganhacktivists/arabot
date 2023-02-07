@@ -9,6 +9,9 @@
     "start": "node dist/index.js",
     "start:migrate": "prisma migrate deploy && npm run start"
   },
+  "imports": {
+    "#utils/*": "./dist/utils/*.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/veganhacktivists/arabot.git"
@@ -48,7 +51,8 @@
     "eslint": "8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
-    "eslint-plugin-import": "^2.26.0",
+    "eslint-import-resolver-typescript": "^3.5.3",
+    "eslint-plugin-import": "^2.27.5",
     "prisma": "^4.4.0"
   }
 }

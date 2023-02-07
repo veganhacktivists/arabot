@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import { Sad } from '../../utils/gifs';
+import { Sad } from '#utils/gifs';
 
 class SadCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

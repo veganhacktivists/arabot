@@ -20,8 +20,8 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 // import { fetchRoles } from '../../utils/database/dbExistingUser';
-import IDs from '../../utils/ids';
-import { blockTime } from '../../utils/database/verification';
+import IDs from '#utils/ids';
+import { blockTime } from '#utils/database/verification';
 
 class VerificationReady extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {

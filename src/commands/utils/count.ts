@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import IDs from '../../utils/ids';
+import IDs from '#utils/ids';
 
 class RenameUserCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
