@@ -18,7 +18,7 @@
 */
 
 import type { GuildMember } from 'discord.js';
-import { PrismaClient } from '@prisma/client';
+import { container } from '@sapphire/framework';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { leaveBan } from '#utils/verificationConfig';
 import { fibonacci } from '#utils/mathsSeries';
@@ -27,10 +27,7 @@ export async function joinVerification(channelId: string, user: GuildMember) {
   // Update the user on the database with the current roles they have
   await updateUser(user);
 
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
-  await prisma.verify.create({
+  await container.database.verify.create({
     data: {
       id: channelId,
       user: {
@@ -40,16 +37,10 @@ export async function joinVerification(channelId: string, user: GuildMember) {
       },
     },
   });
-
-  // Close database connection
-  await prisma.$disconnect();
 }
 
 export async function startVerification(channelId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
-  await prisma.verify.update({
+  await container.database.verify.update({
     where: {
       id: channelId,
     },
@@ -57,17 +48,11 @@ export async function startVerification(channelId: string) {
       startTime: new Date(),
     },
   });
-
-  // Close database connection
-  await prisma.$disconnect();
 }
 
 export async function getUser(channelId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Get the snowflake of the user verifying
-  const user = await prisma.verify.findUnique({
+  const user = await container.database.verify.findUnique({
     where: {
       id: channelId,
     },
@@ -75,9 +60,6 @@ export async function getUser(channelId: string) {
       userId: true,
     },
   });
-
-  // Close database connection
-  await prisma.$disconnect();
 
   // Check the user could be found
   if (user === null) {
@@ -109,11 +91,8 @@ export async function finishVerification(
       convinced: boolean
     } },
 ) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // TODO potentially add an incomplete tracker?
-  await prisma.verify.update({
+  await container.database.verify.update({
     where: {
       id: channelId,
     },
@@ -139,18 +118,12 @@ export async function finishVerification(
       food: info.food,
     },
   });
-
-  // Close database connection
-  await prisma.$disconnect();
 }
 
 // Checks if verification was complete
 export async function checkFinish(channelId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Get the snowflake of the user verifying
-  const finish = await prisma.verify.findUnique({
+  const finish = await container.database.verify.findUnique({
     where: {
       id: channelId,
     },
@@ -158,9 +131,6 @@ export async function checkFinish(channelId: string) {
       finishTime: true,
     },
   });
-
-  // Close database connection
-  await prisma.$disconnect();
 
   // Checks if query returned is null
   if (finish === null) {
@@ -173,30 +143,21 @@ export async function checkFinish(channelId: string) {
 
 // Counts how many times the user has not had a verifier join their VC before leaving
 export async function countIncomplete(userId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Count how many times the user has not completed a verification
-  const incompleteCount = await prisma.verify.count({
+  const incompleteCount = await container.database.verify.count({
     where: {
       userId,
       finishTime: null,
     },
   });
 
-  // Close the database connection
-  await prisma.$disconnect();
-
   return incompleteCount;
 }
 
 // Gets the amount of time left on the block
 export async function blockTime(userId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Count how many times the user has not completed a verification
-  const verification = await prisma.verify.findFirst({
+  const verification = await container.database.verify.findFirst({
     where: {
       userId,
     },
@@ -204,9 +165,6 @@ export async function blockTime(userId: string) {
       id: 'desc',
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 
   if (verification === null) {
     return 0;

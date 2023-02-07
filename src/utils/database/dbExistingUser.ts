@@ -18,23 +18,17 @@
 */
 
 import type { GuildMember, GuildMemberRoleManager } from 'discord.js';
-import { PrismaClient } from '@prisma/client';
+import { container } from '@sapphire/framework';
 import IDs from '#utils/ids';
 
 // Checks if the user exists on the database
 export async function userExists(userId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Counts if the user is on the database by their snowflake
-  const userQuery = await prisma.user.count({
+  const userQuery = await container.database.user.count({
     where: {
       id: userId,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 
   // If the user is found on the database, then return true, otherwise, false.
   return userQuery > 0;
@@ -58,11 +52,8 @@ function getRoles(roles: GuildMemberRoleManager) {
 
 // Adds the user to the database if they were already on the server before the bot/database
 export async function addExistingUser(user: GuildMember) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Counts if the user is on the database by their snowflake
-  const userQuery = await prisma.user.count({
+  const userQuery = await container.database.user.count({
     where: {
       id: user.id,
     },
@@ -77,7 +68,7 @@ export async function addExistingUser(user: GuildMember) {
   const roles = getRoles(user.roles);
 
   // Create the user in the database
-  await prisma.user.create({
+  await container.database.user.create({
     data: {
       id: user.id,
       vegan: roles.vegan,
@@ -90,18 +81,12 @@ export async function addExistingUser(user: GuildMember) {
       muted: roles.muted,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 // Add an empty user to database in case they are not on the server
 export async function addEmptyUser(userId: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Counts if the user is on the database by their snowflake
-  const userQuery = await prisma.user.count({
+  const userQuery = await container.database.user.count({
     where: {
       id: userId,
     },
@@ -113,14 +98,11 @@ export async function addEmptyUser(userId: string) {
   }
 
   // Create the user in the database
-  await prisma.user.create({
+  await container.database.user.create({
     data: {
       id: userId,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 export async function updateUser(user: GuildMember) {
@@ -133,10 +115,7 @@ export async function updateUser(user: GuildMember) {
   // Parse all the roles into a dictionary
   const roles = getRoles(user.roles);
 
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
-  await prisma.user.update({
+  await container.database.user.update({
     where: {
       id: user.id,
     },
@@ -152,17 +131,11 @@ export async function updateUser(user: GuildMember) {
       muted: roles.muted,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 export async function fetchRoles(user: string) {
-  // Initialises Prisma Client
-  const prisma = new PrismaClient();
-
   // Get the user's roles
-  const roleQuery = await prisma.user.findUnique({
+  const roleQuery = await container.database.user.findUnique({
     where: {
       id: user,
     },
@@ -176,9 +149,6 @@ export async function fetchRoles(user: string) {
       convinced: true,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 
   // Assign roles to role snowflakes
   const roles = [];
