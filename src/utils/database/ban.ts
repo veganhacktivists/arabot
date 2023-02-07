@@ -1,11 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { container } from '@sapphire/framework';
 
 export async function addBan(userId: string, modId: string, reason: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Add the user to the database
-  await prisma.ban.create({
+  await container.database.ban.create({
     data: {
       user: {
         connect: {
@@ -20,16 +17,10 @@ export async function addBan(userId: string, modId: string, reason: string) {
       reason,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 export async function removeBan(userId: string, modId: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
-  const ban = await prisma.ban.findFirst({
+  const ban = await container.database.ban.findFirst({
     where: {
       userId,
     },
@@ -43,7 +34,7 @@ export async function removeBan(userId: string, modId: string) {
   }
 
   // Query to deactivate the specific sus note
-  await prisma.ban.update({
+  await container.database.ban.update({
     where: {
       id: ban.id,
     },
@@ -53,16 +44,10 @@ export async function removeBan(userId: string, modId: string) {
       active: false,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 export async function checkActive(userId: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
-  const ban = await prisma.ban.findFirst({
+  const ban = await container.database.ban.findFirst({
     where: {
       userId,
     },
@@ -79,10 +64,7 @@ export async function checkActive(userId: string) {
 }
 
 export async function getReason(userId: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
-  const ban = await prisma.ban.findFirst({
+  const ban = await container.database.ban.findFirst({
     where: {
       userId,
     },

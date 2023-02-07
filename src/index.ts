@@ -21,10 +21,11 @@
 */
 
 import { GatewayIntentBits } from 'discord.js';
-import { LogLevel, SapphireClient } from '@sapphire/framework';
+import { LogLevel, SapphireClient, container } from '@sapphire/framework';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
 // eslint-disable-next-line import/no-extraneous-dependencies
 import '@sapphire/plugin-logger/register';
+import { PrismaClient } from '@prisma/client';
 
 require('dotenv').config();
 
@@ -64,13 +65,21 @@ const main = async () => {
   try {
     const token = process.env.DISCORD_TOKEN;
     client.logger.info('Logging in');
+    container.database = await new PrismaClient();
     await client.login(token);
     client.logger.info('Logged in');
   } catch (error) {
     client.logger.fatal(error);
+    await container.database.$disconnect();
     client.destroy();
     process.exit(1);
   }
 };
+
+declare module '@sapphire/pieces' {
+  interface Container {
+    database: PrismaClient;
+  }
+}
 
 main();

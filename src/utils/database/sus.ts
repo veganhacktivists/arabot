@@ -1,11 +1,8 @@
-import { PrismaClient } from '@prisma/client';
+import { container } from '@sapphire/framework';
 
 export async function addToDatabase(userId: string, modId: string, message: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Add the user to the database
-  await prisma.sus.create({
+  await container.database.sus.create({
     data: {
       user: {
         connect: {
@@ -20,52 +17,36 @@ export async function addToDatabase(userId: string, modId: string, message: stri
       note: message,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 // Get a list of sus notes from the user
 export async function findNotes(userId: string, active: boolean) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Query to get the specific user's sus notes
-  const note = await prisma.sus.findMany({
+  const note = await container.database.sus.findMany({
     where: {
       userId,
       active,
     },
   });
 
-  // Close the database connection
-  await prisma.$disconnect();
   return note;
 }
 
 // Get one note from the id
 export async function getNote(noteId: number) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Query to get the specific user's sus notes
-  const note = await prisma.sus.findUnique({
+  const note = await container.database.sus.findUnique({
     where: {
       id: noteId,
     },
   });
 
-  // Close the database connection
-  await prisma.$disconnect();
   return note;
 }
 
 export async function deactivateNote(noteId: number) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Query to deactivate the specific sus note
-  await prisma.sus.update({
+  await container.database.sus.update({
     where: {
       id: noteId,
     },
@@ -73,17 +54,11 @@ export async function deactivateNote(noteId: number) {
       active: false,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
 
 export async function deactivateAllNotes(userId: string) {
-  // Initialise the database connection
-  const prisma = new PrismaClient();
-
   // Query to deactivate the specific user's sus notes
-  await prisma.sus.updateMany({
+  await container.database.sus.updateMany({
     where: {
       userId: {
         contains: userId,
@@ -93,7 +68,4 @@ export async function deactivateAllNotes(userId: string) {
       active: false,
     },
   });
-
-  // Close the database connection
-  await prisma.$disconnect();
 }
