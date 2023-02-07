@@ -93,7 +93,11 @@ export class BanCommand extends Command {
     }
 
     // Gets guildMember
-    const guildMember = guild.members.cache.get(user.id);
+    let guildMember = guild.members.cache.get(user.id);
+
+    if (guildMember === undefined) {
+      guildMember = await guild.members.fetch(user.id);
+    }
 
     if (guildMember !== undefined) {
       // Checks if the user is not restricted
@@ -200,7 +204,11 @@ export class BanCommand extends Command {
     }
 
     // Gets guildMember
-    const guildMember = guild.members.cache.get(user.id);
+    let guildMember = await guild.members.cache.get(user.id);
+
+    if (guildMember === undefined) {
+      guildMember = await guild.members.fetch(user.id);
+    }
 
     if (guildMember !== undefined) {
       // Checks if the user is not restricted
