@@ -61,7 +61,7 @@ export class Suggestions extends Listener {
       .catch(() => { sent.react('🤷'); });
 
     await message.author.send({
-      content: 'Your suggestion has been received!',
+      content: 'Your suggestion has been sent!',
       embeds: [suggestion],
     }).catch(() => {});
   }
