@@ -18,7 +18,7 @@
 */
 
 import type { TextChannel } from 'discord.js';
-import IDs from '@utils/ids';
+import IDs from '#utils/ids';
 
 /**
  * Checks if the channel is in the staff category.

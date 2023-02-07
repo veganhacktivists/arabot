@@ -22,11 +22,11 @@ import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
 import { time, ChannelType, PermissionsBitField } from 'discord.js';
-import { maxVCs, leaveBan } from '@utils/verificationConfig';
-import { getUser, checkFinish, countIncomplete } from '@utils/database/verification';
-import { fetchRoles } from '@utils/database/dbExistingUser';
-import { fibonacci } from '@utils/mathsSeries';
-import IDs from '@utils/ids';
+import { maxVCs, leaveBan } from '#utils/verificationConfig';
+import { getUser, checkFinish, countIncomplete } from '#utils/database/verification';
+import { fetchRoles } from '#utils/database/dbExistingUser';
+import { fibonacci } from '#utils/mathsSeries';
+import IDs from '#utils/ids';
 
 class VerificationLeaveVCListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {

@@ -19,7 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
-import { Happy } from '@utils/gifs';
+import { Happy } from '#utils/gifs';
 
 class HappyCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

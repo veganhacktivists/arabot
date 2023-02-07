@@ -27,7 +27,7 @@ import {
   PermissionsBitField, Snowflake,
   time,
 } from 'discord.js';
-import IDs from '@utils/ids';
+import IDs from '#utils/ids';
 
 class PrivateCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {

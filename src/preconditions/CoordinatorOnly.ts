@@ -24,7 +24,7 @@ import type {
   Message,
   GuildMember,
 } from 'discord.js';
-import IDs from '@utils/ids';
+import IDs from '#utils/ids';
 
 class CoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   public override async messageRun(message: Message) {
