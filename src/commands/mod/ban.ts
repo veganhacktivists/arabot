@@ -96,7 +96,8 @@ export class BanCommand extends Command {
     let guildMember = guild.members.cache.get(user.id);
 
     if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id);
+      guildMember = await guild.members.fetch(user.id)
+        .catch(() => undefined);
     }
 
     if (guildMember !== undefined) {
@@ -207,7 +208,8 @@ export class BanCommand extends Command {
     let guildMember = await guild.members.cache.get(user.id);
 
     if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id);
+      guildMember = await guild.members.fetch(user.id)
+        .catch(() => undefined);
     }
 
     if (guildMember !== undefined) {
