@@ -33,6 +33,7 @@ const devIDs = {
     restrictions: {
       sus: '999431674997788673',
       muted: '999431675123597402',
+      softMute: '999431675098447940',
       restricted1: '999431674997788677',
       restricted2: '999431674997788676',
       restricted3: '999431674997788675',
