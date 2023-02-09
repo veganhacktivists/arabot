@@ -17,12 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import {
-  Args,
-  Command,
-  container,
-  RegisterBehavior,
-} from '@sapphire/framework';
+import { Args, container, RegisterBehavior } from '@sapphire/framework';
+import { Subcommand } from '@sapphire/plugin-subcommands';
 import {
   ChannelType,
   GuildMember,
@@ -33,30 +29,42 @@ import {
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-export class DiversityCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+export class DiversityCommand extends Subcommand {
+  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'diversity',
       aliases: ['di', 'div'],
+      subcommands: [
+        {
+          name: 'role',
+          default: true,
+          chatInputRun: 'roleCommand',
+          messageRun: 'roleMessage',
+        },
+        {
+          name: 'toggleopen',
+          chatInputRun: 'toggleOpen',
+        },
+      ],
       description: 'Commands for the Diversity Coordinators',
       preconditions: ['DiversityCoordinatorOnly'],
     });
   }
 
   // Registers that this is a slash command
-  public override registerApplicationCommands(registry: Command.Registry) {
+  public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
       (builder) => builder
         .setName(this.name)
         .setDescription(this.description)
-        .addSubcommand((command) => command.setName('toggleopen')
-          .setDescription('Toggles read-only for vegans in diversity section'))
         .addSubcommand((command) => command.setName('role')
           .setDescription('Gives/removes the diversity role')
           .addUserOption((option) => option.setName('user')
             .setDescription('User to give/remove diversity to')
-            .setRequired(true))),
+            .setRequired(true)))
+        .addSubcommand((command) => command.setName('toggleopen')
+          .setDescription('Toggles read-only for vegans in diversity section')),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -64,32 +72,7 @@ export class DiversityCommand extends Command {
   }
 
   // Command run
-  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    const subcommand = interaction.options.getSubcommand(true);
-
-    // Checks what subcommand was run
-    switch (subcommand) {
-      case 'toggleopen': {
-        await this.toggleOpen(interaction);
-        return;
-      }
-      case 'role': {
-        await this.roleCommand(interaction);
-        return;
-      }
-      default: {
-        // If subcommand is invalid
-        await interaction.reply({
-          content: 'Invalid sub command!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-      }
-    }
-  }
-
-  // Command run
-  public async toggleOpen(interaction: Command.ChatInputCommandInteraction) {
+  public async toggleOpen(interaction: Subcommand.ChatInputCommandInteraction) {
     // Check if guild is not null
     if (interaction.guild === null) {
       await interaction.reply({
@@ -148,7 +131,7 @@ export class DiversityCommand extends Command {
     });
   }
 
-  public async roleCommand(interaction: Command.ChatInputCommandInteraction) {
+  public async roleCommand(interaction: Subcommand.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
@@ -201,7 +184,7 @@ export class DiversityCommand extends Command {
       .catch(() => {});
   }
 
-  public async messageRun(message: Message, args: Args) {
+  public async roleMessage(message: Message, args: Args) {
     // Get arguments
     let user: GuildMember;
     try {

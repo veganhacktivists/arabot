@@ -17,7 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Command, RegisterBehavior } from '@sapphire/framework';
+import { RegisterBehavior } from '@sapphire/framework';
+import { Subcommand } from '@sapphire/plugin-subcommands';
 import type { Guild, TextChannel } from 'discord.js';
 import {
   CategoryChannel,
@@ -29,18 +30,28 @@ import {
 } from 'discord.js';
 import IDs from '#utils/ids';
 
-export class PrivateCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+export class PrivateCommand extends Subcommand {
+  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'private',
+      subcommands: [
+        {
+          name: 'create',
+          chatInputRun: 'create',
+        },
+        {
+          name: 'delete',
+          chatInputRun: 'delete',
+        },
+      ],
       description: 'Creates/deletes private channels for a user',
       preconditions: ['CoordinatorOnly'],
     });
   }
 
   // Registers that this is a slash command
-  public override registerApplicationCommands(registry: Command.Registry) {
+  public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
       (builder) => builder
         .setName(this.name)
@@ -60,32 +71,7 @@ export class PrivateCommand extends Command {
     );
   }
 
-  // Command run
-  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    const subcommand = interaction.options.getSubcommand(true);
-
-    // Checks what subcommand was run
-    switch (subcommand) {
-      case 'create': {
-        await this.create(interaction);
-        return;
-      }
-      case 'delete': {
-        await this.delete(interaction);
-        return;
-      }
-      default: {
-        // If subcommand is invalid
-        await interaction.reply({
-          content: 'Invalid sub command!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-      }
-    }
-  }
-
-  private async create(interaction: Command.ChatInputCommandInteraction) {
+  public async create(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const mod = interaction.member;
@@ -227,7 +213,7 @@ export class PrivateCommand extends Command {
     });
   }
 
-  private async delete(interaction: Command.ChatInputCommandInteraction) {
+  public async delete(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const mod = interaction.member;

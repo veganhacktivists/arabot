@@ -17,7 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Command, RegisterBehavior, Args } from '@sapphire/framework';
+import { RegisterBehavior, Args } from '@sapphire/framework';
+import { Subcommand } from '@sapphire/plugin-subcommands';
 import {
   ChannelType,
   EmbedBuilder,
@@ -41,17 +42,38 @@ import IDs from '#utils/ids';
 
 // TODO add a check when they join the server to give the user the sus role again
 
-export class SusCommand extends Command {
-  public constructor(context: Command.Context) {
+export class SusCommand extends Subcommand {
+  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
     super(context, {
+      ...options,
       name: 'sus',
+      subcommands: [
+        {
+          name: 'add',
+          default: true,
+          chatInputRun: 'addNote',
+          messageRun: 'addMessage',
+        },
+        {
+          name: 'view',
+          chatInputRun: 'listNote',
+        },
+        {
+          name: 'remove',
+          chatInputRun: 'removeNote',
+        },
+        {
+          name: 'purge',
+          chatInputRun: 'removeAllNotes',
+        },
+      ],
       description: 'Notes about users that are sus',
       preconditions: [['VerifierOnly', 'ModOnly']],
     });
   }
 
   // Registers that this is a slash command
-  public override registerApplicationCommands(registry: Command.Registry) {
+  public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
       (builder) => builder
         .setName(this.name)
@@ -89,41 +111,8 @@ export class SusCommand extends Command {
     );
   }
 
-  // Command run
-  public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    const subcommand = interaction.options.getSubcommand(true);
-
-    // Checks what subcommand was run
-    switch (subcommand) {
-      case 'add': {
-        await this.addNote(interaction);
-        return;
-      }
-      case 'view': {
-        await this.listNote(interaction);
-        return;
-      }
-      case 'remove': {
-        await this.removeNote(interaction);
-        return;
-      }
-      case 'purge': {
-        await this.removeAllNotes(interaction);
-        return;
-      }
-      default: {
-        // If subcommand is invalid
-        await interaction.reply({
-          content: 'Invalid sub command!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-      }
-    }
-  }
-
   // Subcommand to add sus note
-  private async addNote(interaction: Command.ChatInputCommandInteraction) {
+  public async addNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const note = interaction.options.getString('note');
@@ -177,7 +166,7 @@ export class SusCommand extends Command {
     });
   }
 
-  private async listNote(interaction: Command.ChatInputCommandInteraction) {
+  public async listNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild } = interaction;
@@ -243,7 +232,7 @@ export class SusCommand extends Command {
     });
   }
 
-  private async removeNote(interaction: Command.ChatInputCommandInteraction) {
+  public async removeNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const noteId = interaction.options.getInteger('id');
     const { guild, channel } = interaction;
@@ -368,7 +357,7 @@ export class SusCommand extends Command {
     });
   }
 
-  private async removeAllNotes(interaction: Command.ChatInputCommandInteraction) {
+  public async removeAllNotes(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
@@ -488,7 +477,7 @@ export class SusCommand extends Command {
 
   // Non Application Command method of adding a sus note
   // xlevra begged me to add this... so I guess here it is
-  public async messageRun(message: Message, args: Args) {
+  public async addMessage(message: Message, args: Args) {
     // Get arguments
     let user: GuildMember;
     try {
