@@ -41,6 +41,7 @@ model User {
   SusMod         Sus[]      @relation("susMod")
   RestrictUser   Restrict[] @relation("restUser")
   RestrictMod    Restrict[] @relation("restMod")
+  RestrictEndMod Restrict[] @relation("endRestMod")
   BanUser        Ban[]      @relation("banUser")
   BanMod         Ban[]      @relation("banMod")
   BanEndMod      Ban[]      @relation("endBanMod")
@@ -97,6 +98,8 @@ model Restrict {
   mod       User      @relation("restMod", fields: [modId], references: [id])
   modId     String
   startTime DateTime  @default(now())
+  endMod    User?     @relation("endRestMod", fields: [endModId], references: [id])
+  endModId  String?
   endedTime DateTime?
   reason    String
 }
