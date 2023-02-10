@@ -78,12 +78,20 @@ export class SoftMuteCommand extends Command {
       return;
     }
 
+    if (guildMember.roles.cache.has(IDs.roles.restrictions.softMute)) {
+      await guildMember.roles.remove(IDs.roles.restrictions.softMute);
+      await interaction.reply({
+        content: `Removed soft muted for ${user}`,
+        fetchReply: true,
+      });
+      return;
+    }
+
     await guildMember.roles.add(IDs.roles.restrictions.softMute);
 
     await interaction.reply({
       content: `Soft muted ${user}`,
       fetchReply: true,
-      ephemeral: true,
     });
   }
 
@@ -98,7 +106,13 @@ export class SoftMuteCommand extends Command {
       return;
     }
 
-    await user.roles.add(IDs.roles.restrictions.softMute);
+    if (user.roles.cache.has(IDs.roles.restrictions.softMute)) {
+      await user.roles.remove(IDs.roles.restrictions.softMute);
+      await message.reply(`Removed soft mute for ${user}`);
+    } else {
+      await user.roles.add(IDs.roles.restrictions.softMute);
+      await message.reply(`Soft muted ${user}`);
+    }
 
     await message.react('✅');
   }
