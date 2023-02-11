@@ -106,7 +106,7 @@ export class RestrictCommand extends Command {
 
     if (reason === null) {
       await message.react('❌');
-      await message.reply('Ban reason was not provided!');
+      await message.reply('Restrict reason was not provided!');
       return;
     }
 
@@ -212,7 +212,7 @@ export class RestrictCommand extends Command {
             name: `⛔┃${member.user.username}-restricted`,
             type: ChannelType.GuildText,
             topic: `Restricted channel. ${member.id} ${voiceChannel.id} (Please do not change this)`,
-            parent: IDs.categories.private,
+            parent: IDs.categories.restricted,
             permissionOverwrites: [
               {
                 id: guild.roles.everyone,
@@ -235,7 +235,7 @@ export class RestrictCommand extends Command {
             name: `⛔┃${member.user.id}-restricted`,
             type: ChannelType.GuildText,
             topic: `Restricted channel. ${member.id} ${voiceChannel.id} (Please do not change this)`,
-            parent: IDs.categories.private,
+            parent: IDs.categories.restricted,
             permissionOverwrites: [
               {
                 id: guild.roles.everyone,
