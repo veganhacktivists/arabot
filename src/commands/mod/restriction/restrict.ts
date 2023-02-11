@@ -318,10 +318,10 @@ export class RestrictCommand extends Command {
       .setColor('#FF6700')
       .setAuthor({ name: `Restricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
       .addFields(
-        { name: 'User', value: `${member}` },
-        { name: 'Moderator', value: `${mod}` },
+        { name: 'User', value: `${member}`, inline: true },
+        { name: 'Moderator', value: `${mod}`, inline: true },
+        { name: 'Reason', value: reason },
       )
-      .addFields({ name: 'Reason', value: reason })
       .setTimestamp()
       .setFooter({ text: `ID: ${member.id}` });
 
