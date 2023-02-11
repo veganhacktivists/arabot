@@ -21,7 +21,7 @@ export async function addMute(userId: Snowflake, modId: Snowflake, reason: strin
 }
 
 export async function removeMute(userId: Snowflake) {
-  const ban = await container.database.vCMute.findFirst({
+  const mute = await container.database.vCMute.findFirst({
     where: {
       userId,
     },
@@ -33,14 +33,14 @@ export async function removeMute(userId: Snowflake) {
     },
   });
 
-  if (ban === null) {
+  if (mute === null) {
     return;
   }
 
   // Query to deactivate the specific sus note
   await container.database.vCMute.update({
     where: {
-      id: ban.id,
+      id: mute.id,
     },
     data: {
       endTime: new Date(),
@@ -49,7 +49,7 @@ export async function removeMute(userId: Snowflake) {
 }
 
 export async function checkActive(userId: Snowflake) {
-  const ban = await container.database.vCMute.findFirst({
+  const mute = await container.database.vCMute.findFirst({
     where: {
       userId,
     },
@@ -61,6 +61,9 @@ export async function checkActive(userId: Snowflake) {
     },
   });
 
-  return !(ban === null
-    || ban.endTime === null);
+  if (mute === null) {
+    return false;
+  }
+
+  return mute.endTime === null;
 }
