@@ -32,7 +32,7 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
 
 export class RestrictCommand extends Command {
@@ -146,9 +146,7 @@ export class RestrictCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await updateUser(mod);
 
     if (await checkActive(userId)) {
       info.message = `<@${userId}> is already restricted!`;
@@ -175,9 +173,7 @@ export class RestrictCommand extends Command {
       }
 
       // Check if user and mod are on the database
-      if (!await userExists(member.id)) {
-        await addExistingUser(member);
-      }
+      await updateUser(member);
 
       if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
         await member.roles.add(IDs.roles.restrictions.restricted1);
