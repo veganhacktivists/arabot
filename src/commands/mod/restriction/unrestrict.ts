@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { CategoryChannel, ChannelType, EmbedBuilder } from 'discord.js';
 import type {
   User,
   Message,
@@ -174,6 +174,34 @@ export class UnRestrictCommand extends Command {
 
     // Unrestricts the user on the database
     await unRestrict(userId, modId);
+
+    // Remove vegan restrict channels
+    if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+      const category = guild.channels.cache
+        .get(IDs.categories.restricted) as CategoryChannel | undefined;
+
+      let topic: string[];
+
+      if (category !== undefined) {
+        const textChannels = category.children.cache
+          .filter((c) => c.type === ChannelType.GuildText);
+        textChannels.forEach((c) => {
+          const textChannel = c as TextChannel;
+          // Checks if the channel topic has the user's snowflake
+          if (textChannel.topic?.includes(userId)) {
+            topic = textChannel.topic.split(' ');
+            const vcId = topic[topic.indexOf(userId) + 1];
+            const voiceChannel = guild.channels.cache.get(vcId);
+
+            if (voiceChannel !== undefined
+              && voiceChannel.parentId === IDs.categories.restricted) {
+              voiceChannel.delete();
+            }
+            textChannel.delete();
+          }
+        });
+      }
+    }
 
     info.success = true;
 
