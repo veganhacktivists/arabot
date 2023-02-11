@@ -100,7 +100,7 @@ model Restrict {
   startTime DateTime  @default(now())
   endMod    User?     @relation("endRestMod", fields: [endModId], references: [id])
   endModId  String?
-  endedTime DateTime?
+  endTime   DateTime?
   reason    String
 }
 
@@ -125,7 +125,7 @@ model TempBan {
   mod       User     @relation("tbanMod", fields: [modId], references: [id])
   modId     String
   startTime DateTime @default(now())
-  endedTime DateTime
+  endTime   DateTime
   active    Boolean  @default(true)
   reason    String
 }
