@@ -263,7 +263,7 @@ export class RestrictCommand extends Command {
 
         const embed = new EmbedBuilder()
           .setColor(member.displayHexColor)
-          .setTitle(`Private channel for ${member.user.username}`)
+          .setTitle(`Restricted channel for ${member.user.username}`)
           .setDescription(`${member}`)
           .setThumbnail(member.user.avatarURL()!)
           .addFields(
