@@ -47,6 +47,8 @@ model User {
   BanEndMod      Ban[]      @relation("endBanMod")
   TempBanUser    TempBan[]  @relation("tbanUser")
   TempBanMod     TempBan[]  @relation("tbanMod")
+  VCMuteUser     VCMute[]   @relation("vcMuteUser")
+  VCMuteMod      VCMute[]   @relation("vcMuteMod")
 }
 
 model Verify {
@@ -126,4 +128,15 @@ model TempBan {
   endedTime DateTime
   active    Boolean  @default(true)
   reason    String
+}
+
+model VCMute {
+  id      Int       @id @default(autoincrement())
+  user    User      @relation("vcMuteUser", fields: [userId], references: [id])
+  userId  String
+  mod     User      @relation("vcMuteMod", fields: [modId], references: [id])
+  modId   String
+  time    DateTime  @default(now())
+  endTime DateTime?
+  reason  String?
 }
