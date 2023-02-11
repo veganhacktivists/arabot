@@ -18,16 +18,29 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { User, Message, TextChannel } from 'discord.js';
+import {
+  ChannelType,
+  EmbedBuilder,
+  PermissionsBitField,
+  time,
+} from 'discord.js';
+import type {
+  User,
+  Message,
+  TextChannel,
+  Guild,
+  Snowflake,
+} from 'discord.js';
 import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { restrict, checkActive } from '#utils/database/restriction';
 
 export class RestrictCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
       name: 'restrict',
-      aliases: ['r', 'rest', 'rr'],
+      aliases: ['r', 'rest', 'rr', 'rv'],
       description: 'Restricts a user',
       preconditions: ['ModOnly'],
     });
@@ -69,81 +82,12 @@ export class RestrictCommand extends Command {
       return;
     }
 
-    // Gets mod's GuildMember
-    const modGuildMember = guild.members.cache.get(mod.user.id);
-
-    // Checks if guildMember is null
-    if (modGuildMember === undefined) {
-      await interaction.reply({
-        content: 'Error fetching mod!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Check if mod is in database
-    if (!await userExists(modGuildMember.id)) {
-      await addExistingUser(modGuildMember);
-    }
-
-    // Gets guildMember
-    let guildMember = guild.members.cache.get(user.id);
-
-    if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id);
-    }
-
-    if (guildMember !== undefined) {
-      // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
-        await interaction.reply({
-          content: 'You need to restrict the user first!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-        return;
-      }
-
-      // Check if user and mod are on the database
-      if (!await userExists(guildMember.id)) {
-        await addExistingUser(guildMember);
-      }
-
-      // Send DM for reason of ban
-      await user.send(`You have been banned from ARA for: ${reason}`
-        + '\n\nhttps://vbcamp.org/ARA')
-        .catch(() => {});
-
-      // Ban the user
-      await guildMember.ban({ reason });
-    } else if (!await userExists(user.id)) {
-      await addEmptyUser(user.id);
-    }
+    const info = await this.restrictRun(user?.id, mod.user.id, reason, guild);
 
     await interaction.reply({
-      content: `${user} has been banned.`,
-      ephemeral: true,
+      content: info.message,
       fetchReply: true,
     });
-
-    // Add ban to database
-    await addBan(user.id, mod.user.id, reason);
-
-    // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
-
-    if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Ban Error: Could not fetch log channel');
-        return;
-      }
-    }
-
-    await logChannel.send(`${user} was banned for: ${reason} by ${mod}`);
   }
 
   // Non Application Command method of banning a user
@@ -180,17 +124,25 @@ export class RestrictCommand extends Command {
       return;
     }
 
-    if (await checkActive(user.id)) {
-      await message.react('❌');
-      await message.reply(`${user} is already banned!`);
-      return;
-    }
+    const info = await this.restrictRun(user?.id, mod.user.id, reason, guild);
 
-    if (message.channel.id !== IDs.channels.restricted.moderators) {
-      await message.react('❌');
-      await message.reply(`You can only run this command in <#${IDs.channels.restricted.moderators}> `
-        + 'or alternatively use the slash command!');
-      return;
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async restrictRun(userId: Snowflake, modId: Snowflake, reason: string, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+
+    // Gets mod's GuildMember
+    const mod = guild.members.cache.get(modId);
+
+    // Checks if guildMember is null
+    if (mod === undefined) {
+      info.message = 'Error fetching mod';
+      return info;
     }
 
     // Check if mod is in database
@@ -198,43 +150,155 @@ export class RestrictCommand extends Command {
       await addExistingUser(mod);
     }
 
-    // Gets guildMember
-    let guildMember = await guild.members.cache.get(user.id);
-
-    if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id);
+    if (await checkActive(userId)) {
+      info.message = `<@${userId}> is already restricted!`;
+      return info;
     }
 
-    if (guildMember !== undefined) {
+    // Gets guildMember
+    let member = guild.members.cache.get(userId);
+
+    if (member === undefined) {
+      member = await guild.members.fetch(userId);
+    }
+
+    if (member !== undefined) {
       // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
-        await message.react('❌');
-        await message.reply({
-          content: 'You need to restrict the user first!',
-        });
-        return;
+      if (member.roles.cache.hasAny(
+        IDs.roles.restrictions.restricted1,
+        IDs.roles.restrictions.restricted2,
+        IDs.roles.restrictions.restricted3,
+        IDs.roles.restrictions.restricted4,
+      )) {
+        info.message = `${member} is already restricted!`;
+        return info;
       }
 
       // Check if user and mod are on the database
-      if (!await userExists(guildMember.id)) {
-        await addExistingUser(guildMember);
+      if (!await userExists(member.id)) {
+        await addExistingUser(member);
       }
 
-      // Send DM for reason of ban
-      await user.send(`You have been banned from ARA for: ${reason}`
-        + '\n\nhttps://vbcamp.org/ARA')
-        .catch(() => {});
+      if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        await member.roles.add(IDs.roles.restrictions.restricted1);
 
-      // Ban the user
-      await guildMember.ban({ reason });
-    } else if (!await userExists(user.id)) {
-      await addEmptyUser(user.id);
+        const voiceChannel = await guild.channels.create({
+          name: 'Restricted Voice Channel',
+          type: ChannelType.GuildVoice,
+          parent: IDs.categories.restricted,
+          permissionOverwrites: [
+            {
+              id: guild.roles.everyone,
+              deny: [PermissionsBitField.Flags.ViewChannel],
+            },
+            {
+              id: member.id,
+              allow: [PermissionsBitField.Flags.ViewChannel],
+            },
+            {
+              id: IDs.roles.staff.restricted,
+              allow: [PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel,
+                PermissionsBitField.Flags.Connect,
+                PermissionsBitField.Flags.MuteMembers],
+            },
+          ],
+        });
+
+        let restrictedChannel: TextChannel;
+        let bannedName = false;
+        try {
+          restrictedChannel = await guild.channels.create({
+            name: `⛔┃${member.user.username}-restricted`,
+            type: ChannelType.GuildText,
+            topic: `Restricted channel. ${member.id} ${voiceChannel.id} (Please do not change this)`,
+            parent: IDs.categories.private,
+            permissionOverwrites: [
+              {
+                id: guild.roles.everyone,
+                allow: [PermissionsBitField.Flags.ReadMessageHistory],
+                deny: [PermissionsBitField.Flags.ViewChannel],
+              },
+              {
+                id: member.id,
+                allow: [PermissionsBitField.Flags.ViewChannel],
+              },
+              {
+                id: IDs.roles.staff.restricted,
+                allow: [PermissionsBitField.Flags.SendMessages,
+                  PermissionsBitField.Flags.ViewChannel],
+              },
+            ],
+          });
+        } catch {
+          restrictedChannel = await guild.channels.create({
+            name: `⛔┃${member.user.id}-restricted`,
+            type: ChannelType.GuildText,
+            topic: `Restricted channel. ${member.id} ${voiceChannel.id} (Please do not change this)`,
+            parent: IDs.categories.private,
+            permissionOverwrites: [
+              {
+                id: guild.roles.everyone,
+                allow: [PermissionsBitField.Flags.ReadMessageHistory],
+                deny: [PermissionsBitField.Flags.ViewChannel],
+              },
+              {
+                id: member.id,
+                allow: [PermissionsBitField.Flags.ViewChannel],
+              },
+              {
+                id: IDs.roles.staff.restricted,
+                allow: [PermissionsBitField.Flags.SendMessages,
+                  PermissionsBitField.Flags.ViewChannel],
+              },
+            ],
+          });
+          bannedName = true;
+        }
+
+        if (!bannedName) {
+          await voiceChannel.setName(`${member.user.username}-restricted`);
+        } else {
+          await voiceChannel.setName(`${member.user.id}-restricted`);
+        }
+
+        const joinTime = time(member.joinedAt!);
+        const registerTime = time(member.user.createdAt);
+
+        const embed = new EmbedBuilder()
+          .setColor(member.displayHexColor)
+          .setTitle(`Private channel for ${member.user.username}`)
+          .setDescription(`${member}`)
+          .setThumbnail(member.user.avatarURL()!)
+          .addFields(
+            { name: 'Joined:', value: `${joinTime}`, inline: true },
+            { name: 'Created:', value: `${registerTime}`, inline: true },
+          );
+
+        await restrictedChannel.send({ embeds: [embed] });
+      } else {
+        await member.roles.add(Math.random() > 0.5
+          ? IDs.roles.restrictions.restricted1
+          : IDs.roles.restrictions.restricted2);
+      }
+
+      await member.roles.remove([
+        IDs.roles.vegan.vegan,
+        IDs.roles.vegan.plus,
+        IDs.roles.vegan.activist,
+        IDs.roles.trusted,
+        IDs.roles.nonvegan.nonvegan,
+        IDs.roles.nonvegan.convinced,
+        IDs.roles.nonvegan.vegCurious,
+      ]);
+    } else if (!await userExists(userId)) {
+      await addEmptyUser(userId);
     }
 
-    // Add ban to database
-    await addBan(user.id, mod.id, reason);
+    // Restrict the user on the database
+    await restrict(userId, modId, reason);
 
-    await message.react('✅');
+    info.success = true;
 
     // Log the ban
     let logChannel = guild.channels.cache
@@ -244,11 +308,26 @@ export class RestrictCommand extends Command {
       logChannel = await guild.channels
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
-        this.container.logger.error('Ban Error: Could not fetch log channel');
-        return;
+        this.container.logger.error('Restrict Error: Could not fetch log channel');
+        info.message = `Restricted ${member} but could not find the log channel. This has been logged to the database.`;
+        return info;
       }
     }
 
-    await logChannel.send(`${user} was banned for: ${reason} by ${mod}`);
+    const message = new EmbedBuilder()
+      .setColor('#FF6700')
+      .setAuthor({ name: `Restricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
+      .addFields(
+        { name: 'User', value: `${member}` },
+        { name: 'Moderator', value: `${mod}` },
+      )
+      .addFields({ name: 'Reason', value: reason })
+      .setTimestamp()
+      .setFooter({ text: `ID: ${member.id}` });
+
+    await logChannel.send({ embeds: [message] });
+
+    info.message = `Restricted ${member}`;
+    return info;
   }
 }

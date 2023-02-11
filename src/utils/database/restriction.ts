@@ -1,6 +1,8 @@
 import { container } from '@sapphire/framework';
+import type { Snowflake } from 'discord.js';
 
-export async function addRestriction(userId: string, modId: string, reason: string) {
+export async function restrict(userId: Snowflake, modId: Snowflake, reason: string) {
+  // Add the user to the database
   await container.database.restrict.create({
     data: {
       user: {
@@ -18,62 +20,55 @@ export async function addRestriction(userId: string, modId: string, reason: stri
   });
 }
 
-export async function removeRestriction(userId: string, modId: string) {
-  const restrict = await container.database.restrict.findFirst({
+export async function unRestrict(userId: Snowflake, modId: Snowflake) {
+  const restriction = await container.database.restrict.findFirst({
     where: {
       userId,
+    },
+    select: {
+      id: true,
     },
     orderBy: {
       id: 'desc',
     },
   });
 
-  if (restrict === null) {
+  if (restriction === null) {
     return;
   }
 
   // Query to deactivate the specific sus note
   await container.database.restrict.update({
     where: {
-      id: restrict.id,
+      id: restriction.id,
     },
     data: {
-      endModId: modId,
+      endMod: {
+        connect: {
+          id: modId,
+        },
+      },
       endTime: new Date(),
     },
   });
 }
 
-export async function checkActive(userId: string) {
-  const restrict = await container.database.ban.findFirst({
+export async function checkActive(userId: Snowflake) {
+  const restriction = await container.database.restrict.findFirst({
     where: {
       userId,
+    },
+    select: {
+      endTime: true,
     },
     orderBy: {
       id: 'desc',
     },
   });
 
-  if (restrict === null) {
+  if (restriction === null) {
     return false;
   }
 
-  return restrict.active;
-}
-
-export async function getReason(userId: string) {
-  const restrict = await container.database.restrict.findFirst({
-    where: {
-      userId,
-    },
-    orderBy: {
-      id: 'desc',
-    },
-  });
-
-  if (restrict === null) {
-    return '';
-  }
-
-  return restrict.reason;
+  return restriction.endTime === null;
 }
