@@ -85,7 +85,9 @@ export class VCMuteCommand extends Command {
     // Check if removing VC Mute
     if (await checkActive(member.id)) {
       await removeMute(member.id);
-      await member.voice.setMute(false, reason === null ? undefined : reason);
+      if (member.voice.channel !== null) {
+        await member.voice.setMute(false, reason === null ? undefined : reason);
+      }
 
       await interaction.reply({
         content: `Removed server mute from ${user}`,
@@ -101,7 +103,9 @@ export class VCMuteCommand extends Command {
     }
 
     // Add VC Mute
-    await member.voice.setMute(true, reason === null ? undefined : reason);
+    if (member.voice.channel !== null) {
+      await member.voice.setMute(true, reason === null ? undefined : reason);
+    }
     await addMute(member.id, mod.id, reason);
     await interaction.reply({
       content: `Server muted ${user}`,
@@ -133,7 +137,9 @@ export class VCMuteCommand extends Command {
     // Check if removing VC Mute
     if (await checkActive(member.id)) {
       await removeMute(member.id);
-      await member.voice.setMute(false, reason === null ? undefined : reason);
+      if (member.voice.channel !== null) {
+        await member.voice.setMute(false, reason === null ? undefined : reason);
+      }
 
       await message.reply(`Removed server mute from ${member}`);
       await message.react('✅');
@@ -146,7 +152,9 @@ export class VCMuteCommand extends Command {
     }
 
     // Add VC Mute
-    await member.voice.setMute(true, reason === null ? undefined : reason);
+    if (member.voice.channel !== null) {
+      await member.voice.setMute(true, reason === null ? undefined : reason);
+    }
     await addMute(member.id, mod.id, reason);
     await message.reply(`Server muted ${member}`);
 
