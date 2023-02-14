@@ -1,7 +1,12 @@
 import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
 
-export async function restrict(userId: Snowflake, modId: Snowflake, reason: string) {
+export async function restrict(
+  userId: Snowflake,
+  modId: Snowflake,
+  reason: string,
+  section: number,
+) {
   // Add the user to the database
   await container.database.restrict.create({
     data: {
@@ -16,6 +21,7 @@ export async function restrict(userId: Snowflake, modId: Snowflake, reason: stri
         },
       },
       reason,
+      section,
     },
   });
 }
@@ -37,7 +43,6 @@ export async function unRestrict(userId: Snowflake, modId: Snowflake) {
     return;
   }
 
-  // Query to deactivate the specific sus note
   await container.database.restrict.update({
     where: {
       id: restriction.id,
@@ -71,4 +76,29 @@ export async function checkActive(userId: Snowflake) {
   }
 
   return restriction.endTime === null;
+}
+
+// This is only for restrictions created with the old bot
+export async function unRestrictLegacy(userId: Snowflake, modId: Snowflake, section: number) {
+  await container.database.restrict.create({
+    data: {
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+      mod: {
+        connect: {
+          id: modId,
+        },
+      },
+      endMod: {
+        connect: {
+          id: modId,
+        },
+      },
+      reason: 'This user was restricted with the old bot. Restrict reason, time and mod unknown, check old bot logs.',
+      section,
+    },
+  });
 }
