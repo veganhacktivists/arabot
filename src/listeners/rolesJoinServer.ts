@@ -19,11 +19,12 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-// import { fetchRoles } from '../../utils/database/dbExistingUser';
-import IDs from '#utils/ids';
-import { blockTime } from '#utils/database/verification';
+import { fetchRoles } from '#utils/database/dbExistingUser';
+// import IDs from '#utils/ids';
+// import { blockTime } from '#utils/database/verification';
+// import { checkActive, getSection } from '#utils/database/restriction';
 
-export class VerificationReady extends Listener {
+export class RolesJoinServerListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
@@ -31,20 +32,27 @@ export class VerificationReady extends Listener {
     });
   }
 
-  public async run(user: GuildMember) {
+  public async run(member: GuildMember) {
     // Add basic roles
-    // Removed this because it can give restricted people access back,
-    // Currently using another bot for this
-    // const roles = await fetchRoles(user.id);
-    const roles: string[] = [];
+
+    const roles = await fetchRoles(member.id);
+
+    /*
+    // Check if the user is restricted
+    if (await checkActive(member.id)) {
+      const section = await getSection(member.id);
+      roles.length = 0;
+      roles.push(IDs.roles.restrictions.restricted[section - 1]);
+    }
 
     // Check if the user has a verification block
-    const timeout = await blockTime(user.id);
+    const timeout = await blockTime(member.id);
     if (timeout > 0) {
       roles.push(IDs.roles.verifyBlock);
     }
+    */
 
     // Add roles if they don't have verification block
-    await user.roles.add(roles);
+    await member.roles.add(roles);
   }
 }
