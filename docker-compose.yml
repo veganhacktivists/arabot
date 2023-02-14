@@ -22,6 +22,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: arabot
     depends_on:
       - postgres
       - redis
