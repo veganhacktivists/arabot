@@ -78,6 +78,26 @@ export async function checkActive(userId: Snowflake) {
   return restriction.endTime === null;
 }
 
+export async function getSection(userId: Snowflake) {
+  const restriction = await container.database.restrict.findFirst({
+    where: {
+      userId,
+    },
+    select: {
+      section: true,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+  });
+
+  if (restriction === null) {
+    return 0;
+  }
+
+  return restriction.section;
+}
+
 // This is only for restrictions created with the old bot
 export async function unRestrictLegacy(userId: Snowflake, modId: Snowflake, section: number) {
   await container.database.restrict.create({

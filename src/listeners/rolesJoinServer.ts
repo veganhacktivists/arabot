@@ -22,7 +22,7 @@ import type { GuildMember } from 'discord.js';
 import { fetchRoles } from '#utils/database/dbExistingUser';
 import IDs from '#utils/ids';
 import { blockTime } from '#utils/database/verification';
-import { checkActive } from '#utils/database/restriction';
+import { checkActive, getSection } from '#utils/database/restriction';
 
 export class RolesJoinServerListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -39,13 +39,9 @@ export class RolesJoinServerListener extends Listener {
 
     // Check if the user is restricted
     if (await checkActive(member.id)) {
-      if (roles.includes(IDs.roles.vegan.vegan)) {
-        roles.length = 0;
-        roles.push(IDs.roles.restrictions.restricted1);
-      } else {
-        roles.length = 0;
-        // TODO add role push for restricted roles
-      }
+      const section = await getSection(member.id);
+      roles.length = 0;
+      roles.push(IDs.roles.restrictions.restricted[section - 1]);
     }
 
     // Check if the user has a verification block
