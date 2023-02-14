@@ -28,7 +28,7 @@ import type {
 } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchRoles, addExistingUser, userExists } from '#utils/database/dbExistingUser';
-import { unRestrict, checkActive } from '#utils/database/restriction';
+import { unRestrict, checkActive, unRestrictLegacy } from '#utils/database/restriction';
 
 export class UnRestrictCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -147,13 +147,16 @@ export class UnRestrictCommand extends Command {
       return info;
     }
 
-    // Checks if the user is not restricted
-    if (!member.roles.cache.hasAny(
+    const restrictRoles = [
       IDs.roles.restrictions.restricted1,
       IDs.roles.restrictions.restricted2,
       IDs.roles.restrictions.restricted3,
       IDs.roles.restrictions.restricted4,
-    )) {
+      IDs.roles.restrictions.restricted1, // Vegan restricted
+    ];
+
+    // Checks if the user is not restricted
+    if (!member.roles.cache.hasAny(...restrictRoles)) {
       info.message = `${member} is not restricted!`;
       return info;
     }
@@ -161,19 +164,21 @@ export class UnRestrictCommand extends Command {
     if (await checkActive(userId)) {
       const roles = await fetchRoles(userId);
       await member.roles.add(roles);
+      // Unrestricts the user on the database
+      await unRestrict(userId, modId);
     } else {
+      let section = 1;
+      for (let i = 0; i < restrictRoles.length; i += 0) {
+        if (member.roles.cache.has(restrictRoles[i])) {
+          section = i + 1;
+        }
+      }
       await member.roles.add(IDs.roles.nonvegan.nonvegan);
+      // Unrestricts the user on the database but for restricts done on the old bot
+      await unRestrictLegacy(userId, modId, section);
     }
 
-    await member.roles.remove([
-      IDs.roles.restrictions.restricted1,
-      IDs.roles.restrictions.restricted2,
-      IDs.roles.restrictions.restricted3,
-      IDs.roles.restrictions.restricted4,
-    ]);
-
-    // Unrestricts the user on the database
-    await unRestrict(userId, modId);
+    await member.roles.remove(restrictRoles);
 
     // Remove vegan restrict channels
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
