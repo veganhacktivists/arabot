@@ -46,7 +46,7 @@ let IDs = {
         '872482843304001566', // Restricted 2
         '856582673258774538', // Restricted 3
         '872472182888992858', // Restricted 4
-        '809769217477050369', // Restricted Vegan
+        // '809769217477050369', // Restricted Vegan
       ],
     },
     staff: {

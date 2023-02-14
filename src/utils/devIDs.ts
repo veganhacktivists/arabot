@@ -43,7 +43,7 @@ const devIDs = {
         '999431674997788676', // Restricted 2
         '999431674997788675', // Restricted 3
         '999431674997788674', // Restricted 4
-        '999431674997788677', // Restricted Vegan
+        // '999431674997788677', // Restricted Vegan
       ],
     },
     staff: {
