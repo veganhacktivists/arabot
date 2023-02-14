@@ -147,13 +147,7 @@ export class UnRestrictCommand extends Command {
       return info;
     }
 
-    const restrictRoles = [
-      IDs.roles.restrictions.restricted1,
-      IDs.roles.restrictions.restricted2,
-      IDs.roles.restrictions.restricted3,
-      IDs.roles.restrictions.restricted4,
-      IDs.roles.restrictions.restricted1, // Vegan restricted
-    ];
+    const restrictRoles = IDs.roles.restrictions.restricted;
 
     // Checks if the user is not restricted
     if (!member.roles.cache.hasAny(...restrictRoles)) {

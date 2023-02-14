@@ -82,13 +82,7 @@ export async function restrictRun(
     member = await guild.members.fetch(userId);
   }
 
-  const restrictRoles = [
-    IDs.roles.restrictions.restricted1,
-    IDs.roles.restrictions.restricted2,
-    IDs.roles.restrictions.restricted3,
-    IDs.roles.restrictions.restricted4,
-    IDs.roles.restrictions.restricted1, // Vegan Restrict
-  ];
+  const restrictRoles = IDs.roles.restrictions.restricted;
 
   let section = tolerance ? randint(3, 4) : randint(1, 2);
 
