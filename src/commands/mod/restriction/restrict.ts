@@ -37,7 +37,13 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
+import { randint } from '#utils/random';
+import {
+  addEmptyUser,
+  updateUser,
+  userExists,
+  fetchRoles,
+} from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
 
 export async function restrictRun(
@@ -76,14 +82,19 @@ export async function restrictRun(
     member = await guild.members.fetch(userId);
   }
 
+  const restrictRoles = [
+    IDs.roles.restrictions.restricted1,
+    IDs.roles.restrictions.restricted2,
+    IDs.roles.restrictions.restricted3,
+    IDs.roles.restrictions.restricted4,
+    IDs.roles.restrictions.restricted1, // Vegan Restrict
+  ];
+
+  let section = tolerance ? randint(3, 4) : randint(1, 2);
+
   if (member !== undefined) {
     // Checks if the user is not restricted
-    if (member.roles.cache.hasAny(
-      IDs.roles.restrictions.restricted1,
-      IDs.roles.restrictions.restricted2,
-      IDs.roles.restrictions.restricted3,
-      IDs.roles.restrictions.restricted4,
-    )) {
+    if (member.roles.cache.hasAny(...restrictRoles)) {
       info.message = `${member} is already restricted!`;
       return info;
     }
@@ -92,8 +103,12 @@ export async function restrictRun(
     await updateUser(member);
 
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      await member.roles.add(IDs.roles.restrictions.restricted1);
+      section = 5;
+    }
 
+    await member.roles.add(restrictRoles[section - 1]);
+
+    if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
       const voiceChannel = await guild.channels.create({
         name: 'Restricted Voice Channel',
         type: ChannelType.GuildVoice,
@@ -188,14 +203,6 @@ export async function restrictRun(
         );
 
       await restrictedChannel.send({ embeds: [embed] });
-    } else if (tolerance) {
-      await member.roles.add(Math.random() > 0.5
-        ? IDs.roles.restrictions.restricted3
-        : IDs.roles.restrictions.restricted4);
-    } else {
-      await member.roles.add(Math.random() > 0.5
-        ? IDs.roles.restrictions.restricted1
-        : IDs.roles.restrictions.restricted2);
     }
 
     await member.roles.remove([
@@ -209,11 +216,16 @@ export async function restrictRun(
     ]);
   } else if (!await userExists(userId)) {
     await addEmptyUser(userId);
+    const dbRoles = await fetchRoles(userId);
+    if (dbRoles.includes(IDs.roles.vegan.vegan)) {
+      section = 5;
+    }
   }
 
   // Restrict the user on the database
-  await restrict(userId, modId, reason);
+  await restrict(userId, modId, reason, section);
 
+  info.message = `Restricted ${member}`;
   info.success = true;
 
   // Log the ban
@@ -243,7 +255,6 @@ export async function restrictRun(
 
   await logChannel.send({ embeds: [message] });
 
-  info.message = `Restricted ${member}`;
   return info;
 }
 
