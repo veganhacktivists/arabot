@@ -102,6 +102,7 @@ model Restrict {
   endModId  String?
   endTime   DateTime?
   reason    String
+  section   Int
 }
 
 model Ban {
