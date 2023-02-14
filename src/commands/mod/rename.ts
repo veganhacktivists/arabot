@@ -81,7 +81,16 @@ export class RenameUserCommand extends Command {
     }
 
     // Change nickname
-    await guildMember.setNickname(nickname);
+    try {
+      await guildMember.setNickname(nickname);
+    } catch {
+      await interaction.reply({
+        content: 'Bot doesn\'t have permission to change the user\'s name!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
+    }
     await interaction.reply({
       content: `Changed ${user}'s nickname`,
       fetchReply: true,
@@ -108,7 +117,13 @@ export class RenameUserCommand extends Command {
       return;
     }
 
-    await user.setNickname(nickname);
+    try {
+      await user.setNickname(nickname);
+    } catch {
+      await message.react('❌');
+      await message.reply('Bot doesn\'t have permission to change the user\'s name!');
+      return;
+    }
 
     await message.react('✅');
   }
