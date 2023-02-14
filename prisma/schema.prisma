@@ -39,6 +39,8 @@ model User {
   VerifyVerifier Verify[]   @relation("verVerifier")
   SusUser        Sus[]      @relation("susUser")
   SusMod         Sus[]      @relation("susMod")
+  WarnUser       Warnings[] @relation("warnUser")
+  WarnMod        Warnings[] @relation("warnMod")
   RestrictUser   Restrict[] @relation("restUser")
   RestrictMod    Restrict[] @relation("restMod")
   RestrictEndMod Restrict[] @relation("endRestMod")
@@ -85,6 +87,17 @@ model Sus {
   user   User     @relation("susUser", fields: [userId], references: [id])
   userId String
   mod    User     @relation("susMod", fields: [modId], references: [id])
+  modId  String
+  time   DateTime @default(now())
+  active Boolean  @default(true)
+  note   String
+}
+
+model Warnings {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation("warnUser", fields: [userId], references: [id])
+  userId String
+  mod    User     @relation("warnMod", fields: [modId], references: [id])
   modId  String
   time   DateTime @default(now())
   active Boolean  @default(true)
