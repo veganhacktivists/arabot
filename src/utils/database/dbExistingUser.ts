@@ -17,12 +17,12 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { GuildMember, GuildMemberRoleManager } from 'discord.js';
+import type { GuildMember, GuildMemberRoleManager, Snowflake } from 'discord.js';
 import { container } from '@sapphire/framework';
 import IDs from '#utils/ids';
 
 // Checks if the user exists on the database
-export async function userExists(userId: string) {
+export async function userExists(userId: Snowflake) {
   // Counts if the user is on the database by their snowflake
   const userQuery = await container.database.user.count({
     where: {
@@ -51,11 +51,11 @@ function getRoles(roles: GuildMemberRoleManager) {
 }
 
 // Adds the user to the database if they were already on the server before the bot/database
-export async function addExistingUser(user: GuildMember) {
+export async function addExistingUser(member: GuildMember) {
   // Counts if the user is on the database by their snowflake
   const userQuery = await container.database.user.count({
     where: {
-      id: user.id,
+      id: member.id,
     },
   });
 
@@ -65,12 +65,12 @@ export async function addExistingUser(user: GuildMember) {
   }
 
   // Parse all the roles into a dictionary
-  const roles = getRoles(user.roles);
+  const roles = getRoles(member.roles);
 
   // Create the user in the database
   await container.database.user.create({
     data: {
-      id: user.id,
+      id: member.id,
       vegan: roles.vegan,
       trusted: roles.trusted,
       activist: roles.activist,
@@ -84,7 +84,7 @@ export async function addExistingUser(user: GuildMember) {
 }
 
 // Add an empty user to database in case they are not on the server
-export async function addEmptyUser(userId: string) {
+export async function addEmptyUser(userId: Snowflake) {
   // Counts if the user is on the database by their snowflake
   const userQuery = await container.database.user.count({
     where: {
@@ -105,22 +105,22 @@ export async function addEmptyUser(userId: string) {
   });
 }
 
-export async function updateUser(user: GuildMember) {
+export async function updateUser(member: GuildMember) {
   // Check if the user is already on the database
-  if (!(await userExists(user.id))) {
-    await addExistingUser(user);
+  if (!(await userExists(member.id))) {
+    await addExistingUser(member);
     return;
   }
 
   // Parse all the roles into a dictionary
-  const roles = getRoles(user.roles);
+  const roles = getRoles(member.roles);
 
   await container.database.user.update({
     where: {
-      id: user.id,
+      id: member.id,
     },
     data: {
-      id: user.id,
+      id: member.id,
       vegan: roles.vegan,
       trusted: roles.trusted,
       activist: roles.activist,
@@ -133,11 +133,11 @@ export async function updateUser(user: GuildMember) {
   });
 }
 
-export async function fetchRoles(user: string) {
+export async function fetchRoles(userId: Snowflake) {
   // Get the user's roles
   const roleQuery = await container.database.user.findUnique({
     where: {
-      id: user,
+      id: userId,
     },
     select: {
       vegan: true,
