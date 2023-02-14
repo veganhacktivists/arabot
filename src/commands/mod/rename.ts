@@ -53,14 +53,14 @@ export class RenameUserCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
+    const user = interaction.options.getUser('user', true);
     const nickname = interaction.options.getString('nickname');
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -68,10 +68,10 @@ export class RenameUserCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
+    const member = guild.members.cache.get(user?.id);
 
     // Checks if guildMember is null
-    if (guildMember === undefined) {
+    if (member === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -82,7 +82,7 @@ export class RenameUserCommand extends Command {
 
     // Change nickname
     try {
-      await guildMember.setNickname(nickname);
+      await member.setNickname(nickname);
     } catch {
       await interaction.reply({
         content: 'Bot doesn\'t have permission to change the user\'s name!',
@@ -100,9 +100,9 @@ export class RenameUserCommand extends Command {
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let member: GuildMember;
     try {
-      user = await args.pick('member');
+      member = await args.pick('member');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
@@ -118,7 +118,7 @@ export class RenameUserCommand extends Command {
     }
 
     try {
-      await user.setNickname(nickname);
+      await member.setNickname(nickname);
     } catch {
       await message.react('❌');
       await message.reply('Bot doesn\'t have permission to change the user\'s name!');
