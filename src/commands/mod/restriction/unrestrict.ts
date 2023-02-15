@@ -162,7 +162,7 @@ export class UnRestrictCommand extends Command {
       await unRestrict(userId, modId);
     } else {
       let section = 1;
-      for (let i = 0; i < restrictRoles.length; i += 0) {
+      for (let i = 0; i < restrictRoles.length; i += 1) {
         if (member.roles.cache.has(restrictRoles[i])) {
           section = i + 1;
         }
