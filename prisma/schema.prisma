@@ -39,8 +39,8 @@ model User {
   VerifyVerifier Verify[]   @relation("verVerifier")
   SusUser        Sus[]      @relation("susUser")
   SusMod         Sus[]      @relation("susMod")
-  WarnUser       Warnings[] @relation("warnUser")
-  WarnMod        Warnings[] @relation("warnMod")
+  WarnUser       Warning[]  @relation("warnUser")
+  WarnMod        Warning[]  @relation("warnMod")
   RestrictUser   Restrict[] @relation("restUser")
   RestrictMod    Restrict[] @relation("restMod")
   RestrictEndMod Restrict[] @relation("endRestMod")
@@ -93,7 +93,7 @@ model Sus {
   note   String
 }
 
-model Warnings {
+model Warning {
   id     Int      @id @default(autoincrement())
   user   User     @relation("warnUser", fields: [userId], references: [id])
   userId String
