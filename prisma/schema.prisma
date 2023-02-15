@@ -82,6 +82,45 @@ model Verify {
   notes       String?
 }
 
+model Event {
+  id    Int @id @default(autoincrement())
+  leader User   @relation("statsLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId  String
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+  // Add a type of Event like Discord Outreach, Voice Chat, etc?
+}
+
+model EventStat {
+  event Event   @relation(fields: [eventId], references: [id])
+  eventId   Int
+  stats Stats   @relation(fields: [statsId], references: [id])
+  statsId   Int
+
+  @@id([eventId, statsId])
+}
+
+model Stat {
+  id    Int     @id @default(autoincrement())
+  leader User   @relation("statsLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId  String
+  vegan Int @default(0)
+  considered    Int @default(0)
+  antivegan Int @default(0)
+  thanked   Int @default(0)
+  documentary   Int @default(0)
+  educated  Int @default(0)
+}
+
+model ParticipantStat {
+  stats Stats   @relation(fields: [statsId], references: [id])
+  statsId   Int
+  user   User     @relation("participantUser", fields: [userId], references: [id])
+  userId String
+
+  @@id([statsId, userId])
+}
+
 model Sus {
   id     Int      @id @default(autoincrement())
   user   User     @relation("susUser", fields: [userId], references: [id])
