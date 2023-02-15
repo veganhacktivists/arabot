@@ -131,7 +131,7 @@ export class UnRestrictCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
+    if (!await userExists(modId)) {
       await addExistingUser(mod);
     }
 
@@ -145,6 +145,11 @@ export class UnRestrictCommand extends Command {
     if (member === undefined) {
       info.message = 'Can\'t unrestrict the user as they are not on this server';
       return info;
+    }
+
+    // Check if mod is in database
+    if (!await userExists(userId)) {
+      await addExistingUser(member);
     }
 
     const restrictRoles = IDs.roles.restrictions.restricted;
