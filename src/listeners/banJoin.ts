@@ -21,7 +21,7 @@ import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import { checkActive, getReason } from '#utils/database/ban';
 
-export class BanJoin extends Listener {
+export class BanJoinListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
