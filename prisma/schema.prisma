@@ -49,6 +49,7 @@ model User {
   BanEndMod      Ban[]      @relation("endBanMod")
   TempBanUser    TempBan[]  @relation("tbanUser")
   TempBanMod     TempBan[]  @relation("tbanMod")
+  TempBanEndMod  TempBan[]  @relation("endTbanMod")
   VCMuteUser     VCMute[]   @relation("vcMuteUser")
   VCMuteMod      VCMute[]   @relation("vcMuteMod")
 }
@@ -139,6 +140,8 @@ model TempBan {
   mod       User     @relation("tbanMod", fields: [modId], references: [id])
   modId     String
   startTime DateTime @default(now())
+  endMod    User?    @relation("endTbanMod", fields: [endModId], references: [id])
+  endModId  String?
   endTime   DateTime
   active    Boolean  @default(true)
   reason    String
