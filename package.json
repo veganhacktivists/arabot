@@ -36,6 +36,7 @@
     "@sapphire/plugin-scheduled-tasks": "^4.0.0",
     "@sapphire/plugin-subcommands": "^4.0.0",
     "@sapphire/stopwatch": "^1.4.1",
+    "@sapphire/time-utilities": "^1.7.8",
     "@sapphire/utilities": "^3.9.2",
     "@types/node": "^18.0.3",
     "bullmq": "^1.89.1",
