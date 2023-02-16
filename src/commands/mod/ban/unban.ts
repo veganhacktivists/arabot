@@ -135,7 +135,11 @@ export class UnbanCommand extends Command {
     let user = guild.client.users.cache.get(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId) as User;
+      user = await guild.client.users.fetch(userId);
+      if (user === undefined) {
+        info.message = 'Could not fetch the user!';
+        return info;
+      }
     }
 
     if (!await checkBan(userId)) {
