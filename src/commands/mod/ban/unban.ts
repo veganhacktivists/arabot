@@ -28,7 +28,7 @@ import type {
 } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
-import { removeBan, checkActive, addBan } from '#utils/database/ban';
+import { removeBan, checkBan, addBan } from '#utils/database/ban';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
 export class UnbanCommand extends Command {
@@ -138,7 +138,7 @@ export class UnbanCommand extends Command {
       user = await guild.client.users.fetch(userId) as User;
     }
 
-    if (!await checkActive(userId)) {
+    if (!await checkBan(userId)) {
       let ban: GuildBan;
       try {
         ban = await guild.bans.fetch(userId);

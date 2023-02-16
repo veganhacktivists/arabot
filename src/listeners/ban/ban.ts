@@ -20,7 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildBan } from 'discord.js';
 import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
-import { addBan, checkActive } from '#utils/database/ban';
+import { addBan, checkBan } from '#utils/database/ban';
 import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
@@ -33,7 +33,7 @@ export class BanListener extends Listener {
   }
 
   public async run(ban: GuildBan) {
-    if (await checkActive(ban.user.id)) {
+    if (await checkBan(ban.user.id)) {
       return;
     }
 
@@ -94,7 +94,7 @@ export class BanListener extends Listener {
       await addExistingUser(mod);
     }
 
-    if (await checkActive(user.id)) {
+    if (await checkBan(user.id)) {
       this.container.logger.error('BanListener: got past the checkActive at the start.');
       return;
     }

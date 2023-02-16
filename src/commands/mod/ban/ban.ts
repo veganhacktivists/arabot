@@ -27,7 +27,7 @@ import type {
 } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
-import { addBan, checkActive } from '#utils/database/ban';
+import { addBan, checkBan } from '#utils/database/ban';
 import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
 
 export class BanCommand extends Command {
@@ -149,7 +149,7 @@ export class BanCommand extends Command {
       return info;
     }
 
-    if (await checkActive(userId)) {
+    if (await checkBan(userId)) {
       info.message = `${user} is already banned!`;
       return info;
     }

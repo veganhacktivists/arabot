@@ -20,7 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildBan } from 'discord.js';
 import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
-import { addBan, checkActive, removeBan } from '#utils/database/ban';
+import { addBan, checkBan, removeBan } from '#utils/database/ban';
 import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
@@ -86,7 +86,7 @@ export class UnbanListener extends Listener {
     }
 
     // Check for missing ban on database
-    if (!await checkActive(user.id)) {
+    if (!await checkBan(user.id)) {
       // Check if user and mod are on the database
       if (!await userExists(user.id)) {
         await addEmptyUser(user.id);

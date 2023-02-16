@@ -19,7 +19,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-import { checkActive, getReason } from '#utils/database/ban';
+import { checkBan, getBanReason } from '#utils/database/ban';
 
 export class BanJoinListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -31,12 +31,12 @@ export class BanJoinListener extends Listener {
 
   public async run(user: GuildMember) {
     // Check if the user is banned
-    if (!await checkActive(user.id)) {
+    if (!await checkBan(user.id)) {
       return;
     }
 
     // Get reason from database
-    const reason = await getReason(user.id);
+    const reason = await getBanReason(user.id);
 
     // Send DM for ban reason
     await user.send(`You have been banned from ARA for: ${reason}`
