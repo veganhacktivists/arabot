@@ -25,7 +25,7 @@ import { time, ChannelType, PermissionsBitField } from 'discord.js';
 import { maxVCs, leaveBan } from '#utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '#utils/database/verification';
 import { fetchRoles } from '#utils/database/dbExistingUser';
-import { fibonacci } from '#utils/mathsSeries';
+import { fibonacci } from '#utils/maths';
 import IDs from '#utils/ids';
 
 export class VerificationLeaveVCListener extends Listener {

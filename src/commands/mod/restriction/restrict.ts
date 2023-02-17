@@ -37,7 +37,6 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { randint } from '#utils/random';
 import {
   addEmptyUser,
   updateUser,
@@ -45,6 +44,7 @@ import {
   fetchRoles,
 } from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
+import { randint } from '#utils/maths';
 
 export async function restrictRun(
   userId: Snowflake,
