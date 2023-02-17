@@ -16,6 +16,16 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+/**
+ * Checks if any parsed value is a number.
+ * @param number check if variable is a number
+ * @returns {boolean} true if it is a number
+ */
+export function isNumber(number: any) {
+  return !Number.isNaN(+number);
+}
+
 /**
  * Creates a (PRNG) random integer between minimum and maximum both inclusive
  * @param min minimum integer
