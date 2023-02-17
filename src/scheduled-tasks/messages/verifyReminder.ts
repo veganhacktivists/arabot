@@ -15,33 +15,34 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-export class StandupTask extends ScheduledTask {
+export class VerifyReminder extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      cron: '0 12 * * 1',
+      pattern: '0 */1 * * *',
     });
   }
 
   public async run() {
     const { client } = container;
 
-    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
+    const channel = client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel;
 
-    await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
-                            \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
+    await channel.send('If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
+      + 'To do this, hop into the \'Verification\' voice channel.'
+      + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.');
   }
 }
 
 declare module '@sapphire/plugin-scheduled-tasks' {
-  interface ScheduledTasks {
-    cron: never;
+  interface VerifyReminder {
+    pattern: never;
   }
 }
