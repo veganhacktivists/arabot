@@ -29,6 +29,7 @@ import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 import { addBan, checkBan } from '#utils/database/ban';
 import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
+import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
 export class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -187,6 +188,10 @@ export class BanCommand extends Command {
 
     // Add ban to database
     await addBan(userId, modId, reason);
+
+    if (await checkTempBan(userId)) {
+      await removeTempBan(userId);
+    }
 
     info.message = `${user} has been banned.`;
     info.success = true;
