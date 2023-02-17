@@ -29,6 +29,7 @@ import type {
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 import { removeBan, checkBan, addBan } from '#utils/database/ban';
+import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
 export class UnbanCommand extends Command {
@@ -142,7 +143,10 @@ export class UnbanCommand extends Command {
       }
     }
 
-    if (!await checkBan(userId)) {
+    let dbBan = await checkBan(userId);
+    const dbTempBan = await checkTempBan(userId);
+
+    if (!dbBan && !dbTempBan) {
       let ban: GuildBan;
       try {
         ban = await guild.bans.fetch(userId);
@@ -167,14 +171,19 @@ export class UnbanCommand extends Command {
 
       // Add missing ban
       await addBan(userId, modId, `(Mod who banned is not accurate) - ${reason}`);
+      dbBan = true;
     }
 
     // Unban the user
     await guild.members.unban(user)
       .catch(() => {});
 
-    // Add unban to database
-    await removeBan(user.id, mod.user.id);
+    if (dbBan) {
+      // Add unban to database
+      await removeBan(user.id, mod.user.id);
+    } else if (dbTempBan) {
+      await removeTempBan(user.id, mod.user.id);
+    }
 
     info.message = `${user} has been unbanned.`;
     info.success = true;
