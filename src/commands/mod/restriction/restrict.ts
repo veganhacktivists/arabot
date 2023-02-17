@@ -58,6 +58,12 @@ export async function restrictRun(
     success: false,
   };
 
+  let user = guild.client.users.cache.get(userId);
+
+  if (user === undefined) {
+    user = await guild.client.users.fetch(userId) as User;
+  }
+
   // Gets mod's GuildMember
   const mod = guild.members.cache.get(modId);
 
@@ -79,7 +85,8 @@ export async function restrictRun(
   let member = guild.members.cache.get(userId);
 
   if (member === undefined) {
-    member = await guild.members.fetch(userId);
+    member = await guild.members.fetch(userId)
+      .catch(() => undefined);
   }
 
   const restrictRoles = IDs.roles.restrictions.restricted;
@@ -239,14 +246,14 @@ export async function restrictRun(
 
   const message = new EmbedBuilder()
     .setColor('#FF6700')
-    .setAuthor({ name: `Restricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
+    .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
     .addFields(
       { name: 'User', value: `${member}`, inline: true },
       { name: 'Moderator', value: `${mod}`, inline: true },
       { name: 'Reason', value: reason },
     )
     .setTimestamp()
-    .setFooter({ text: `ID: ${member.id}` });
+    .setFooter({ text: `ID: ${userId}` });
 
   await logChannel.send({ embeds: [message] });
 

@@ -139,7 +139,8 @@ export class UnRestrictCommand extends Command {
     let member = guild.members.cache.get(userId);
 
     if (member === undefined) {
-      member = await guild.members.fetch(userId);
+      member = await guild.members.fetch(userId)
+        .catch(() => undefined);
     }
 
     if (member === undefined) {
