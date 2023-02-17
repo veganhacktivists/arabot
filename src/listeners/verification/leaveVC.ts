@@ -88,7 +88,6 @@ export class VerificationLeaveVCListener extends Listener {
         // Creates the length of the time for the ban
         const banLength = fibonacci(incompleteCount) * 3600_000;
 
-        // @ts-ignore
         this.container.tasks.create('verifyUnblock', {
           userId: user.id,
           guildId: guild.id,
