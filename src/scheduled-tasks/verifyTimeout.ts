@@ -51,6 +51,6 @@ export class VerifyTimeout extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    verifyUnblock: never;
+    verifyTimeout: never;
   }
 }
