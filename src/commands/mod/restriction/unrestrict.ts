@@ -35,7 +35,7 @@ export class UnRestrictCommand extends Command {
     super(context, {
       ...options,
       name: 'unrestrict',
-      aliases: ['ur'], // TODO add urv for when restrict vegan will be implemented
+      aliases: ['ur', 'urv'],
       description: 'Unrestricts a user',
       preconditions: ['ModOnly'],
     });

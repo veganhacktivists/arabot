@@ -97,9 +97,6 @@ export async function restrictRun(
     await updateUser(member);
 
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      // TODO remove this error before enabling vegan restricts
-      info.message = `${member} is vegan, can't restrict them yet 😭`;
-      return info;
       section = 5;
     }
 
@@ -212,10 +209,8 @@ export async function restrictRun(
       IDs.roles.nonvegan.vegCurious,
     ]);
   } else if (!await userExists(userId)) {
-    // TODO remove this error before replacing other bot role replacement
-    info.message = `<@${userId}> is not on this server, can't restrict them yet! 😭`;
-    return info;
     await addEmptyUser(userId);
+  } else {
     const dbRoles = await fetchRoles(userId);
     if (dbRoles.includes(IDs.roles.vegan.vegan)) {
       section = 5;
@@ -263,7 +258,7 @@ export class RestrictCommand extends Command {
     super(context, {
       ...options,
       name: 'restrict',
-      aliases: ['r', 'rest', 'rr'], // TODO add 'rv' when enabling vegan restrictions
+      aliases: ['r', 'rest', 'rr', 'rv'],
       description: 'Restricts a user',
       preconditions: ['ModOnly'],
     });
