@@ -20,6 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import { checkBan, getBanReason } from '#utils/database/ban';
+import { checkTempBan } from '#utils/database/tempBan';
 
 export class BanJoinListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -31,7 +32,8 @@ export class BanJoinListener extends Listener {
 
   public async run(user: GuildMember) {
     // Check if the user is banned
-    if (!await checkBan(user.id)) {
+    if (!await checkBan(user.id)
+      && !await checkTempBan(user.id)) {
       return;
     }
 
