@@ -26,7 +26,7 @@ import type {
   VoiceState,
   GuildMember,
   Guild,
-  User, VoiceBasedChannel,
+  User,
 } from 'discord.js';
 import {
   time,
@@ -38,6 +38,7 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
 } from 'discord.js';
+import { createVerificationText, createVerificationVoice } from '#utils/verification';
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
 import { findNotes } from '#utils/database/sus';
@@ -143,14 +144,13 @@ export class VerificationJoinVCListener extends Listener {
       let verificationText: TextChannel;
       let bannedName = false;
       try {
-        verificationText = await this.createTextChannel(member, channel, category, guild);
+        verificationText = await createVerificationText(member, channel, category);
       } catch {
         bannedName = true;
-        verificationText = await this.createTextChannel(
+        verificationText = await createVerificationText(
           member,
           channel,
           category,
-          guild,
           bannedName,
         );
       }
@@ -177,9 +177,9 @@ export class VerificationJoinVCListener extends Listener {
 
     // Checks if there are more than 10 voice channels
     if (listVoiceChannels.size > maxVCs - 1) {
-      await this.createVoiceChannel(guild, category, true);
+      await createVerificationVoice(category, true);
     } else {
-      await this.createVoiceChannel(guild, category);
+      await createVerificationVoice(category);
     }
 
     // Change permissions to join the current channel
@@ -216,100 +216,6 @@ export class VerificationJoinVCListener extends Listener {
       },
     ]);
     await currentChannel.setUserLimit(0);
-  }
-
-  private async createTextChannel(
-    member: GuildMember,
-    voiceChannel: VoiceBasedChannel,
-    category: CategoryChannel,
-    guild: Guild,
-    bannedName = false,
-  ) {
-    const channel = await guild.channels.create({
-      name: `✅┃${!bannedName ? member.displayName : member.id}-verification`,
-      type: ChannelType.GuildText,
-      topic: `Channel for verifiers only. ${member.id} ${voiceChannel.id} (Please do not change this)`,
-      parent: category.id,
-      userLimit: 1,
-      permissionOverwrites: [
-        {
-          id: guild.roles.everyone,
-          deny: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: IDs.roles.verifyBlock,
-          deny: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: IDs.roles.staff.verifier,
-          allow: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: IDs.roles.staff.trialVerifier,
-          allow: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel],
-        },
-      ],
-    });
-    return channel;
-  }
-
-  private async createVoiceChannel(guild: Guild, category: CategoryChannel, full = false) {
-    const channel = await guild.channels.create({
-      name: 'Verification',
-      type: ChannelType.GuildVoice,
-      parent: category.id,
-      userLimit: 1,
-      permissionOverwrites: [
-        {
-          id: guild.roles.everyone,
-          deny: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Stream],
-        },
-        {
-          id: IDs.roles.verifyBlock,
-          deny: [PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Connect,
-            PermissionsBitField.Flags.SendMessages],
-        },
-        {
-          id: IDs.roles.nonvegan.nonvegan,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: IDs.roles.vegan.vegan,
-          allow: [PermissionsBitField.Flags.ViewChannel],
-        },
-        {
-          id: IDs.roles.vegan.activist,
-          deny: [PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Connect],
-        },
-        {
-          id: IDs.roles.staff.verifier,
-          allow: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Connect,
-            PermissionsBitField.Flags.MuteMembers],
-        },
-        {
-          id: IDs.roles.staff.trialVerifier,
-          allow: [PermissionsBitField.Flags.SendMessages,
-            PermissionsBitField.Flags.ViewChannel,
-            PermissionsBitField.Flags.Connect,
-            PermissionsBitField.Flags.MuteMembers],
-        },
-      ],
-    });
-
-    if (full) {
-      await channel.permissionOverwrites.edit(IDs.roles.nonvegan.nonvegan, { Connect: false });
-      await channel.permissionOverwrites.edit(IDs.roles.vegan.vegan, { Connect: false });
-    }
   }
 
   // Creates an embed for information about the user
