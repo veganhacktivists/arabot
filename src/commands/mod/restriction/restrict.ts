@@ -61,7 +61,11 @@ export async function restrictRun(
   let user = guild.client.users.cache.get(userId);
 
   if (user === undefined) {
-    user = await guild.client.users.fetch(userId) as User;
+    user = await guild.client.users.fetch(userId);
+    if (user === undefined) {
+      info.message = 'Error fetching user';
+      return info;
+    }
   }
 
   // Gets mod's GuildMember
@@ -227,7 +231,7 @@ export async function restrictRun(
   // Restrict the user on the database
   await restrict(userId, modId, reason, section);
 
-  info.message = `Restricted ${member}`;
+  info.message = `Restricted ${user}`;
   info.success = true;
 
   // Log the ban
@@ -239,7 +243,7 @@ export async function restrictRun(
       .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
     if (logChannel === undefined) {
       container.logger.error('Restrict Error: Could not fetch log channel');
-      info.message = `Restricted ${member} but could not find the log channel. This has been logged to the database.`;
+      info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
       return info;
     }
   }
@@ -248,7 +252,7 @@ export async function restrictRun(
     .setColor('#FF6700')
     .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
     .addFields(
-      { name: 'User', value: `${member}`, inline: true },
+      { name: 'User', value: `${user}`, inline: true },
       { name: 'Moderator', value: `${mod}`, inline: true },
       { name: 'Reason', value: reason },
     )

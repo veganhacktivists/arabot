@@ -121,6 +121,16 @@ export class UnRestrictCommand extends Command {
       success: false,
     };
 
+    let user = guild.client.users.cache.get(userId);
+
+    if (user === undefined) {
+      user = await guild.client.users.fetch(userId);
+      if (user === undefined) {
+        info.message = 'Error fetching user';
+        return info;
+      }
+    }
+
     // Gets mod's GuildMember
     const mod = guild.members.cache.get(modId);
 
@@ -157,7 +167,7 @@ export class UnRestrictCommand extends Command {
 
     // Checks if the user is not restricted
     if (!member.roles.cache.hasAny(...restrictRoles)) {
-      info.message = `${member} is not restricted!`;
+      info.message = `${user} is not restricted!`;
       return info;
     }
 
@@ -219,24 +229,24 @@ export class UnRestrictCommand extends Command {
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('Restrict Error: Could not fetch log channel');
-        info.message = `Unrestricted ${member} but could not find the log channel. This has been logged to the database.`;
+        info.message = `Unrestricted ${user} but could not find the log channel. This has been logged to the database.`;
         return info;
       }
     }
 
     const message = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unrestricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
+      .setAuthor({ name: `Unrestricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
       .addFields(
-        { name: 'User', value: `${member}`, inline: true },
+        { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },
       )
       .setTimestamp()
-      .setFooter({ text: `ID: ${member.id}` });
+      .setFooter({ text: `ID: ${userId}` });
 
     await logChannel.send({ embeds: [message] });
 
-    info.message = `Unrestricted ${member}`;
+    info.message = `Unrestricted ${user}`;
     return info;
   }
 }
