@@ -26,32 +26,35 @@ datasource db {
 }
 
 model User {
-  id             String     @id @db.VarChar(255)
-  vegan          Boolean    @default(false)
-  trusted        Boolean    @default(false)
-  activist       Boolean    @default(false)
-  plus           Boolean    @default(false)
-  notVegan       Boolean    @default(false)
-  vegCurious     Boolean    @default(false)
-  convinced      Boolean    @default(false)
-  muted          Boolean    @default(false)
-  VerifyUser     Verify[]   @relation("verUser")
-  VerifyVerifier Verify[]   @relation("verVerifier")
-  SusUser        Sus[]      @relation("susUser")
-  SusMod         Sus[]      @relation("susMod")
-  WarnUser       Warning[]  @relation("warnUser")
-  WarnMod        Warning[]  @relation("warnMod")
-  RestrictUser   Restrict[] @relation("restUser")
-  RestrictMod    Restrict[] @relation("restMod")
-  RestrictEndMod Restrict[] @relation("endRestMod")
-  BanUser        Ban[]      @relation("banUser")
-  BanMod         Ban[]      @relation("banMod")
-  BanEndMod      Ban[]      @relation("endBanMod")
-  TempBanUser    TempBan[]  @relation("tbanUser")
-  TempBanMod     TempBan[]  @relation("tbanMod")
-  TempBanEndMod  TempBan[]  @relation("endTbanMod")
-  VCMuteUser     VCMute[]   @relation("vcMuteUser")
-  VCMuteMod      VCMute[]   @relation("vcMuteMod")
+  id                    String            @id @db.VarChar(255)
+  vegan                 Boolean           @default(false)
+  trusted               Boolean           @default(false)
+  activist              Boolean           @default(false)
+  plus                  Boolean           @default(false)
+  notVegan              Boolean           @default(false)
+  vegCurious            Boolean           @default(false)
+  convinced             Boolean           @default(false)
+  muted                 Boolean           @default(false)
+  VerifyUser            Verify[]          @relation("verUser")
+  VerifyVerifier        Verify[]          @relation("verVerifier")
+  EventLeader           Event[]           @relation("eventLeader")
+  StatLeader            Stat[]            @relation("statLeader")
+  OutreachParticipation ParticipantStat[] @relation("participantUser")
+  SusUser               Sus[]             @relation("susUser")
+  SusMod                Sus[]             @relation("susMod")
+  WarnUser              Warning[]         @relation("warnUser")
+  WarnMod               Warning[]         @relation("warnMod")
+  RestrictUser          Restrict[]        @relation("restUser")
+  RestrictMod           Restrict[]        @relation("restMod")
+  RestrictEndMod        Restrict[]        @relation("endRestMod")
+  BanUser               Ban[]             @relation("banUser")
+  BanMod                Ban[]             @relation("banMod")
+  BanEndMod             Ban[]             @relation("endBanMod")
+  TempBanUser           TempBan[]         @relation("tbanUser")
+  TempBanMod            TempBan[]         @relation("tbanMod")
+  TempBanEndMod         TempBan[]         @relation("endTbanMod")
+  VCMuteUser            VCMute[]          @relation("vcMuteUser")
+  VCMuteMod             VCMute[]          @relation("vcMuteMod")
 }
 
 model Verify {
@@ -84,42 +87,45 @@ model Verify {
 }
 
 model Event {
-  id    Int @id @default(autoincrement())
-  leader User   @relation("statsLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  id        Int         @id @default(autoincrement())
+  leader    User        @relation("eventLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
   leaderId  String
-  startTime DateTime  @default(now())
+  startTime DateTime    @default(now())
   endTime   DateTime?
   // Add a type of Event like Discord Outreach, Voice Chat, etc?
+  EventStat EventStat[]
 }
 
 model EventStat {
-  event Event   @relation(fields: [eventId], references: [id])
-  eventId   Int
-  stats Stats   @relation(fields: [statsId], references: [id])
-  statsId   Int
+  event   Event @relation(fields: [eventId], references: [id])
+  eventId Int
+  stat    Stat  @relation(fields: [statId], references: [id])
+  statId  Int
 
-  @@id([eventId, statsId])
+  @@id([eventId, statId])
 }
 
 model Stat {
-  id    Int     @id @default(autoincrement())
-  leader User   @relation("statsLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
-  leaderId  String
-  vegan Int @default(0)
-  considered    Int @default(0)
-  antivegan Int @default(0)
-  thanked   Int @default(0)
-  documentary   Int @default(0)
-  educated  Int @default(0)
+  id              Int               @id @default(autoincrement())
+  leader          User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId        String
+  vegan           Int               @default(0)
+  considered      Int               @default(0)
+  antivegan       Int               @default(0)
+  thanked         Int               @default(0)
+  documentary     Int               @default(0)
+  educated        Int               @default(0)
+  EventStat       EventStat[]
+  ParticipantStat ParticipantStat[]
 }
 
 model ParticipantStat {
-  stats Stats   @relation(fields: [statsId], references: [id])
-  statsId   Int
-  user   User     @relation("participantUser", fields: [userId], references: [id])
+  stat   Stat   @relation(fields: [statId], references: [id])
+  statId Int
+  user   User   @relation("participantUser", fields: [userId], references: [id])
   userId String
 
-  @@id([statsId, userId])
+  @@id([statId, userId])
 }
 
 model Sus {
