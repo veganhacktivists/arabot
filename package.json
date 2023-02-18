@@ -1,6 +1,6 @@
 {
   "name": "arabot",
-  "version": "0.1.0",
+  "version": "0.2.1",
   "description": "A Discord bot for Animal Rights Advocates",
   "main": "dist/index.js",
   "scripts": {
@@ -29,16 +29,17 @@
   },
   "homepage": "https://github.com/veganhacktivists/arabot#readme",
   "dependencies": {
-    "@prisma/client": "^4.0.0",
+    "@prisma/client": "^4.10.1",
     "@sapphire/discord.js-utilities": "^6.0.0",
-    "@sapphire/framework": "^4.0.1",
+    "@sapphire/framework": "^4.1.0",
     "@sapphire/plugin-logger": "^3.0.1",
-    "@sapphire/plugin-scheduled-tasks": "^4.0.0",
+    "@sapphire/plugin-scheduled-tasks": "^6.0.0",
     "@sapphire/plugin-subcommands": "^4.0.0",
-    "@sapphire/stopwatch": "^1.4.1",
+    "@sapphire/stopwatch": "^1.5.0",
+    "@sapphire/time-utilities": "^1.7.8",
     "@sapphire/utilities": "^3.9.2",
     "@types/node": "^18.0.3",
-    "bullmq": "^1.89.1",
+    "bullmq": "^3.6.6",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.1",
     "ts-node": "^10.8.2",
@@ -54,6 +55,6 @@
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-import-resolver-typescript": "^3.5.3",
     "eslint-plugin-import": "^2.27.5",
-    "prisma": "^4.4.0"
+    "prisma": "^4.10.1"
   }
 }

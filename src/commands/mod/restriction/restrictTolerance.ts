@@ -18,16 +18,17 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { User, Message } from 'discord.js';
+import { restrictRun } from './restrict';
 
-export class RenameUserCommand extends Command {
+export class RestrictToleranceCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'rename',
-      aliases: ['ru', 'nick'],
-      description: 'Changes the nickname for the user',
-      preconditions: [['CoordinatorOnly', 'ModOnly']],
+      name: 'restricttolerance',
+      aliases: ['rt'],
+      description: 'Restricts a user for bigoted reasons',
+      preconditions: ['ModOnly'],
     });
   }
 
@@ -38,11 +39,11 @@ export class RenameUserCommand extends Command {
         .setName(this.name)
         .setDescription(this.description)
         .addUserOption((option) => option.setName('user')
-          .setDescription('User to change nickname')
+          .setDescription('User to restrict')
           .setRequired(true))
-        .addStringOption((option) => option.setName('nickname')
-          .setDescription('The nickname to give the user')
-          .setMaxLength(32)),
+        .addStringOption((option) => option.setName('reason')
+          .setDescription('Reason for restricting the user')
+          .setRequired(true)),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -51,27 +52,14 @@ export class RenameUserCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
-    const nickname = interaction.options.getString('nickname');
+    const reason = interaction.options.getString('reason', true);
+    const mod = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null) {
-      await interaction.reply({
-        content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const member = guild.members.cache.get(user?.id);
-
-    // Checks if guildMember is null
-    if (member === undefined) {
+    if (guild === null || mod === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -80,51 +68,51 @@ export class RenameUserCommand extends Command {
       return;
     }
 
-    // Change nickname
-    try {
-      await member.setNickname(nickname);
-    } catch {
-      await interaction.reply({
-        content: 'Bot doesn\'t have permission to change the user\'s name!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await restrictRun(user?.id, mod.user.id, reason, guild, true);
+
     await interaction.reply({
-      content: `Changed ${user}'s nickname`,
+      content: info.message,
       fetchReply: true,
-      ephemeral: true,
     });
   }
 
+  // Non Application Command method of banning a user
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let member: GuildMember;
+    let user: User;
     try {
-      member = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
+    const reason = args.finished ? null : await args.rest('string');
+    const mod = message.member;
 
-    const nickname = args.finished ? null : await args.rest('string');
-
-    if ((nickname != null) && nickname.length > 32) {
+    if (reason === null) {
       await message.react('❌');
-      await message.reply('Nickname is too long!');
+      await message.reply('Restrict reason was not provided!');
       return;
     }
 
-    try {
-      await member.setNickname(nickname);
-    } catch {
+    if (mod === null) {
       await message.react('❌');
-      await message.reply('Bot doesn\'t have permission to change the user\'s name!');
+      await message.reply('Moderator not found! Try again or contact a developer!');
       return;
     }
 
-    await message.react('✅');
+    const { guild } = message;
+
+    if (guild === null) {
+      await message.react('❌');
+      await message.reply('Guild not found! Try again or contact a developer!');
+      return;
+    }
+
+    const info = await restrictRun(user?.id, mod.user.id, reason, guild, true);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
   }
 }

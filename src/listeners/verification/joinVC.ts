@@ -128,7 +128,6 @@ export class VerificationJoinVCListener extends Listener {
       ]);
 
       // Start 15-minute timer if verifier does not join
-      // @ts-ignore
       this.container.tasks.create('verifyTimeout', {
         channelId: channel.id,
         userId: member.id,

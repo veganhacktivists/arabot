@@ -1,0 +1,17 @@
+-- CreateTable
+CREATE TABLE "VCMute" (
+    "id" SERIAL NOT NULL,
+    "userId" TEXT NOT NULL,
+    "modId" TEXT NOT NULL,
+    "time" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "endTime" TIMESTAMP(3),
+    "reason" TEXT,
+
+    CONSTRAINT "VCMute_pkey" PRIMARY KEY ("id")
+);
+
+-- AddForeignKey
+ALTER TABLE "VCMute" ADD CONSTRAINT "VCMute_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "VCMute" ADD CONSTRAINT "VCMute_modId_fkey" FOREIGN KEY ("modId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

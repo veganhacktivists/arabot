@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2023  Anthony Berg
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,10 +18,18 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { User, Message, TextChannel } from 'discord.js';
+import type {
+  User,
+  Message,
+  Snowflake,
+  TextChannel,
+  Guild,
+} from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
-import { addBan, checkActive } from '#utils/database/ban';
-import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addBan, checkBan } from '#utils/database/ban';
+import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
+import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
 export class BanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -54,13 +62,13 @@ export class BanCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const reason = interaction.options.getString('reason');
+    const user = interaction.options.getUser('user', true);
+    const reason = interaction.options.getString('reason', true);
     const mod = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || reason === null || mod === null) {
+    if (guild === null || mod === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -69,87 +77,9 @@ export class BanCommand extends Command {
       return;
     }
 
-    // Gets mod's GuildMember
-    const modGuildMember = guild.members.cache.get(mod.user.id);
+    const ban = await this.ban(user.id, mod.user.id, reason, guild);
 
-    // Checks if guildMember is null
-    if (modGuildMember === undefined) {
-      await interaction.reply({
-        content: 'Error fetching mod!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    if (await checkActive(user.id)) {
-      await interaction.reply(`${user} is already banned!`);
-      return;
-    }
-
-    // Check if mod is in database
-    if (!await userExists(modGuildMember.id)) {
-      await addExistingUser(modGuildMember);
-    }
-
-    // Gets guildMember
-    let guildMember = guild.members.cache.get(user.id);
-
-    if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id)
-        .catch(() => undefined);
-    }
-
-    if (guildMember !== undefined) {
-      // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
-        await interaction.reply({
-          content: 'You need to restrict the user first!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-        return;
-      }
-
-      // Check if user and mod are on the database
-      if (!await userExists(guildMember.id)) {
-        await addExistingUser(guildMember);
-      }
-
-      // Send DM for reason of ban
-      await user.send(`You have been banned from ARA for: ${reason}`
-        + '\n\nhttps://vbcamp.org/ARA')
-        .catch(() => {});
-
-      // Ban the user
-      await guildMember.ban({ reason });
-    } else if (!await userExists(user.id)) {
-      await addEmptyUser(user.id);
-    }
-
-    await interaction.reply({
-      content: `${user} has been banned.`,
-      ephemeral: true,
-      fetchReply: true,
-    });
-
-    // Add ban to database
-    await addBan(user.id, mod.user.id, reason);
-
-    // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
-
-    if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Ban Error: Could not fetch log channel');
-        return;
-      }
-    }
-
-    await logChannel.send(`${user} was banned for: ${reason} by ${mod}`);
+    await interaction.reply({ content: ban.message });
   }
 
   // Non Application Command method of banning a user
@@ -186,62 +116,85 @@ export class BanCommand extends Command {
       return;
     }
 
-    if (await checkActive(user.id)) {
-      await message.react('❌');
-      await message.reply(`${user} is already banned!`);
-      return;
-    }
-
     if (message.channel.id !== IDs.channels.restricted.moderators) {
       await message.react('❌');
       await message.reply(`You can only run this command in <#${IDs.channels.restricted.moderators}> `
-      + 'or alternatively use the slash command!');
+        + 'or alternatively use the slash command!');
       return;
     }
 
-    // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
+    const ban = await this.ban(user.id, mod.user.id, reason, guild);
+
+    await message.reply(ban.message);
+    await message.react(ban.success ? '✅' : '❌');
+  }
+
+  private async ban(userId: Snowflake, modId: Snowflake, reason: string, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+
+    let user = guild.client.users.cache.get(userId);
+
+    if (user === undefined) {
+      user = await guild.client.users.fetch(userId) as User;
     }
 
-    // Gets guildMember
-    let guildMember = await guild.members.cache.get(user.id);
+    // Gets mod's GuildMember
+    const mod = guild.members.cache.get(modId);
 
-    if (guildMember === undefined) {
-      guildMember = await guild.members.fetch(user.id)
+    // Checks if guildMember is null
+    if (mod === undefined) {
+      info.message = 'Error fetching mod!';
+      return info;
+    }
+
+    if (await checkBan(userId)) {
+      info.message = `${user} is already banned!`;
+      return info;
+    }
+
+    // Check if mod is in database
+    await updateUser(mod);
+
+    // Gets guildMember
+    let member = guild.members.cache.get(userId);
+
+    if (member === undefined) {
+      member = await guild.members.fetch(userId)
         .catch(() => undefined);
     }
 
-    if (guildMember !== undefined) {
+    if (member !== undefined) {
       // Checks if the user is not restricted
-      if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
-        await message.react('❌');
-        await message.reply({
-          content: 'You need to restrict the user first!',
-        });
-        return;
+      if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        info.message = 'You need to restrict the user first!';
+        return info;
       }
 
-      // Check if user and mod are on the database
-      if (!await userExists(guildMember.id)) {
-        await addExistingUser(guildMember);
-      }
+      await updateUser(member);
 
       // Send DM for reason of ban
-      await user.send(`You have been banned from ARA for: ${reason}`
+      await member.send(`You have been banned from ARA for: ${reason}`
         + '\n\nhttps://vbcamp.org/ARA')
         .catch(() => {});
 
       // Ban the user
-      await guildMember.ban({ reason });
-    } else if (!await userExists(user.id)) {
-      await addEmptyUser(user.id);
+      await member.ban({ reason });
+    } else if (!await userExists(userId)) {
+      await addEmptyUser(userId);
     }
 
     // Add ban to database
-    await addBan(user.id, mod.id, reason);
+    await addBan(userId, modId, reason);
 
-    await message.react('✅');
+    if (await checkTempBan(userId)) {
+      await removeTempBan(userId);
+    }
+
+    info.message = `${user} has been banned.`;
+    info.success = true;
 
     // Log the ban
     let logChannel = guild.channels.cache
@@ -252,10 +205,24 @@ export class BanCommand extends Command {
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('Ban Error: Could not fetch log channel');
-        return;
+        info.message = `${user} has been banned. This hasn't been logged in a text channel as log channel could not be found`;
+        return info;
       }
     }
 
-    await logChannel.send(`${user} was banned for: ${reason} by ${mod}`);
+    const log = new EmbedBuilder()
+      .setColor('#FF0000')
+      .setAuthor({ name: `Banned ${user.tag}`, iconURL: `${user.avatarURL()}` })
+      .addFields(
+        { name: 'User', value: `${user}`, inline: true },
+        { name: 'Moderator', value: `${mod}`, inline: true },
+        { name: 'Reason', value: reason },
+      )
+      .setTimestamp()
+      .setFooter({ text: `ID: ${user.id}` });
+
+    await logChannel.send({ embeds: [log] });
+
+    return info;
   }
 }

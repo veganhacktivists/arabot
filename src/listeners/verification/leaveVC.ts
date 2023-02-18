@@ -25,7 +25,7 @@ import { time, ChannelType, PermissionsBitField } from 'discord.js';
 import { maxVCs, leaveBan } from '#utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '#utils/database/verification';
 import { fetchRoles } from '#utils/database/dbExistingUser';
-import { fibonacci } from '#utils/mathsSeries';
+import { fibonacci } from '#utils/maths';
 import IDs from '#utils/ids';
 
 export class VerificationLeaveVCListener extends Listener {
@@ -88,7 +88,6 @@ export class VerificationLeaveVCListener extends Listener {
         // Creates the length of the time for the ban
         const banLength = fibonacci(incompleteCount) * 3600_000;
 
-        // @ts-ignore
         this.container.tasks.create('verifyUnblock', {
           userId: user.id,
           guildId: guild.id,

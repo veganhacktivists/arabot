@@ -19,14 +19,16 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
+import { addMute, removeMute, checkActive } from '#utils/database/vcMute';
+import { addExistingUser, userExists } from '#utils/database/dbExistingUser';
 
-export class RenameUserCommand extends Command {
+export class VCMuteCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'rename',
-      aliases: ['ru', 'nick'],
-      description: 'Changes the nickname for the user',
+      name: 'vcmute',
+      aliases: ['vmute'],
+      description: 'Persists a server mute if a user is trying to bypass mute',
       preconditions: [['CoordinatorOnly', 'ModOnly']],
     });
   }
@@ -38,11 +40,10 @@ export class RenameUserCommand extends Command {
         .setName(this.name)
         .setDescription(this.description)
         .addUserOption((option) => option.setName('user')
-          .setDescription('User to change nickname')
+          .setDescription('User to persistently mute')
           .setRequired(true))
-        .addStringOption((option) => option.setName('nickname')
-          .setDescription('The nickname to give the user')
-          .setMaxLength(32)),
+        .addStringOption((option) => option.setName('reason')
+          .setDescription('Reason for persistently muting the user')),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -51,27 +52,14 @@ export class RenameUserCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
-    const nickname = interaction.options.getString('nickname');
+    const reason = interaction.options.getString('reason');
+    const modUser = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null) {
-      await interaction.reply({
-        content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const member = guild.members.cache.get(user?.id);
-
-    // Checks if guildMember is null
-    if (member === undefined) {
+    if (modUser === null || guild === null) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -80,19 +68,47 @@ export class RenameUserCommand extends Command {
       return;
     }
 
-    // Change nickname
-    try {
-      await member.setNickname(nickname);
-    } catch {
+    // Gets guildMember whilst removing the ability of each other variables being null
+    const member = guild.members.cache.get(user.id);
+    const mod = guild.members.cache.get(modUser.user.id);
+
+    // Checks if guildMember is null
+    if (member === undefined || mod === undefined) {
       await interaction.reply({
-        content: 'Bot doesn\'t have permission to change the user\'s name!',
+        content: 'Error fetching user!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
+
+    // Check if removing VC Mute
+    if (await checkActive(member.id)) {
+      await removeMute(member.id);
+      if (member.voice.channel !== null) {
+        await member.voice.setMute(false, reason === null ? undefined : reason);
+      }
+
+      await interaction.reply({
+        content: `Removed server mute from ${user}`,
+        fetchReply: true,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // Check if mod is in database
+    if (!await userExists(mod.id)) {
+      await addExistingUser(mod);
+    }
+
+    // Add VC Mute
+    if (member.voice.channel !== null) {
+      await member.voice.setMute(true, reason === null ? undefined : reason);
+    }
+    await addMute(member.id, mod.id, reason);
     await interaction.reply({
-      content: `Changed ${user}'s nickname`,
+      content: `Server muted ${user}`,
       fetchReply: true,
       ephemeral: true,
     });
@@ -109,21 +125,38 @@ export class RenameUserCommand extends Command {
       return;
     }
 
-    const nickname = args.finished ? null : await args.rest('string');
+    const reason = args.finished ? null : await args.rest('string');
+    const mod = message.member;
 
-    if ((nickname != null) && nickname.length > 32) {
+    if (mod === null) {
       await message.react('❌');
-      await message.reply('Nickname is too long!');
+      await message.reply('Moderator not found! Try again or contact a developer!');
       return;
     }
 
-    try {
-      await member.setNickname(nickname);
-    } catch {
-      await message.react('❌');
-      await message.reply('Bot doesn\'t have permission to change the user\'s name!');
+    // Check if removing VC Mute
+    if (await checkActive(member.id)) {
+      await removeMute(member.id);
+      if (member.voice.channel !== null) {
+        await member.voice.setMute(false, reason === null ? undefined : reason);
+      }
+
+      await message.reply(`Removed server mute from ${member}`);
+      await message.react('✅');
       return;
     }
+
+    // Check if mod is in database
+    if (!await userExists(mod.id)) {
+      await addExistingUser(mod);
+    }
+
+    // Add VC Mute
+    if (member.voice.channel !== null) {
+      await member.voice.setMute(true, reason === null ? undefined : reason);
+    }
+    await addMute(member.id, mod.id, reason);
+    await message.reply(`Server muted ${member}`);
 
     await message.react('✅');
   }

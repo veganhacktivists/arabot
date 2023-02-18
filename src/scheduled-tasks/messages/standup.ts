@@ -15,40 +15,33 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-export class RestrictedMessageTask extends ScheduledTask {
+export class StandupTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      cron: '0 17 * * *',
+      pattern: '0 12 * * 1',
     });
   }
 
   public async run() {
     const { client } = container;
 
-    const restricted = client.channels.cache.get(IDs.channels.restricted.restricted) as TextChannel;
-    const tolerance = client.channels.cache.get(IDs.channels.restricted.tolerance) as TextChannel;
+    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
 
-    await restricted.send(this.message(IDs.roles.restrictions.restricted1));
-    await tolerance.send(this.message(IDs.roles.restrictions.restricted3));
-  }
-
-  private message(id: string) {
-    return `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264> `
-      + 'to attempt to clear up the issue that lead to your restriction and rejoin the server.'
-      + '\n\nJust let us know what got you restricted and why you’d like to avoid repeating that behaviour and we’ll try to sort it out.';
+    await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
+                            \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
   }
 }
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    cron: never;
+    pattern: never;
   }
 }
