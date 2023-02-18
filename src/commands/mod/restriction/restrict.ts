@@ -37,7 +37,6 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { randint } from '#utils/random';
 import {
   addEmptyUser,
   updateUser,
@@ -45,6 +44,7 @@ import {
   fetchRoles,
 } from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
+import { randint } from '#utils/maths';
 
 export async function restrictRun(
   userId: Snowflake,
@@ -57,6 +57,16 @@ export async function restrictRun(
     message: '',
     success: false,
   };
+
+  let user = guild.client.users.cache.get(userId);
+
+  if (user === undefined) {
+    user = await guild.client.users.fetch(userId);
+    if (user === undefined) {
+      info.message = 'Error fetching user';
+      return info;
+    }
+  }
 
   // Gets mod's GuildMember
   const mod = guild.members.cache.get(modId);
@@ -79,7 +89,8 @@ export async function restrictRun(
   let member = guild.members.cache.get(userId);
 
   if (member === undefined) {
-    member = await guild.members.fetch(userId);
+    member = await guild.members.fetch(userId)
+      .catch(() => undefined);
   }
 
   const restrictRoles = IDs.roles.restrictions.restricted;
@@ -97,9 +108,6 @@ export async function restrictRun(
     await updateUser(member);
 
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      // TODO remove this error before enabling vegan restricts
-      info.message = `${member} is vegan, can't restrict them yet 😭`;
-      return info;
       section = 5;
     }
 
@@ -212,10 +220,8 @@ export async function restrictRun(
       IDs.roles.nonvegan.vegCurious,
     ]);
   } else if (!await userExists(userId)) {
-    // TODO remove this error before replacing other bot role replacement
-    info.message = `<@${userId}> is not on this server, can't restrict them yet! 😭`;
-    return info;
     await addEmptyUser(userId);
+  } else {
     const dbRoles = await fetchRoles(userId);
     if (dbRoles.includes(IDs.roles.vegan.vegan)) {
       section = 5;
@@ -225,7 +231,7 @@ export async function restrictRun(
   // Restrict the user on the database
   await restrict(userId, modId, reason, section);
 
-  info.message = `Restricted ${member}`;
+  info.message = `Restricted ${user}`;
   info.success = true;
 
   // Log the ban
@@ -237,21 +243,21 @@ export async function restrictRun(
       .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
     if (logChannel === undefined) {
       container.logger.error('Restrict Error: Could not fetch log channel');
-      info.message = `Restricted ${member} but could not find the log channel. This has been logged to the database.`;
+      info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
       return info;
     }
   }
 
   const message = new EmbedBuilder()
     .setColor('#FF6700')
-    .setAuthor({ name: `Restricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
+    .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
     .addFields(
-      { name: 'User', value: `${member}`, inline: true },
+      { name: 'User', value: `${user}`, inline: true },
       { name: 'Moderator', value: `${mod}`, inline: true },
       { name: 'Reason', value: reason },
     )
     .setTimestamp()
-    .setFooter({ text: `ID: ${member.id}` });
+    .setFooter({ text: `ID: ${userId}` });
 
   await logChannel.send({ embeds: [message] });
 
@@ -263,7 +269,7 @@ export class RestrictCommand extends Command {
     super(context, {
       ...options,
       name: 'restrict',
-      aliases: ['r', 'rest', 'rr'], // TODO add 'rv' when enabling vegan restrictions
+      aliases: ['r', 'rest', 'rr', 'rv'],
       description: 'Restricts a user',
       preconditions: ['ModOnly'],
     });

@@ -21,7 +21,7 @@ import type { GuildMember } from 'discord.js';
 import { container } from '@sapphire/framework';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { leaveBan } from '#utils/verificationConfig';
-import { fibonacci } from '#utils/mathsSeries';
+import { fibonacci } from '#utils/maths';
 
 export async function joinVerification(channelId: string, user: GuildMember) {
   // Update the user on the database with the current roles they have

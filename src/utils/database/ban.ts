@@ -46,7 +46,7 @@ export async function removeBan(userId: string, modId: string) {
   });
 }
 
-export async function checkActive(userId: string) {
+export async function checkBan(userId: string) {
   const ban = await container.database.ban.findFirst({
     where: {
       userId,
@@ -63,7 +63,7 @@ export async function checkActive(userId: string) {
   return ban.active;
 }
 
-export async function getReason(userId: string) {
+export async function getBanReason(userId: string) {
   const ban = await container.database.ban.findFirst({
     where: {
       userId,

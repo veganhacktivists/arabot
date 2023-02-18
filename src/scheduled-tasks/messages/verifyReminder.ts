@@ -22,33 +22,27 @@ import { container } from '@sapphire/framework';
 import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
-export class RestrictedMessageTask extends ScheduledTask {
+export class VerifyReminder extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      cron: '0 17 * * *',
+      pattern: '0 */1 * * *',
     });
   }
 
   public async run() {
     const { client } = container;
 
-    const restricted = client.channels.cache.get(IDs.channels.restricted.restricted) as TextChannel;
-    const tolerance = client.channels.cache.get(IDs.channels.restricted.tolerance) as TextChannel;
+    const channel = client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel;
 
-    await restricted.send(this.message(IDs.roles.restrictions.restricted1));
-    await tolerance.send(this.message(IDs.roles.restrictions.restricted3));
-  }
-
-  private message(id: string) {
-    return `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264> `
-      + 'to attempt to clear up the issue that lead to your restriction and rejoin the server.'
-      + '\n\nJust let us know what got you restricted and why you’d like to avoid repeating that behaviour and we’ll try to sort it out.';
+    await channel.send('If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
+      + 'To do this, hop into the \'Verification\' voice channel.'
+      + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.');
   }
 }
 
 declare module '@sapphire/plugin-scheduled-tasks' {
-  interface ScheduledTasks {
-    cron: never;
+  interface VerifyReminder {
+    pattern: never;
   }
 }

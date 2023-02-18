@@ -15,35 +15,33 @@
 
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-import { Listener } from '@sapphire/framework';
-import type { GuildMember } from 'discord.js';
-import { checkActive, getReason } from '#utils/database/ban';
+import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
+import { container } from '@sapphire/framework';
+import type { TextChannel } from 'discord.js';
+import IDs from '#utils/ids';
 
-export class BanJoin extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+export class StandupTask extends ScheduledTask {
+  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      event: 'guildMemberAdd',
+      pattern: '0 12 * * 1',
     });
   }
 
-  public async run(user: GuildMember) {
-    // Check if the user is banned
-    if (!await checkActive(user.id)) {
-      return;
-    }
+  public async run() {
+    const { client } = container;
 
-    // Get reason from database
-    const reason = await getReason(user.id);
+    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
 
-    // Send DM for ban reason
-    await user.send(`You have been banned from ARA for: ${reason}`
-      + '\n\nhttps://vbcamp.org/ARA')
-      .catch(() => {});
+    await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
+                            \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);
+  }
+}
 
-    // Ban the user
-    await user.ban({ reason });
+declare module '@sapphire/plugin-scheduled-tasks' {
+  interface ScheduledTasks {
+    pattern: never;
   }
 }

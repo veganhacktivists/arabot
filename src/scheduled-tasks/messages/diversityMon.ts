@@ -26,7 +26,7 @@ export class DiversityMonMessageTask extends ScheduledTask {
   public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
     super(context, {
       ...options,
-      cron: '0 15 * * 1',
+      pattern: '0 15 * * 1',
     });
   }
 
@@ -53,6 +53,6 @@ export class DiversityMonMessageTask extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    cron: never;
+    pattern: never;
   }
 }

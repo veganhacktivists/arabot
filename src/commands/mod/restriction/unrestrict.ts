@@ -35,7 +35,7 @@ export class UnRestrictCommand extends Command {
     super(context, {
       ...options,
       name: 'unrestrict',
-      aliases: ['ur'], // TODO add urv for when restrict vegan will be implemented
+      aliases: ['ur', 'urv'],
       description: 'Unrestricts a user',
       preconditions: ['ModOnly'],
     });
@@ -121,6 +121,16 @@ export class UnRestrictCommand extends Command {
       success: false,
     };
 
+    let user = guild.client.users.cache.get(userId);
+
+    if (user === undefined) {
+      user = await guild.client.users.fetch(userId);
+      if (user === undefined) {
+        info.message = 'Error fetching user';
+        return info;
+      }
+    }
+
     // Gets mod's GuildMember
     const mod = guild.members.cache.get(modId);
 
@@ -131,7 +141,7 @@ export class UnRestrictCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
+    if (!await userExists(modId)) {
       await addExistingUser(mod);
     }
 
@@ -139,7 +149,8 @@ export class UnRestrictCommand extends Command {
     let member = guild.members.cache.get(userId);
 
     if (member === undefined) {
-      member = await guild.members.fetch(userId);
+      member = await guild.members.fetch(userId)
+        .catch(() => undefined);
     }
 
     if (member === undefined) {
@@ -147,11 +158,16 @@ export class UnRestrictCommand extends Command {
       return info;
     }
 
+    // Check if mod is in database
+    if (!await userExists(userId)) {
+      await addExistingUser(member);
+    }
+
     const restrictRoles = IDs.roles.restrictions.restricted;
 
     // Checks if the user is not restricted
     if (!member.roles.cache.hasAny(...restrictRoles)) {
-      info.message = `${member} is not restricted!`;
+      info.message = `${user} is not restricted!`;
       return info;
     }
 
@@ -162,7 +178,7 @@ export class UnRestrictCommand extends Command {
       await unRestrict(userId, modId);
     } else {
       let section = 1;
-      for (let i = 0; i < restrictRoles.length; i += 0) {
+      for (let i = 0; i < restrictRoles.length; i += 1) {
         if (member.roles.cache.has(restrictRoles[i])) {
           section = i + 1;
         }
@@ -213,24 +229,24 @@ export class UnRestrictCommand extends Command {
         .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('Restrict Error: Could not fetch log channel');
-        info.message = `Unrestricted ${member} but could not find the log channel. This has been logged to the database.`;
+        info.message = `Unrestricted ${user} but could not find the log channel. This has been logged to the database.`;
         return info;
       }
     }
 
     const message = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unrestricted ${member.user.tag}`, iconURL: `${member.user.avatarURL()}` })
+      .setAuthor({ name: `Unrestricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
       .addFields(
-        { name: 'User', value: `${member}`, inline: true },
+        { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },
       )
       .setTimestamp()
-      .setFooter({ text: `ID: ${member.id}` });
+      .setFooter({ text: `ID: ${userId}` });
 
     await logChannel.send({ embeds: [message] });
 
-    info.message = `Unrestricted ${member}`;
+    info.message = `Unrestricted ${user}`;
     return info;
   }
 }
