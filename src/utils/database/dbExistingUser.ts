@@ -151,10 +151,9 @@ export async function fetchRoles(userId: Snowflake) {
   });
 
   // Assign roles to role snowflakes
-  const roles = [];
+  const roles: Snowflake[] = [];
 
   if (roleQuery === null) {
-    roles.push('');
     return roles;
   }
   if (roleQuery.vegan) {
