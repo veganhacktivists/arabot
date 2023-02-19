@@ -53,6 +53,8 @@ export class RolesJoinServerListener extends Listener {
     }
 
     // Add roles if they don't have verification block
-    await member.roles.add(roles);
+    if (roles.length > 0) {
+      await member.roles.add(roles);
+    }
   }
 }
