@@ -32,6 +32,7 @@ export class NonVeganAccessReady extends Listener {
       ...options,
       once: true,
       event: 'ready',
+      enabled: false,
     });
   }
 
