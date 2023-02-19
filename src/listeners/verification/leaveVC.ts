@@ -21,7 +21,8 @@ import { Listener } from '@sapphire/framework';
 import type {
   VoiceState, CategoryChannel, VoiceChannel, TextChannel,
 } from 'discord.js';
-import { time, ChannelType, PermissionsBitField } from 'discord.js';
+import { time, ChannelType } from 'discord.js';
+import { createVerificationVoice } from '#utils/verification';
 import { maxVCs, leaveBan } from '#utils/verificationConfig';
 import { getUser, checkFinish, countIncomplete } from '#utils/database/verification';
 import { fetchRoles } from '#utils/database/dbExistingUser';
@@ -126,52 +127,7 @@ export class VerificationLeaveVCListener extends Listener {
     // If there are no VCs left in verification after having the channel deleted
     if (listVoiceChannels.size - 1 === 0) {
       // Create a verification channel
-      await guild.channels.create({
-        name: 'Verification',
-        type: ChannelType.GuildVoice,
-        parent: category.id,
-        userLimit: 1,
-        permissionOverwrites: [
-          {
-            id: guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.verifyBlock,
-            deny: [PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.nonvegan.nonvegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.vegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.activist,
-            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.staff.verifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-          {
-            id: IDs.roles.staff.trialVerifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-        ],
-      });
+      await createVerificationVoice(category);
     }
 
     // If there are less than 10, stop

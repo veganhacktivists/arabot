@@ -24,7 +24,8 @@ import type {
   TextChannel,
   VoiceChannel,
 } from 'discord.js';
-import { ChannelType, PermissionsBitField } from 'discord.js';
+import { ChannelType } from 'discord.js';
+import { createVerificationVoice } from '#utils/verification';
 import IDs from '#utils/ids';
 
 export class VerificationReady extends Listener {
@@ -84,52 +85,7 @@ export class VerificationReady extends Listener {
       }
     });
     if (!verification) {
-      await category.guild.channels.create({
-        name: 'Verification',
-        type: ChannelType.GuildVoice,
-        parent: category.id,
-        userLimit: 1,
-        permissionOverwrites: [
-          {
-            id: category.guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.verifyBlock,
-            deny: [PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.nonvegan.nonvegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.vegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.activist,
-            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.staff.verifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-          {
-            id: IDs.roles.staff.trialVerifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-        ],
-      });
+      await createVerificationVoice(category);
     }
   }
 }

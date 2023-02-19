@@ -19,7 +19,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-// import { fetchRoles } from '#utils/database/dbExistingUser';
+import { fetchRoles } from '#utils/database/dbExistingUser';
 import IDs from '#utils/ids';
 import { blockTime } from '#utils/database/verification';
 import { checkActive, getSection } from '#utils/database/restriction';
@@ -35,8 +35,7 @@ export class RolesJoinServerListener extends Listener {
   public async run(member: GuildMember) {
     // Add basic roles
 
-    const roles = [];
-    // const roles = await fetchRoles(member.id);
+    const roles = await fetchRoles(member.id);
 
     // Check if the user is restricted
     if (await checkActive(member.id)) {
