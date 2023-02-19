@@ -77,6 +77,7 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
         ephemeral: true,
       });
     } catch (error) {
+      this.container.logger.error(`Non Vegan Access Interaction: ${error}`);
       await interaction.reply({
         content: errorMessage,
         ephemeral: true,
