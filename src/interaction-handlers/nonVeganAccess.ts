@@ -38,7 +38,7 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
   public async run(interaction: ButtonInteraction) {
     let { member } = interaction;
 
-    const errorMessage = 'There was an error giving you the role, please try again later or contact ModMail/the developer'
+    const errorMessage = 'There was an error giving you the role, please try again later or contact ModMail/the developer '
       + 'to sort out this problem.';
 
     if (member === null) {
@@ -60,19 +60,19 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
         return;
       }
 
-      if (member.roles.cache.has(IDs.roles.vegan.activist)) {
-        await member.roles.remove(IDs.roles.vegan.activist);
+      if (member.roles.cache.has(IDs.roles.vegan.nvAccess)) {
+        await member.roles.remove(IDs.roles.vegan.nvAccess);
         await interaction.reply({
-          content: 'Your access from the non vegan section has been removed successfully. '
+          content: 'Your access from the non vegan section has been removed. '
             + 'If you want to gain access again, click this button again.',
           ephemeral: true,
         });
         return;
       }
 
-      await member.roles.add(IDs.roles.vegan.activist);
+      await member.roles.add(IDs.roles.vegan.nvAccess);
       await interaction.reply({
-        content: 'Your access to the non vegan section has been given back successfully. '
+        content: 'Your access to the non vegan section has been given back. '
           + 'If you want to remove access again, click this button again.',
         ephemeral: true,
       });
