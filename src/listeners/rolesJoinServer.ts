@@ -40,7 +40,9 @@ export class RolesJoinServerListener extends Listener {
     // Check if the user is restricted
     if (await checkActive(member.id)) {
       const section = await getSection(member.id);
-      roles.length = 0;
+      for (let i = 0; i < roles.length; i += 1) {
+        roles.pop();
+      }
       roles.push(IDs.roles.restrictions.restricted[section - 1]);
     }
 
