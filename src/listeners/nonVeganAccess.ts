@@ -51,15 +51,16 @@ export class NonVeganAccessReady extends Listener {
     const messages = await roles.messages.fetch();
     const message = messages.first();
 
-    const content = 'If you\'re vegan want your access removed/added back to the non vegan sections'
-      + 'press the button bellow to gain/remove access to the non vegan sections.';
+    const content = '**Change access to non-vegan section of the server:**\n\n'
+      + 'If you\'re vegan and want your access removed/added back to the non vegan sections, '
+      + 'press the button bellow to remove/gain access to the non vegan sections.';
 
     const button = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(
         new ButtonBuilder()
           .setCustomId('nvAccess')
           .setLabel('Non Vegan Access')
-          .setStyle(ButtonStyle.Secondary),
+          .setStyle(ButtonStyle.Primary),
       );
 
     if (message?.author.id !== botId) {
