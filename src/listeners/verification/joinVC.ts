@@ -534,6 +534,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesText += `<@&${IDs.roles.vegan.vegan}>`;
+      rolesText += `<@&${IDs.roles.vegan.nvAccess}`;
     } else {
       rolesText += `<@&${IDs.roles.nonvegan.nonvegan}>`;
     }
@@ -565,6 +566,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesAdd.push(IDs.roles.vegan.vegan);
+      rolesAdd.push(IDs.roles.vegan.nvAccess);
     } else {
       rolesAdd.push(IDs.roles.nonvegan.nonvegan);
     }
