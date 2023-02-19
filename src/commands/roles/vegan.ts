@@ -103,6 +103,7 @@ export class VeganCommand extends Command {
       await guildMember.roles.remove([
         vegan,
         IDs.roles.vegan.activist,
+        IDs.roles.vegan.nvAccess,
       ]);
       await interaction.reply({
         content: `Removed the ${vegan.name} role from ${user}`,
@@ -113,7 +114,10 @@ export class VeganCommand extends Command {
     }
 
     // Add Vegan role to the user
-    await guildMember.roles.add(vegan);
+    await guildMember.roles.add([
+      vegan,
+      IDs.roles.vegan.nvAccess,
+    ]);
     await guildMember.roles.remove([
       IDs.roles.nonvegan.nonvegan,
       IDs.roles.nonvegan.convinced,
