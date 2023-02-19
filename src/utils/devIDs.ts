@@ -28,6 +28,7 @@ const devIDs = {
     vegan: {
       vegan: '999431675098447937',
       activist: '999431675098447934',
+      nvAccess: '1076859125415301141',
       plus: '999431675010359460',
     },
     restrictions: {

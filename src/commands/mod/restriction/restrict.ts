@@ -214,6 +214,7 @@ export async function restrictRun(
       IDs.roles.vegan.vegan,
       IDs.roles.vegan.plus,
       IDs.roles.vegan.activist,
+      IDs.roles.vegan.nvAccess,
       IDs.roles.trusted,
       IDs.roles.nonvegan.nonvegan,
       IDs.roles.nonvegan.convinced,

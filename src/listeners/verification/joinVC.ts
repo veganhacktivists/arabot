@@ -38,6 +38,7 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
 } from 'discord.js';
+import { createVerificationText, createVerificationVoice } from '#utils/verification';
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
 import { findNotes } from '#utils/database/sus';
@@ -139,73 +140,19 @@ export class VerificationJoinVCListener extends Listener {
       .filter((c) => c.type === ChannelType.GuildVoice);
 
     // Create a text channel for verifiers only
-    // Checks if there are more than 10 voice channels
     if (!verifier) {
-      // TODO refactor this mess to circumvent
-      //  "Contains words not allowed for servers in Server Discovery."
       let verificationText: TextChannel;
       let bannedName = false;
       try {
-        verificationText = await guild.channels.create({
-          name: `✅┃${member.displayName}-verification`,
-          type: ChannelType.GuildText,
-          topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
-          parent: category.id,
-          userLimit: 1,
-          permissionOverwrites: [
-            {
-              id: guild.roles.everyone,
-              deny: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.verifyBlock,
-              deny: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.staff.verifier,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.staff.trialVerifier,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-          ],
-        });
+        verificationText = await createVerificationText(member, channel, category);
       } catch {
-        verificationText = await guild.channels.create({
-          name: `✅┃${member.displayName}-verification`,
-          type: ChannelType.GuildText,
-          topic: `Channel for verifiers only. ${member.id} ${channel.id} (Please do not change this)`,
-          parent: category.id,
-          userLimit: 1,
-          permissionOverwrites: [
-            {
-              id: guild.roles.everyone,
-              deny: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.verifyBlock,
-              deny: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.staff.verifier,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-            {
-              id: IDs.roles.staff.trialVerifier,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
-            },
-          ],
-        });
         bannedName = true;
+        verificationText = await createVerificationText(
+          member,
+          channel,
+          category,
+          bannedName,
+        );
       }
 
       if (!bannedName) {
@@ -230,102 +177,9 @@ export class VerificationJoinVCListener extends Listener {
 
     // Checks if there are more than 10 voice channels
     if (listVoiceChannels.size > maxVCs - 1) {
-      await guild.channels.create({
-        name: 'Verification',
-        type: ChannelType.GuildVoice,
-        parent: category.id,
-        userLimit: 1,
-        permissionOverwrites: [
-          {
-            id: guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Stream],
-          },
-          {
-            id: IDs.roles.verifyBlock,
-            deny: [PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.nonvegan.nonvegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-            deny: [PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.vegan.vegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-            deny: [PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.vegan.activist,
-            deny: [PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.staff.verifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-          {
-            id: IDs.roles.staff.trialVerifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-        ],
-      });
+      await createVerificationVoice(category, true);
     } else {
-      await guild.channels.create({
-        name: 'Verification',
-        type: ChannelType.GuildVoice,
-        parent: category.id,
-        userLimit: 1,
-        permissionOverwrites: [
-          {
-            id: guild.roles.everyone,
-            deny: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.verifyBlock,
-            deny: [PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.SendMessages],
-          },
-          {
-            id: IDs.roles.nonvegan.nonvegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.vegan,
-            allow: [PermissionsBitField.Flags.ViewChannel],
-          },
-          {
-            id: IDs.roles.vegan.activist,
-            deny: [PermissionsBitField.Flags.ViewChannel, PermissionsBitField.Flags.Connect],
-          },
-          {
-            id: IDs.roles.staff.verifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-          {
-            id: IDs.roles.staff.trialVerifier,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel,
-              PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
-          },
-        ],
-      });
+      await createVerificationVoice(category);
     }
 
     // Change permissions to join the current channel
@@ -680,6 +534,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesText += `<@&${IDs.roles.vegan.vegan}>`;
+      rolesText += `<@&${IDs.roles.vegan.nvAccess}`;
     } else {
       rolesText += `<@&${IDs.roles.nonvegan.nonvegan}>`;
     }
@@ -711,6 +566,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesAdd.push(IDs.roles.vegan.vegan);
+      rolesAdd.push(IDs.roles.vegan.nvAccess);
     } else {
       rolesAdd.push(IDs.roles.nonvegan.nonvegan);
     }
