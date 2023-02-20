@@ -27,6 +27,10 @@ export async function findNotes(userId: string, active: boolean) {
       userId,
       active,
     },
+    orderBy:
+      {
+        id: 'asc',
+      },
   });
 
   return note;

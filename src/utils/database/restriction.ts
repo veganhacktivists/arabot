@@ -58,6 +58,19 @@ export async function unRestrict(userId: Snowflake, modId: Snowflake) {
   });
 }
 
+export async function getRestrictions(userId: Snowflake) {
+  const restrictions = await container.database.restrict.findMany({
+    where: {
+      userId,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return restrictions;
+}
+
 export async function checkActive(userId: Snowflake) {
   const restriction = await container.database.restrict.findFirst({
     where: {
