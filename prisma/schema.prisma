@@ -88,13 +88,20 @@ model Verify {
 }
 
 model Event {
-  id        Int         @id @default(autoincrement())
-  leader    User        @relation("eventLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
-  leaderId  String
-  startTime DateTime    @default(now())
-  endTime   DateTime?
+  id            Int         @id @default(autoincrement())
+  type          EventType   @relation(fields: [eventTypeType], references: [type])
+  leader        User        @relation("eventLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId      String
+  startTime     DateTime    @default(now())
+  endTime       DateTime?
   // Add a type of Event like Discord Outreach, Voice Chat, etc?
-  EventStat EventStat[]
+  EventStat     EventStat[]
+  eventTypeType String
+}
+
+model EventType {
+  type  String  @id
+  Event Event[]
 }
 
 model EventStat {
