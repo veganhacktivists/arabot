@@ -286,6 +286,7 @@ export class VerificationJoinVCListener extends Listener {
       roles: {
         vegan: false,
         activist: false,
+        araVegan: false,
         trusted: false,
         vegCurious: false,
         convinced: false,

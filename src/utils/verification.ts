@@ -22,7 +22,7 @@ import {
   CategoryChannel,
   ChannelType,
   GuildMember,
-  PermissionsBitField,
+  PermissionsBitField, Snowflake,
   TextChannel,
   time,
   User,
@@ -135,12 +135,14 @@ export async function getVerificationRoles(
   roles: {
     vegan: boolean,
     activist: boolean,
+    araVegan: boolean
     trusted: boolean,
     vegCurious: boolean,
     convinced: boolean
   },
+  manual: boolean = false,
 ) {
-  const rolesAdd = [];
+  const rolesAdd: Snowflake[] = [];
   if (roles.convinced) {
     rolesAdd.push(IDs.roles.nonvegan.convinced);
   }
@@ -152,8 +154,11 @@ export async function getVerificationRoles(
   }
   if (roles.activist) {
     rolesAdd.push(IDs.roles.vegan.activist);
-  } else {
+  } else if (!manual) {
     rolesAdd.push(IDs.roles.verifyBlock);
+  }
+  if (roles.araVegan) {
+    rolesAdd.push(IDs.roles.vegan.araVegan);
   }
   if (roles.trusted) {
     rolesAdd.push(IDs.roles.trusted);
@@ -168,6 +173,7 @@ export async function getVerificationRoles(
 export async function finishDM(user: User, roles: {
   vegan: boolean,
   activist: boolean,
+  araVegan: boolean,
   trusted: boolean,
   vegCurious: boolean,
   convinced: boolean
@@ -196,6 +202,7 @@ export async function finishVerifyMessages(
   roles: {
     vegan: boolean,
     activist: boolean,
+    araVegan: boolean
     trusted: boolean,
     vegCurious: boolean,
     convinced: boolean
