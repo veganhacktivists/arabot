@@ -130,7 +130,7 @@ export async function createVerificationVoice(
   }
 }
 
-export async function getVerificationRoles(
+export async function giveVerificationRoles(
   member: GuildMember,
   roles: {
     vegan: boolean,

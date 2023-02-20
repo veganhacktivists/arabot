@@ -40,7 +40,7 @@ import {
 import {
   createVerificationText,
   createVerificationVoice,
-  getVerificationRoles,
+  giveVerificationRoles,
   finishVerifyMessages,
 } from '#utils/verification';
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
@@ -447,7 +447,7 @@ export class VerificationJoinVCListener extends Listener {
         // Add verification data to database
         await finishVerification(verId, button.user.id, info);
         // Give roles on Discord
-        await getVerificationRoles(user, info.roles);
+        await giveVerificationRoles(user, info.roles);
         // Add timeout if they do not have activist role
         if (!info.roles.activist) {
           // @ts-ignore
