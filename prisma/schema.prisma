@@ -66,6 +66,7 @@ model Verify {
   joinTime    DateTime  @default(now())
   startTime   DateTime?
   finishTime  DateTime?
+  manual      Boolean   @default(false) // If they were verified with the verify command
   timedOut    Boolean   @default(false) // If they got kicked out of verification because they timed out
   //complete  Boolean   @default(false) // If the verification was incomplete
   // Roles they got from verification

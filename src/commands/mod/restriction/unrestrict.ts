@@ -173,9 +173,6 @@ export class UnRestrictCommand extends Command {
 
     if (await checkActive(userId)) {
       const roles = await fetchRoles(userId);
-      if (roles.includes(IDs.roles.vegan.vegan)) {
-        roles.push(IDs.roles.vegan.nvAccess);
-      }
       await member.roles.add(roles);
       // Unrestricts the user on the database
       await unRestrict(userId, modId);

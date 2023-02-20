@@ -37,10 +37,6 @@ export class RolesJoinServerListener extends Listener {
 
     const roles = await fetchRoles(member.id);
 
-    if (roles.includes(IDs.roles.vegan.vegan)) {
-      roles.push(IDs.roles.vegan.nvAccess);
-    }
-
     // Check if the user is restricted
     if (await checkActive(member.id)) {
       const section = await getSection(member.id);

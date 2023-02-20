@@ -26,7 +26,6 @@ import type {
   VoiceState,
   GuildMember,
   Guild,
-  User,
 } from 'discord.js';
 import {
   time,
@@ -38,7 +37,12 @@ import {
   ActionRowBuilder,
   EmbedBuilder,
 } from 'discord.js';
-import { createVerificationText, createVerificationVoice } from '#utils/verification';
+import {
+  createVerificationText,
+  createVerificationVoice,
+  giveVerificationRoles,
+  finishVerifyMessages,
+} from '#utils/verification';
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
 import { findNotes } from '#utils/database/sus';
@@ -122,6 +126,7 @@ export class VerificationJoinVCListener extends Listener {
       // Remove all roles from the user
       await member.roles.remove([
         IDs.roles.vegan.vegan,
+        IDs.roles.vegan.nvAccess,
         IDs.roles.trusted,
         IDs.roles.nonvegan.nonvegan,
         IDs.roles.nonvegan.convinced,
@@ -282,6 +287,7 @@ export class VerificationJoinVCListener extends Listener {
       roles: {
         vegan: false,
         activist: false,
+        araVegan: false,
         trusted: false,
         vegCurious: false,
         convinced: false,
@@ -442,7 +448,7 @@ export class VerificationJoinVCListener extends Listener {
         // Add verification data to database
         await finishVerification(verId, button.user.id, info);
         // Give roles on Discord
-        await this.giveRoles(user, info.roles);
+        await giveVerificationRoles(user, info.roles);
         // Add timeout if they do not have activist role
         if (!info.roles.activist) {
           // @ts-ignore
@@ -464,7 +470,7 @@ export class VerificationJoinVCListener extends Listener {
           components: [],
         });
         // Send welcome message after verification
-        await this.finishMessages(user.user, info.roles);
+        await finishVerifyMessages(user.user, info.roles);
       }
       if (button.customId === 'cancel' && info.page >= questionLength) {
         info.page = 5;
@@ -534,7 +540,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesText += `<@&${IDs.roles.vegan.vegan}>`;
-      rolesText += `<@&${IDs.roles.vegan.nvAccess}`;
+      rolesText += `<@&${IDs.roles.vegan.nvAccess}>`;
     } else {
       rolesText += `<@&${IDs.roles.nonvegan.nonvegan}>`;
     }
@@ -548,122 +554,5 @@ export class VerificationJoinVCListener extends Listener {
       rolesText += `<@&${IDs.roles.nonvegan.vegCurious}>`;
     }
     return rolesText;
-  }
-
-  private async giveRoles(
-    user: GuildMember,
-    roles: {
-      vegan: boolean,
-      activist: boolean,
-      trusted: boolean,
-      vegCurious: boolean,
-      convinced: boolean
-    },
-  ) {
-    const rolesAdd = [];
-    if (roles.convinced) {
-      rolesAdd.push(IDs.roles.nonvegan.convinced);
-    }
-    if (roles.vegan) {
-      rolesAdd.push(IDs.roles.vegan.vegan);
-      rolesAdd.push(IDs.roles.vegan.nvAccess);
-    } else {
-      rolesAdd.push(IDs.roles.nonvegan.nonvegan);
-    }
-    if (roles.activist) {
-      rolesAdd.push(IDs.roles.vegan.activist);
-    } else {
-      rolesAdd.push(IDs.roles.verifyBlock);
-    }
-    if (roles.trusted) {
-      rolesAdd.push(IDs.roles.trusted);
-    }
-    if (roles.vegCurious) {
-      rolesAdd.push(IDs.roles.nonvegan.vegCurious);
-    }
-    await user.roles.add(rolesAdd);
-  }
-
-  // Messages after verifying the user
-  private async finishMessages(user: User, roles: {
-    vegan: boolean,
-    activist: boolean,
-    trusted: boolean,
-    vegCurious: boolean,
-    convinced: boolean
-  }) {
-    // Send a DM with when their verification is finished
-    await this.finishDM(user, roles)
-      .catch(() => this.container.logger.error('Verification: Closed DMs'));
-
-    // Not vegan
-    if (!roles.vegan) {
-      const general = this.container.client.channels.cache
-        .get(IDs.channels.nonVegan.general) as TextChannel | undefined;
-      if (general === undefined) {
-        return;
-      }
-      let msg = `${user}, you have been verified! Please check <#${IDs.channels.information.roles}> `
-        + `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`;
-      // Add extra info if the user got veg curious or convinced.
-      if (roles.vegCurious || roles.convinced) {
-        msg += `\n\nYou also have access to <#${IDs.channels.dietSupport.main}> for help on going vegan.`;
-      }
-      await general.send(msg);
-      return;
-    }
-
-    // Vegan
-    const general = this.container.client.channels.cache
-      .get(IDs.channels.vegan.general) as TextChannel | undefined;
-    if (general === undefined) {
-      return;
-    }
-    const msg = `Welcome ${user}! Please check out <#${IDs.channels.information.roles}> :)`;
-    await general.send(msg);
-
-    // Activist role
-    if (roles.activist) {
-      const activist = this.container.client.channels.cache
-        .get(IDs.channels.activism.activism) as TextChannel | undefined;
-      if (activist === undefined) {
-        return;
-      }
-      const activistMsg = `${user} you have been given the activist role! This means that if you'd wish to engage with non-vegans in `
-        + `<#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
-        + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
-        + '2. Don\'t discuss social topics while activism is happening\n'
-        + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
-        + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
-        + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
-      await user.send(activistMsg)
-        .catch(() => { activist.send(activistMsg); });
-    }
-  }
-
-  // Messages after verifying the user
-  private async finishDM(user: User, roles: {
-    vegan: boolean,
-    activist: boolean,
-    trusted: boolean,
-    vegCurious: boolean,
-    convinced: boolean
-  }) {
-    if (!roles.vegan && !roles.convinced) {
-      const message = 'You\'ve been verified as non-vegan!'
-        + `\n\nYou can next verify on ${time(Math.round(Date.now() / 1000) + 1814400)}`;
-
-      await user.send(message);
-    } else if (roles.convinced) {
-      const message = 'You\'ve been verified as convinced!'
-        + `\n\nYou can next verify on ${time(Math.round(Date.now() / 1000) + 604800)}`;
-
-      await user.send(message);
-    } else if (roles.vegan && !roles.activist) {
-      const message = 'You\'ve been verified as a vegan!'
-        + `\n\nYou can next get verified on ${time(Math.round(Date.now() / 1000) + 604800)} if you would wish to have the activist role.`;
-
-      await user.send(message);
-    }
   }
 }
