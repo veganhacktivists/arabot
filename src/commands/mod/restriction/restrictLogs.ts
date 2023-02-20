@@ -218,7 +218,7 @@ export class RestrictLogsCommand extends Command {
         }
       }
 
-      let restTitle = `Restriction: ${i} | Restricted by: ${restMod} |  `;
+      let restTitle = `Restriction: ${i + 1} | Restricted by: ${restMod} |  `;
 
       if (endRestMod !== null) {
         restTitle += `Unrestricted by: ${endRestMod} | `;
