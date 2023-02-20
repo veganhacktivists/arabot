@@ -17,13 +17,13 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { GuildMember } from 'discord.js';
+import type { GuildMember, Snowflake } from 'discord.js';
 import { container } from '@sapphire/framework';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { leaveBan } from '#utils/verificationConfig';
 import { fibonacci } from '#utils/maths';
 
-export async function joinVerification(channelId: string, user: GuildMember) {
+export async function joinVerification(channelId: Snowflake, user: GuildMember) {
   // Update the user on the database with the current roles they have
   await updateUser(user);
 
@@ -39,7 +39,7 @@ export async function joinVerification(channelId: string, user: GuildMember) {
   });
 }
 
-export async function startVerification(channelId: string) {
+export async function startVerification(channelId: Snowflake) {
   await container.database.verify.update({
     where: {
       id: channelId,
@@ -50,7 +50,7 @@ export async function startVerification(channelId: string) {
   });
 }
 
-export async function getUser(channelId: string) {
+export async function getUser(channelId: Snowflake) {
   // Get the snowflake of the user verifying
   const user = await container.database.verify.findUnique({
     where: {
@@ -71,8 +71,8 @@ export async function getUser(channelId: string) {
 }
 
 export async function finishVerification(
-  channelId: string,
-  verifierId: string,
+  channelId: Snowflake,
+  verifierId: Snowflake,
   info: {
     page: number,
     find: {
@@ -121,7 +121,7 @@ export async function finishVerification(
 }
 
 // Checks if verification was complete
-export async function checkFinish(channelId: string) {
+export async function checkFinish(channelId: Snowflake) {
   // Get the snowflake of the user verifying
   const finish = await container.database.verify.findUnique({
     where: {
@@ -142,7 +142,7 @@ export async function checkFinish(channelId: string) {
 }
 
 // Counts how many times the user has not had a verifier join their VC before leaving
-export async function countIncomplete(userId: string) {
+export async function countIncomplete(userId: Snowflake) {
   // Count how many times the user has not completed a verification
   const incompleteCount = await container.database.verify.count({
     where: {
@@ -155,7 +155,7 @@ export async function countIncomplete(userId: string) {
 }
 
 // Gets the amount of time left on the block
-export async function blockTime(userId: string) {
+export async function blockTime(userId: Snowflake) {
   // Count how many times the user has not completed a verification
   const verification = await container.database.verify.findFirst({
     where: {
