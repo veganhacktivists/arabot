@@ -158,6 +158,7 @@ export async function fetchRoles(userId: Snowflake) {
   }
   if (roleQuery.vegan) {
     roles.push(IDs.roles.vegan.vegan);
+    roles.push(IDs.roles.vegan.nvAccess);
   }
   if (roleQuery.trusted) {
     roles.push(IDs.roles.trusted);

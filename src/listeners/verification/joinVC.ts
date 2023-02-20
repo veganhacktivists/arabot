@@ -126,6 +126,7 @@ export class VerificationJoinVCListener extends Listener {
       // Remove all roles from the user
       await member.roles.remove([
         IDs.roles.vegan.vegan,
+        IDs.roles.vegan.nvAccess,
         IDs.roles.trusted,
         IDs.roles.nonvegan.nonvegan,
         IDs.roles.nonvegan.convinced,
