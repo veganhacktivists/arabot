@@ -23,16 +23,16 @@ import { updateUser } from '#utils/database/dbExistingUser';
 import { leaveBan } from '#utils/verificationConfig';
 import { fibonacci } from '#utils/maths';
 
-export async function joinVerification(channelId: Snowflake, user: GuildMember) {
+export async function joinVerification(channelId: Snowflake, member: GuildMember) {
   // Update the user on the database with the current roles they have
-  await updateUser(user);
+  await updateUser(member);
 
   await container.database.verify.create({
     data: {
       id: channelId,
       user: {
         connect: {
-          id: user.id,
+          id: member.id,
         },
       },
     },
