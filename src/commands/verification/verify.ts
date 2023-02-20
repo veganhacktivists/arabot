@@ -19,13 +19,14 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type {
-  GuildMember,
   Message,
   User,
   Guild,
+  Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { Snowflake } from 'discord.js';
+import { finishVerifyMessages, giveVerificationRoles } from '#utils/verification';
+import { manualVerification } from '#utils/database/verification';
 
 export class VerifyCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -35,7 +36,6 @@ export class VerifyCommand extends Command {
       aliases: ['ver'],
       description: 'Gives roles to the user',
       preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
-      enabled: false,
     });
   }
 
@@ -59,15 +59,15 @@ export class VerifyCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const roles = interaction.options.getString('roles', true);
-    const mod = interaction.member;
+    const verifier = interaction.member;
     const { guild } = interaction;
+    const messageId = interaction.id;
 
     // Checks if all the variables are of the right type
-    if (mod === null || guild === null) {
+    if (verifier === null || guild === null) {
       await interaction.reply({
         content: 'Error fetching moderator or guild!',
         ephemeral: true,
@@ -76,23 +76,36 @@ export class VerifyCommand extends Command {
       return;
     }
 
-    await this.verify(user, roles, guild);
+    const verify = await this.verify(user, verifier.user.id, roles, messageId, guild);
+
+    await interaction.reply({
+      content: verify.message,
+      fetchReply: true,
+    });
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const roles = args.finished ? null : await args.rest('string');
 
-    if (mod === null) {
+    if (roles === null) {
+      await message.react('❌');
+      await message.reply('Roles were not provided!');
+      return;
+    }
+
+    const verifier = message.member;
+
+    if (verifier === null) {
       await message.react('❌');
       await message.reply('Verifier not found! Try again or contact a developer!');
       return;
@@ -105,50 +118,86 @@ export class VerifyCommand extends Command {
       await message.reply('Guild not found! Try again or contact a developer!');
       return;
     }
+
+    const verify = await this.verify(user, verifier.user.id, roles, message.id, guild);
+
+    await message.reply(verify.message);
+    await message.react(verify.success ? '✅' : '❌');
   }
 
-  private async verify(user: User, rolesString: string, guild: Guild) {
+  private async verify(
+    user: User,
+    verifierId: Snowflake,
+    rolesString: string,
+    messageId: Snowflake,
+    guild: Guild,
+  ) {
     const info = {
       message: '',
       success: false,
     };
 
-    const validRoles = ['v', 'a', 't', 'x', 'nv', 'veg', 'conv'];
+    const roles = {
+      vegan: false,
+      activist: false,
+      araVegan: false,
+      trusted: false,
+      vegCurious: false,
+      convinced: false,
+    };
 
-    const member = guild.members.cache.get(user.id);
+    let member = guild.members.cache.get(user.id);
 
-    // Checks if guildMember is null
+    // Checks if member is null
     if (member === undefined) {
-      info.message = 'Failed to fetch member';
+      member = await guild.members.fetch(user.id)
+        .catch(() => undefined);
+      if (member === undefined) {
+        info.message = 'Failed to fetch member';
+        return info;
+      }
+    }
+
+    if (member.roles.cache.hasAny(...IDs.roles.restrictions.restricted)) {
+      info.message = 'Can\'t verify a restricted user!';
       return info;
     }
 
-    const roles = rolesString.split(' ');
+    let verifier = guild.members.cache.get(verifierId);
 
-    const giveRoles: Snowflake[] = [];
+    // Checks if verifier is null
+    if (verifier === undefined) {
+      verifier = await guild.members.fetch(user.id)
+        .catch(() => undefined);
+      if (verifier === undefined) {
+        info.message = 'Failed to fetch verifier';
+        return info;
+      }
+    }
 
-    roles.forEach((role) => {
+    const roleArgs = rolesString.split(' ');
+
+    roleArgs.forEach((role) => {
       switch (role.toLowerCase()) {
         case 'v':
-          giveRoles.push(IDs.roles.vegan.vegan);
-          giveRoles.push(IDs.roles.vegan.nvAccess);
+          roles.vegan = true;
           break;
         case 'a':
-          giveRoles.push(IDs.roles.vegan.activist);
+          roles.activist = true;
           break;
         case 'x':
-          giveRoles.push(IDs.roles.vegan.araVegan);
+          roles.araVegan = true;
+          break;
         case 't':
-          giveRoles.push(IDs.roles.trusted);
+          roles.trusted = true;
           break;
         case 'nv':
-          giveRoles.push(IDs.roles.nonvegan.nonvegan);
           break;
         case 'veg':
-          giveRoles.push(IDs.roles.nonvegan.vegCurious);
+          roles.vegCurious = true;
           break;
         case 'conv':
-          giveRoles.push(IDs.roles.nonvegan.convinced);
+          roles.convinced = true;
           break;
         default:
           info.message = 'There was an invalid argument!';
@@ -160,14 +209,35 @@ export class VerifyCommand extends Command {
       return info;
     }
 
-    if (roles.includes('v') && (roles.includes('nv') || roles.includes('veg') || roles.includes('conv'))) {
+    if ((roles.vegan || member.roles.cache.has(IDs.roles.vegan.vegan))
+      && (roleArgs.includes('nv') || roles.vegCurious || roles.convinced)) {
       info.message = 'Can\'t give non-vegan roles to a vegan';
       return info;
     }
 
-    if (roles.includes('nv') && (roles.includes('v') || roles.includes('a') || roles.includes('x')))
+    if (roleArgs.includes('nv')
+      && (roles.vegan || roles.activist || roles.araVegan)) {
+      info.message = 'Can\'t give vegan roles to a non-vegan';
+      return info;
+    }
 
-    await member.roles.add(giveRoles);
+    await giveVerificationRoles(member, roles, true);
 
+    await finishVerifyMessages(user, roles, true);
+
+    await manualVerification(messageId, member, verifier, roles);
+
+    if (member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
+      && (roles.vegan || roles.activist || roles.araVegan)) {
+      await member.roles.remove([
+        IDs.roles.nonvegan.nonvegan,
+        IDs.roles.nonvegan.vegCurious,
+        IDs.roles.nonvegan.convinced,
+      ]);
+    }
+
+    info.success = true;
+    info.message = `Verified ${user}`;
+    return info;
   }
 }
