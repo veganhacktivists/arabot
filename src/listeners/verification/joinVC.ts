@@ -539,7 +539,7 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegan) {
       rolesText += `<@&${IDs.roles.vegan.vegan}>`;
-      rolesText += `<@&${IDs.roles.vegan.nvAccess}`;
+      rolesText += `<@&${IDs.roles.vegan.nvAccess}>`;
     } else {
       rolesText += `<@&${IDs.roles.nonvegan.nonvegan}>`;
     }
