@@ -23,6 +23,47 @@ import { updateUser } from '#utils/database/dbExistingUser';
 import { leaveBan } from '#utils/verificationConfig';
 import { fibonacci } from '#utils/maths';
 
+export async function manualVerification(
+  messageId: Snowflake,
+  member: GuildMember,
+  verifier: GuildMember,
+  roles: {
+    vegan: boolean,
+    activist: boolean,
+    araVegan: boolean,
+    trusted: boolean,
+    vegCurious: boolean,
+    convinced: boolean
+  },
+) {
+  await updateUser(member);
+  await updateUser(verifier);
+
+  await container.database.verify.create({
+    data: {
+      id: messageId,
+      user: {
+        connect: {
+          id: member.id,
+        },
+      },
+      verifier: {
+        connect: {
+          id: verifier.id,
+        },
+      },
+      manual: true,
+      // Roles
+      vegan: roles.vegan,
+      activist: roles.activist,
+      serverVegan: roles.araVegan,
+      trusted: roles.trusted,
+      vegCurious: roles.vegCurious,
+      convinced: roles.convinced,
+    },
+  });
+}
+
 export async function joinVerification(channelId: Snowflake, member: GuildMember) {
   // Update the user on the database with the current roles they have
   await updateUser(member);
@@ -86,6 +127,7 @@ export async function finishVerification(
     roles: {
       vegan: boolean,
       activist: boolean,
+      araVegan: boolean,
       trusted: boolean,
       vegCurious: boolean,
       convinced: boolean
@@ -106,6 +148,7 @@ export async function finishVerification(
       // Roles
       vegan: info.roles.vegan,
       activist: info.roles.activist,
+      serverVegan: info.roles.araVegan,
       trusted: info.roles.trusted,
       vegCurious: info.roles.vegCurious,
       convinced: info.roles.convinced,
