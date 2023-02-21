@@ -38,6 +38,14 @@ export class OutreachCommand extends Subcommand {
             { name: 'end', chatInputRun: 'eventEnd' },
           ],
         },
+        {
+          name: 'group',
+          type: 'group',
+          entries: [
+            { name: 'create', chatInputRun: 'groupCreate' },
+            { name: 'add', chatInputRun: 'groupAdd' },
+          ],
+        },
       ],
       preconditions: ['ModOnly'],
     });
@@ -58,7 +66,22 @@ export class OutreachCommand extends Subcommand {
           .addSubcommand((command) => command.setName('start')
             .setDescription('Start an outreach event'))
           .addSubcommand((command) => command.setName('end')
-            .setDescription('End an outreach event'))),
+            .setDescription('End an outreach event')))
+        .addSubcommandGroup((group) => group.setName('group')
+          .setDescription('Commands to do with groups')
+          .addSubcommand((command) => command.setName('create')
+            .setDescription('Create a group for people doing activism')
+            .addUserOption((option) => option.setName('leader')
+              .setDescription('This is the person leading the group')
+              .setRequired(true)))
+          .addSubcommand((command) => command.setName('add')
+            .setDescription('Add a person to the group')
+            .addStringOption((option) => option.setName('group')
+              .setDescription('Group to add the user to')
+              .setRequired(true))
+            .addStringOption((option) => option.setName('user')
+              .setDescription('User to add to the group')
+              .setRequired(true)))),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
