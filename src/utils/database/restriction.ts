@@ -132,6 +132,7 @@ export async function unRestrictLegacy(userId: Snowflake, modId: Snowflake, sect
       },
       reason: 'This user was restricted with the old bot. Restrict reason, time and mod unknown, check old bot logs.',
       section,
+      endTime: new Date(),
     },
   });
 }
