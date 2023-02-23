@@ -109,6 +109,7 @@ const devIDs = {
       disabilities: '999431679527628810',
     },
     restricted: {
+      welcome: '999431679812845655',
       moderators: '999431679812845656',
       restricted: '999431680295194684',
       tolerance: '999431680295194685',

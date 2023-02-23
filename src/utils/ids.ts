@@ -112,6 +112,7 @@ let IDs = {
       disabilities: '933078769365823518',
     },
     restricted: {
+      welcome: '992060036312481874',
       moderators: '928349536395604029',
       restricted: '847880218521632788',
       tolerance: '856516474120962048',
