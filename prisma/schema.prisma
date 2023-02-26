@@ -103,15 +103,6 @@ model EventType {
   Event Event[]
 }
 
-model EventStat {
-  event   Event @relation(fields: [eventId], references: [id])
-  eventId Int
-  stat    Stat  @relation(fields: [statId], references: [id])
-  statId  Int
-
-  @@id([eventId, statId])
-}
-
 model Stat {
   id              Int               @id @default(autoincrement())
   leader          User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
