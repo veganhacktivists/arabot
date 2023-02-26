@@ -18,7 +18,7 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import type { GuildMember } from 'discord.js';
+import type { GuildMember, Snowflake } from 'discord.js';
 import { fetchRoles } from '#utils/database/dbExistingUser';
 import IDs from '#utils/ids';
 import { blockTime } from '#utils/database/verification';
@@ -33,17 +33,15 @@ export class RolesJoinServerListener extends Listener {
   }
 
   public async run(member: GuildMember) {
-    // Add basic roles
-
-    const roles = await fetchRoles(member.id);
+    let roles: Snowflake[] = [];
 
     // Check if the user is restricted
     if (await checkActive(member.id)) {
       const section = await getSection(member.id);
-      for (let i = 0; i < roles.length; i += 1) {
-        roles.pop();
-      }
       roles.push(IDs.roles.restrictions.restricted[section - 1]);
+    } else {
+      // Add roles if not restricted
+      roles = await fetchRoles(member.id);
     }
 
     // Check if the user has a verification block
