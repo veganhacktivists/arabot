@@ -1,11 +1,12 @@
 import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
 
+// Events
 export async function createEvent(
   modId: Snowflake,
 ) {
   // Add the user to the database
-  await container.database.event.create({
+  const event = await container.database.event.create({
     data: {
       leader: {
         connect: {
@@ -19,8 +20,68 @@ export async function createEvent(
       },
     },
   });
+
+  return event.id;
 }
 
+export async function checkActiveEvent() {
+  const event = await container.database.event.findFirst({
+    where: {
+      endTime: null,
+    },
+  });
+
+  return event !== null;
+}
+
+export async function getCurrentEvent() {
+  const event = await container.database.event.findFirst({
+    where: {
+      endTime: null,
+    },
+  });
+
+  return event;
+}
+
+// Stats
+export async function addStatUser(statId: number, userId: Snowflake) {
+  await container.database.participantStat.create({
+    data: {
+      stat: {
+        connect: {
+          id: statId,
+        },
+      },
+      user: {
+        connect: {
+          id: userId,
+        },
+      },
+    },
+  });
+}
+
+export async function createStat(eventId: number, leaderId: Snowflake) {
+  const stat = await container.database.stat.create({
+    data: {
+      event: {
+        connect: {
+          id: eventId,
+        },
+      },
+      leader: {
+        connect: {
+          id: leaderId,
+        },
+      },
+    },
+  });
+
+  await addStatUser(stat.id, leaderId);
+}
+
+// Misc
 export async function countTypes() {
   const count = await container.database.eventType.count();
   return count;

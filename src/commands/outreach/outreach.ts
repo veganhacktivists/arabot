@@ -20,7 +20,12 @@
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { RegisterBehavior } from '@sapphire/framework';
 import { updateUser } from '#utils/database/dbExistingUser';
-import { createEvent } from '#utils/database/outreach';
+import {
+  checkActiveEvent,
+  createEvent,
+  createStat,
+  getCurrentEvent,
+} from '#utils/database/outreach';
 
 export class OutreachCommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -109,7 +114,6 @@ export class OutreachCommand extends Subcommand {
     if (modInteraction === null || guild === null) {
       await interaction.reply({
         content: 'Mod or guild was not found!',
-        fetchReply: true,
         ephemeral: true,
       });
       return;
@@ -120,7 +124,14 @@ export class OutreachCommand extends Subcommand {
     if (mod === undefined) {
       await interaction.reply({
         content: 'Mod was not found!',
-        fetchReply: true,
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if (await checkActiveEvent()) {
+      await interaction.reply({
+        content: 'There is already an active event!',
         ephemeral: true,
       });
       return;
@@ -129,5 +140,26 @@ export class OutreachCommand extends Subcommand {
     await updateUser(mod);
 
     await createEvent(modInteraction.user.id);
+  }
+
+  public async groupCreate(interaction: Subcommand.ChatInputCommandInteraction) {
+    const leader = interaction.options.getUser('leader', true);
+
+    const event = await getCurrentEvent();
+
+    if (event === null) {
+      await interaction.reply({
+        content: 'There is no current event!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await createStat(event.id, leader.id);
+
+    await interaction.reply({
+      content: `Created a group with the leader being ${leader}`,
+      ephemeral: true,
+    });
   }
 }
