@@ -44,6 +44,7 @@ export class OutreachCommand extends Subcommand {
           entries: [
             { name: 'create', chatInputRun: 'groupCreate' },
             { name: 'add', chatInputRun: 'groupAdd' },
+            { name: 'update', chatInputRun: 'groupUpdate' },
           ],
         },
       ],
@@ -81,7 +82,19 @@ export class OutreachCommand extends Subcommand {
               .setRequired(true))
             .addStringOption((option) => option.setName('user')
               .setDescription('User to add to the group')
-              .setRequired(true)))),
+              .setRequired(true)))
+          .addSubcommand((command) => command.setName('update')
+            .setDescription('Update the statistics for the group')
+            .addIntegerOption((option) => option.setName('vegan')
+              .setDescription('How many said would go vegan?'))
+            .addIntegerOption((option) => option.setName('considered')
+              .setDescription('How many seriously considered being vegan?'))
+            .addIntegerOption((option) => option.setName('thanked')
+              .setDescription('How many thanked you for the conversation?'))
+            .addIntegerOption((option) => option.setName('documentary')
+              .setDescription('How many said they would watch a vegan documentary?'))
+            .addIntegerOption((option) => option.setName('educated')
+              .setDescription('How many got educated on veganism or the animal industry?')))),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
