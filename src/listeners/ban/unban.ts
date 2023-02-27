@@ -113,7 +113,7 @@ export class UnbanListener extends Listener {
 
     const log = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unbanned ${user.tag} (not done via bot)`, iconURL: `${user.avatarURL()}` })
+      .setAuthor({ name: `Unbanned ${user.tag} (not done via bot)`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

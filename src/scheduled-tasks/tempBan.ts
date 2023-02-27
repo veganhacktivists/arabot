@@ -82,7 +82,7 @@ export class TempBan extends ScheduledTask {
 
     const log = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unbanned ${user.tag} (tempban)`, iconURL: `${user.avatarURL()}` })
+      .setAuthor({ name: `Unbanned ${user.tag} (tempban)`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
       )

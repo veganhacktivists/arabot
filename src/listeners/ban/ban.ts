@@ -128,7 +128,7 @@ export class BanListener extends Listener {
 
     const log = new EmbedBuilder()
       .setColor('#FF0000')
-      .setAuthor({ name: `Banned ${user.tag} (not done via bot)`, iconURL: `${user.avatarURL()}` })
+      .setAuthor({ name: `Banned ${user.tag} (not done via bot)`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

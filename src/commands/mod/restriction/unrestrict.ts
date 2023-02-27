@@ -236,7 +236,7 @@ export class UnRestrictCommand extends Command {
 
     const message = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unrestricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
+      .setAuthor({ name: `Unrestricted ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

@@ -207,7 +207,7 @@ export class SusCommand extends Subcommand {
     const noteEmbed = new EmbedBuilder()
       .setColor('#0099ff')
       .setTitle(`${notes.length} sus notes for ${user.username}`)
-      .setThumbnail(user.avatarURL()!);
+      .setThumbnail(user.displayAvatarURL());
 
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
@@ -402,7 +402,7 @@ export class SusCommand extends Subcommand {
     const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
       .setTitle(`Delete ${notes.length} sus notes for ${user.username}?`)
-      .setThumbnail(user.avatarURL()!);
+      .setThumbnail(user.displayAvatarURL());
 
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {

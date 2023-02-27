@@ -198,7 +198,7 @@ export class PrivateCommand extends Subcommand {
       .setColor(guildMember.displayHexColor)
       .setTitle(`Private channel for ${guildMember.user.username}`)
       .setDescription(`${guildMember}`)
-      .setThumbnail(guildMember.user.avatarURL()!)
+      .setThumbnail(guildMember.user.displayAvatarURL())
       .addFields(
         { name: 'Joined:', value: `${joinTime}`, inline: true },
         { name: 'Created:', value: `${registerTime}`, inline: true },

@@ -197,7 +197,7 @@ export class RestrictLogsCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor('#FF6700')
       .setTitle(`${restrictions.length} restrictions for ${user.tag}`)
-      .setThumbnail(user.avatarURL()!)
+      .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `ID: ${userId}` });
 
     // Add up to 10 of the latest restrictions to the embed
