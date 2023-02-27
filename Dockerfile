@@ -15,6 +15,8 @@ RUN npx prisma generate
 
 RUN npm run build
 
+ENV NODE_ENV=production
+
 RUN chown node:node /opt/app/
 
 USER node
