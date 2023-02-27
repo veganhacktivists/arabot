@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "Event" (
     "id" SERIAL NOT NULL,
+    "eventType" TEXT NOT NULL,
     "leaderId" TEXT NOT NULL,
     "startTime" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "endTime" TIMESTAMP(3),
-    "eventTypeType" TEXT NOT NULL,
 
     CONSTRAINT "Event_pkey" PRIMARY KEY ("id")
 );
@@ -17,16 +17,9 @@ CREATE TABLE "EventType" (
 );
 
 -- CreateTable
-CREATE TABLE "EventStat" (
-    "eventId" INTEGER NOT NULL,
-    "statId" INTEGER NOT NULL,
-
-    CONSTRAINT "EventStat_pkey" PRIMARY KEY ("eventId","statId")
-);
-
--- CreateTable
 CREATE TABLE "Stat" (
     "id" SERIAL NOT NULL,
+    "eventId" INTEGER NOT NULL,
     "leaderId" TEXT NOT NULL,
     "vegan" INTEGER NOT NULL DEFAULT 0,
     "considered" INTEGER NOT NULL DEFAULT 0,
@@ -47,16 +40,13 @@ CREATE TABLE "ParticipantStat" (
 );
 
 -- AddForeignKey
-ALTER TABLE "Event" ADD CONSTRAINT "Event_eventTypeType_fkey" FOREIGN KEY ("eventTypeType") REFERENCES "EventType"("type") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Event" ADD CONSTRAINT "Event_eventType_fkey" FOREIGN KEY ("eventType") REFERENCES "EventType"("type") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Event" ADD CONSTRAINT "Event_leaderId_fkey" FOREIGN KEY ("leaderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EventStat" ADD CONSTRAINT "EventStat_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "EventStat" ADD CONSTRAINT "EventStat_statId_fkey" FOREIGN KEY ("statId") REFERENCES "Stat"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Stat" ADD CONSTRAINT "Stat_eventId_fkey" FOREIGN KEY ("eventId") REFERENCES "Event"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Stat" ADD CONSTRAINT "Stat_leaderId_fkey" FOREIGN KEY ("leaderId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

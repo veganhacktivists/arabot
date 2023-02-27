@@ -68,7 +68,7 @@ model Verify {
   finishTime  DateTime?
   manual      Boolean   @default(false) // If they were verified with the verify command
   timedOut    Boolean   @default(false) // If they got kicked out of verification because they timed out
-  //complete  Boolean   @default(false) // If the verification was incomplete
+  // complete  Boolean   @default(false) // If the verification was incomplete
   // Roles they got from verification
   vegan       Boolean   @default(false) // If they got verified as a vegan
   activist    Boolean   @default(false) // If they got the activist role when they verified
@@ -88,14 +88,14 @@ model Verify {
 }
 
 model Event {
-  id            Int         @id @default(autoincrement())
-  type          EventType   @relation(fields: [eventTypeType], references: [type])
-  leader        User        @relation("eventLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
-  leaderId      String
-  startTime     DateTime    @default(now())
-  endTime       DateTime?
-  EventStat     EventStat[]
-  eventTypeType String
+  id        Int       @id @default(autoincrement())
+  type      EventType @relation(fields: [eventType], references: [type])
+  eventType String
+  leader    User      @relation("eventLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId  String
+  startTime DateTime  @default(now())
+  endTime   DateTime?
+  stats     Stat[]
 }
 
 model EventType {
@@ -104,17 +104,18 @@ model EventType {
 }
 
 model Stat {
-  id              Int               @id @default(autoincrement())
-  leader          User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
-  leaderId        String
-  vegan           Int               @default(0)
-  considered      Int               @default(0)
-  antivegan       Int               @default(0)
-  thanked         Int               @default(0)
-  documentary     Int               @default(0)
-  educated        Int               @default(0)
-  EventStat       EventStat[]
-  ParticipantStat ParticipantStat[]
+  id                 Int               @id @default(autoincrement())
+  event              Event             @relation(fields: [eventId], references: [id])
+  eventId            Int
+  leader             User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId           String
+  vegan              Int               @default(0)
+  considered         Int               @default(0)
+  antivegan          Int               @default(0)
+  thanked            Int               @default(0)
+  documentary        Int               @default(0)
+  educated           Int               @default(0)
+  participationStats ParticipantStat[]
 }
 
 model ParticipantStat {
