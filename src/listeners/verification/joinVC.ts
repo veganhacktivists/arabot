@@ -231,7 +231,7 @@ export class VerificationJoinVCListener extends Listener {
     const embed = new EmbedBuilder()
       .setColor(user.displayHexColor)
       .setTitle(`Information on ${user.user.username}`)
-      .setThumbnail(user.user.avatarURL()!)
+      .setThumbnail(user.user.displayAvatarURL())
       .addFields(
         { name: 'Joined:', value: `${joinTime}`, inline: true },
         { name: 'Created:', value: `${registerTime}`, inline: true },
@@ -461,7 +461,7 @@ export class VerificationJoinVCListener extends Listener {
         embed = new EmbedBuilder()
           .setColor('#34c000')
           .setTitle(`Successfully verified ${user.displayName}!`)
-          .setThumbnail(user.user.avatarURL()!)
+          .setThumbnail(user.user.displayAvatarURL())
           .addFields(
             { name: 'Roles:', value: this.getTextRoles(info.roles) },
           );

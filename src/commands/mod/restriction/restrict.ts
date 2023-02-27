@@ -201,7 +201,7 @@ export async function restrictRun(
         .setColor(member.displayHexColor)
         .setTitle(`Restricted channel for ${member.user.username}`)
         .setDescription(`${member}`)
-        .setThumbnail(member.user.avatarURL()!)
+        .setThumbnail(member.user.displayAvatarURL())
         .addFields(
           { name: 'Joined:', value: `${joinTime}`, inline: true },
           { name: 'Created:', value: `${registerTime}`, inline: true },
@@ -251,7 +251,7 @@ export async function restrictRun(
 
   const message = new EmbedBuilder()
     .setColor('#FF6700')
-    .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.avatarURL()}` })
+    .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
     .addFields(
       { name: 'User', value: `${user}`, inline: true },
       { name: 'Moderator', value: `${mod}`, inline: true },

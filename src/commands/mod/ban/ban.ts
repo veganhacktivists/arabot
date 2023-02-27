@@ -212,7 +212,7 @@ export class BanCommand extends Command {
 
     const log = new EmbedBuilder()
       .setColor('#FF0000')
-      .setAuthor({ name: `Banned ${user.tag}`, iconURL: `${user.avatarURL()}` })
+      .setAuthor({ name: `Banned ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

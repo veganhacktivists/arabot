@@ -46,7 +46,7 @@ export class Suggestions extends Listener {
 
     const suggestion = new EmbedBuilder()
       .setColor('#FFFFFF')
-      .setAuthor({ name: `Suggestion from ${message.author.tag}`, iconURL: `${message.author.avatarURL()}` })
+      .setAuthor({ name: `Suggestion from ${message.author.tag}`, iconURL: `${message.author.displayAvatarURL()}` })
       .addFields(
         { name: 'Suggestion:', value: message.content },
       )
