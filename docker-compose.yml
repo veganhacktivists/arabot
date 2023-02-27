@@ -8,6 +8,10 @@ services:
       - .env
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - arabot
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7
@@ -17,8 +21,12 @@ services:
       - .env
     volumes:
       - redis:/data
+    networks:
+      - arabot
+    ports:
+      - "6379:6379"
 
-  node:
+  arabot:
     build:
       context: .
       dockerfile: Dockerfile
@@ -28,9 +36,14 @@ services:
       - redis
     env_file:
       - .env
+    networks:
+      - arabot
 
 volumes:
   postgres:
     name: arabot-db
   redis:
     name: arabot-redis
+
+networks:
+  arabot:
