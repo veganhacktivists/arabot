@@ -31,6 +31,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: arabot
+    restart: always
     depends_on:
       - postgres
       - redis
