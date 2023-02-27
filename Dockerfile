@@ -2,6 +2,8 @@ FROM node:18
 
 WORKDIR /opt/app
 
+ENV NODE_ENV=production
+
 COPY --chown=node:node package.json .
 COPY --chown=node:node package-lock.json .
 COPY --chown=node:node tsconfig.json .
@@ -14,8 +16,6 @@ COPY . .
 RUN npx prisma generate
 
 RUN npm run build
-
-ENV NODE_ENV=production
 
 RUN chown node:node /opt/app/
 
