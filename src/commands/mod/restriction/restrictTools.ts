@@ -69,12 +69,12 @@ export class RestrictToolsCommand extends Subcommand {
     const modInteraction = interaction.member;
     const { guild, channel } = interaction;
 
+    await interaction.deferReply({ ephemeral: true });
+
     // Checks if all the variables are of the right type
     if (modInteraction === null || guild === null || channel === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -83,10 +83,8 @@ export class RestrictToolsCommand extends Subcommand {
 
     // Checks if guildMember is null
     if (mod === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching moderator!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -95,19 +93,15 @@ export class RestrictToolsCommand extends Subcommand {
 
     if (user === null) {
       if (channel.type !== ChannelType.GuildText) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'Please make sure you ran this command in the original restricted text channel!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
 
       if (channel.parentId !== IDs.categories.restricted) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'Please make sure you ran this command in the original restricted text channel!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
@@ -118,19 +112,15 @@ export class RestrictToolsCommand extends Subcommand {
         || channel.id === IDs.channels.restricted.restricted
         || channel.id === IDs.channels.restricted.tolerance
       ) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'You can\'t run this command these channels!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
 
       if (channel.topic === null) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'There was an error with this channel\'s topic!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
@@ -153,10 +143,8 @@ export class RestrictToolsCommand extends Subcommand {
       .get(IDs.categories.restricted) as CategoryChannel | undefined;
 
     if (category === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Could not find category!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -178,9 +166,8 @@ export class RestrictToolsCommand extends Subcommand {
       }
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Successfully deleted the channel for ${user}`,
-      fetchReply: true,
     });
   }
 }

@@ -77,9 +77,11 @@ export class BanCommand extends Command {
       return;
     }
 
+    await interaction.deferReply();
+
     const ban = await this.ban(user.id, mod.user.id, reason, guild);
 
-    await interaction.reply({ content: ban.message });
+    await interaction.editReply({ content: ban.message });
   }
 
   // Non Application Command method of banning a user

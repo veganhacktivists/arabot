@@ -73,6 +73,8 @@ export class UnRestrictCommand extends Command {
       return;
     }
 
+    await interaction.deferReply();
+
     const info = await this.unRestrictRun(user?.id, mod.user.id, guild);
 
     await interaction.reply({
