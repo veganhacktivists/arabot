@@ -57,31 +57,27 @@ export class MoveAllCommand extends Command {
     const { member } = interaction;
     const { guild } = interaction;
 
+    await interaction.deferReply({ ephemeral: true });
+
     if (channel.type !== ChannelType.GuildVoice
       && channel.type !== ChannelType.GuildStageVoice) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'The channel you provided is not a voice channel!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
     // Checks if all the variables are of the right type
     if (guild === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
     if (member === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching your user',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -89,19 +85,15 @@ export class MoveAllCommand extends Command {
     const mod = guild.members.cache.get(member.user.id);
 
     if (mod === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching user from guild',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
     if (mod.voice.channelId === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'You need to be in a voice channel to run this command!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -110,10 +102,8 @@ export class MoveAllCommand extends Command {
 
     if (voice === undefined
       || !voice.isVoiceBased()) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching your current voice channel!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -122,10 +112,8 @@ export class MoveAllCommand extends Command {
       memberVC.voice.setChannel(channel.id);
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Successfully moved ${voice.members.size} members to <#${channel.id}>!`,
-      ephemeral: true,
-      fetchReply: true,
     });
   }
 

@@ -77,12 +77,12 @@ export class PrivateCommand extends Subcommand {
     const mod = interaction.member;
     const { guild } = interaction;
 
+    await interaction.deferReply({ ephemeral: true });
+
     // Checks if all the variables are of the right type
     if (user === null || guild === null || mod === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -92,10 +92,8 @@ export class PrivateCommand extends Subcommand {
 
     // Checks if guildMember is null
     if (guildMember === undefined || modGuildMember === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching users!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -103,10 +101,8 @@ export class PrivateCommand extends Subcommand {
     const [name, coordinator] = this.getCoordinator(modGuildMember);
 
     if (this.checkPrivate(guildMember.id, coordinator, guild)) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'A private channel already exists!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -206,10 +202,8 @@ export class PrivateCommand extends Subcommand {
 
     await privateChannel.send({ embeds: [embed] });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Created the private channel: ${privateChannel}`,
-      fetchReply: true,
-      ephemeral: true,
     });
   }
 
@@ -219,12 +213,12 @@ export class PrivateCommand extends Subcommand {
     const mod = interaction.member;
     const { guild, channel } = interaction;
 
+    await interaction.deferReply({ ephemeral: true });
+
     // Checks if all the variables are of the right type
     if (mod === null || guild === null || channel === null) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -233,10 +227,8 @@ export class PrivateCommand extends Subcommand {
 
     // Checks if guildMember is null
     if (modGuildMember === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Error fetching users!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -247,28 +239,22 @@ export class PrivateCommand extends Subcommand {
 
     if (user === null) {
       if (channel.type !== ChannelType.GuildText) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'Please make sure you ran this command in the original private text channel!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
 
       if (channel.parentId !== IDs.categories.private) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'Please make sure you ran this command in the original private text channel!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
 
       if (channel.topic === null) {
-        await interaction.reply({
+        await interaction.editReply({
           content: 'There was an error with this channel\'s topic!',
-          ephemeral: true,
-          fetchReply: true,
         });
         return;
       }
@@ -290,10 +276,8 @@ export class PrivateCommand extends Subcommand {
       .get(IDs.categories.private) as CategoryChannel | undefined;
 
     if (category === undefined) {
-      await interaction.reply({
+      await interaction.editReply({
         content: 'Could not find category!',
-        ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -315,10 +299,8 @@ export class PrivateCommand extends Subcommand {
       }
     });
 
-    await interaction.reply({
+    await interaction.editReply({
       content: `Successfully deleted the channel for ${user}`,
-      fetchReply: true,
-      ephemeral: true,
     });
   }
 

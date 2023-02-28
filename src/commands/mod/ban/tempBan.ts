@@ -89,6 +89,8 @@ export class TempBanCommand extends Command {
       return;
     }
 
+    await interaction.deferReply();
+
     const ban = await this.ban(user.id, mod.user.id, time, reason, guild);
 
     await interaction.reply({ content: ban.message });

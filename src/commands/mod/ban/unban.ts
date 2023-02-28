@@ -74,6 +74,8 @@ export class UnbanCommand extends Command {
       return;
     }
 
+    await interaction.deferReply();
+
     const unban = await this.unban(user.id, mod.user.id, guild);
 
     await interaction.reply({ content: unban.message });

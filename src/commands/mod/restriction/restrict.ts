@@ -312,6 +312,8 @@ export class RestrictCommand extends Command {
       return;
     }
 
+    await interaction.deferReply();
+
     const info = await restrictRun(user?.id, mod.user.id, reason, guild);
 
     await interaction.reply({
