@@ -21,6 +21,9 @@ import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
 import { updateUser } from '#utils/database/dbExistingUser';
+import { checkBan } from '#utils/database/ban';
+import { checkTempBan } from '#utils/database/tempBan';
+import { checkActive } from '#utils/database/restriction';
 
 export class DbLeaveServerListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -34,7 +37,11 @@ export class DbLeaveServerListener extends Listener {
     if (!member.roles.cache.hasAny(
       IDs.roles.vegan.vegan,
       IDs.roles.nonvegan.nonvegan,
-    )) {
+    )
+      || await checkBan(member.id)
+      || await checkTempBan(member.id)
+      || await checkActive(member.id)
+    ) {
       return;
     }
 
