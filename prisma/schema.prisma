@@ -104,18 +104,25 @@ model EventType {
 }
 
 model Stat {
-  id                 Int               @id @default(autoincrement())
-  event              Event             @relation(fields: [eventId], references: [id])
-  eventId            Int
-  leader             User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
-  leaderId           String
-  vegan              Int               @default(0)
-  considered         Int               @default(0)
-  antivegan          Int               @default(0)
-  thanked            Int               @default(0)
-  documentary        Int               @default(0)
-  educated           Int               @default(0)
-  participationStats ParticipantStat[]
+  id           Int               @id @default(autoincrement())
+  event        Event             @relation(fields: [eventId], references: [id])
+  eventId      Int
+  leader       User              @relation("statLeader", fields: [leaderId], references: [id]) // Not sure if this will stay
+  leaderId     String
+  vegan        Int               @default(0)
+  considered   Int               @default(0)
+  antivegan    Int               @default(0)
+  thanked      Int               @default(0)
+  documentary  Int               @default(0)
+  educated     Int               @default(0)
+  participants ParticipantStat[]
+  role         StatRole[]
+}
+
+model StatRole {
+  stat   Stat   @relation(fields: [statId], references: [id])
+  statId Int    @id
+  roleId String
 }
 
 model ParticipantStat {

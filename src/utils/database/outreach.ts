@@ -62,8 +62,8 @@ export async function addStatUser(statId: number, userId: Snowflake) {
   });
 }
 
-export async function createStat(eventId: number, leaderId: Snowflake) {
-  const stat = await container.database.stat.create({
+export async function createStat(eventId: number, leaderId: Snowflake, roleId: Snowflake) {
+  await container.database.stat.create({
     data: {
       event: {
         connect: {
@@ -75,10 +75,35 @@ export async function createStat(eventId: number, leaderId: Snowflake) {
           id: leaderId,
         },
       },
+      participants: {
+        create: {
+          user: {
+            connect: {
+              id: leaderId,
+            },
+          },
+        },
+      },
+      role: {
+        create: {
+          roleId,
+        },
+      },
+    },
+  });
+}
+
+export async function getStatGroups(eventId: number) {
+  const stats = await container.database.stat.findMany({
+    where: {
+      eventId,
+    },
+    orderBy: {
+      id: 'asc',
     },
   });
 
-  await addStatUser(stat.id, leaderId);
+  return stats;
 }
 
 // Misc

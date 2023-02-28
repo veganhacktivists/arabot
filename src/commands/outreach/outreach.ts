@@ -24,7 +24,7 @@ import {
   checkActiveEvent,
   createEvent,
   createStat,
-  getCurrentEvent,
+  getCurrentEvent, getStatGroups,
 } from '#utils/database/outreach';
 
 export class OutreachCommand extends Subcommand {
@@ -144,18 +144,33 @@ export class OutreachCommand extends Subcommand {
 
   public async groupCreate(interaction: Subcommand.ChatInputCommandInteraction) {
     const leader = interaction.options.getUser('leader', true);
+    const { guild } = interaction;
 
-    const event = await getCurrentEvent();
-
-    if (event === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'There is no current event!',
+        content: 'Guild not found!',
         ephemeral: true,
       });
       return;
     }
 
-    await createStat(event.id, leader.id);
+    await interaction.deferReply({ ephemeral: true });
+
+    const event = await getCurrentEvent();
+
+    if (event === null) {
+      await interaction.editReply({
+        content: 'There is no current event!',
+      });
+      return;
+    }
+
+    const statGroups = await getStatGroups(event.id);
+    const groupNo = statGroups.length + 1;
+
+    const role = await guild.roles.create({ name: `Outreach Group ${groupNo}` });
+
+    await createStat(event.id, leader.id, role.id);
 
     await interaction.reply({
       content: `Created a group with the leader being ${leader}`,
