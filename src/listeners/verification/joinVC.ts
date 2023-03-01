@@ -35,7 +35,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ActionRowBuilder,
-  EmbedBuilder,
+  EmbedBuilder, Snowflake,
 } from 'discord.js';
 import {
   createVerificationText,
@@ -90,7 +90,15 @@ export class VerificationJoinVCListener extends Listener {
     const currentChannel = currentChannelGuild as VoiceChannel;
     const category = categoryGuild as CategoryChannel;
 
-    const roles = rolesToString(member.roles.cache.map((r) => r.id));
+    const roles: Snowflake[] = [];
+
+    member.roles.cache.forEach((role) => {
+      if (role.id !== guild.id) {
+        roles.push(role.id);
+      }
+    });
+
+    const rolesParsed = rolesToString(roles);
 
     // Check if a verifier joined a verification VC and update database
     if (channel.members.size === 2) {
@@ -167,7 +175,7 @@ export class VerificationJoinVCListener extends Listener {
       }
 
       // Send a message that someone wants to be verified
-      const userInfoEmbed = await this.getUserInfo(member, roles);
+      const userInfoEmbed = await this.getUserInfo(member, rolesParsed);
       const susNotes = await this.getSus(member, guild);
       await verificationText.send({
         content: `${member.user} wants to be verified in ${channel}
