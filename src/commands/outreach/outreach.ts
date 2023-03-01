@@ -34,6 +34,7 @@ import {
   userInStats,
 } from '#utils/database/outreach';
 import IDs from '#utils/ids';
+import { EmbedBuilder } from 'discord.js';
 
 export class OutreachCommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -178,7 +179,7 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    if (mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+    if (!mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
       await interaction.reply({
         content: 'You need to be an Outreach Coordinator to run this command!',
         ephemeral: true,
@@ -202,6 +203,48 @@ export class OutreachCommand extends Subcommand {
     });
 
     await endEvent(event.id);
+
+    // Statistics shown at the end
+
+    let vegan = 0;
+    let considered = 0;
+    let antiVegan = 0;
+    let thanked = 0;
+    let documentary = 0;
+    let educated = 0;
+
+    stat.forEach((group) => {
+      vegan += group.vegan;
+      considered += group.considered;
+      antiVegan += group.antivegan;
+      thanked += group.thanked;
+      documentary += group.documentary;
+      educated += group.educated;
+    });
+
+    const activist = guild.channels.cache.get(IDs.channels.activism.activism);
+
+    if (activist === undefined
+        || !activist.isTextBased()) {
+      await interaction.editReply('Event has now ended, but could not post statistics!');
+      return;
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor('#0099FF')
+      .setAuthor({ name: 'Stats for Discord Outreach' })
+      .addFields(
+        { name: 'How many said would go vegan?', value: `${vegan}` },
+        { name: 'How many seriously considered being vegan?', value: `${considered}` },
+        { name: 'How many people had anti-vegan viewpoints?', value: `${antiVegan}` },
+        { name: 'How many thanked you for the conversation?', value: `${thanked}` },
+        { name: 'How many said they would watch a vegan documentary?', value: `${documentary}` },
+        { name: 'How many got educated on veganism or the animal industry?', value: `${educated}` },
+      )
+      .setTimestamp()
+      .setFooter({ text: `Outreach Event: ${event.id}` });
+
+    await activist.send({ embeds: [embed] });
 
     await interaction.editReply('Event has now ended!');
   }
