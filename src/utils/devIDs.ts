@@ -56,6 +56,7 @@ const devIDs = {
       mentorCoordinator: '999431675140382809',
       verifierCoordinator: '999431675140382810',
       eventCoordinator: '999431675165556817',
+      outreachCoordinator: '999431675140382807',
       restricted: '999431675123597407',
       moderator: '999431675123597408',
       trialModerator: '999431675123597404',

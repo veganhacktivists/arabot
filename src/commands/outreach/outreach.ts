@@ -19,13 +19,16 @@
 
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { RegisterBehavior } from '@sapphire/framework';
+import type { Snowflake } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import {
+  addStatUser,
   checkActiveEvent,
   createEvent,
   createStat,
-  getCurrentEvent, getStatGroups,
+  getCurrentEvent, getStatFromLeader, getStatFromRole, getStatGroups, userInStats,
 } from '#utils/database/outreach';
+import IDs from '#utils/ids';
 
 export class OutreachCommand extends Subcommand {
   public constructor(context: Subcommand.Context, options: Subcommand.Options) {
@@ -82,12 +85,11 @@ export class OutreachCommand extends Subcommand {
               .setRequired(true)))
           .addSubcommand((command) => command.setName('add')
             .setDescription('Add a person to the group')
-            .addStringOption((option) => option.setName('group')
-              .setDescription('Group to add the user to')
-              .setRequired(true))
-            .addStringOption((option) => option.setName('user')
+            .addUserOption((option) => option.setName('user')
               .setDescription('User to add to the group')
-              .setRequired(true)))
+              .setRequired(true))
+            .addRoleOption((option) => option.setName('group')
+              .setDescription('Group to add the user to')))
           .addSubcommand((command) => command.setName('update')
             .setDescription('Update the statistics for the group')
             .addIntegerOption((option) => option.setName('vegan')
@@ -172,9 +174,110 @@ export class OutreachCommand extends Subcommand {
 
     await createStat(event.id, leader.id, role.id);
 
-    await interaction.reply({
+    const leaderMember = await guild.members.cache.get(leader.id);
+
+    if (leaderMember === undefined) {
+      await interaction.editReply({
+        content: `Created a group with the leader being ${leader}, however could not give the role.`,
+      });
+      return;
+    }
+
+    await leaderMember.roles.add(role);
+
+    await interaction.editReply({
       content: `Created a group with the leader being ${leader}`,
-      ephemeral: true,
+    });
+  }
+
+  public async groupAdd(interaction: Subcommand.ChatInputCommandInteraction) {
+    const user = interaction.options.getUser('user', true);
+    const group = interaction.options.getRole('group');
+    const leader = interaction.user;
+    const { guild } = interaction;
+
+    if (guild === null) {
+      await interaction.reply({
+        content: 'Could not find guild!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await interaction.deferReply({ ephemeral: true });
+
+    let statId: number;
+    let roleId: Snowflake;
+
+    // Find group from role
+    if (group !== null) {
+      const [stat] = await Promise.all([getStatFromRole(group.id)]);
+
+      if (stat === null) {
+        await interaction.editReply({
+          content: `Could not find the group for role ${group}`,
+        });
+        return;
+      }
+
+      const leaderMember = guild.members.cache.get(leader.id);
+
+      if (leaderMember === undefined) {
+        await interaction.editReply({
+          content: 'Could not find your GuildMember in cache!',
+        });
+        return;
+      }
+
+      if (leader.id !== stat.stat.leaderId
+          && !leaderMember.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+        await interaction.editReply({
+          content: `You are not the leader for ${group}`,
+        });
+        return;
+      }
+
+      statId = stat.statId;
+      roleId = stat.roleId;
+    } else {
+      // Find group from person who ran the command
+      const [stat] = await Promise.all([getStatFromLeader(leader.id)]);
+
+      if (stat === null) {
+        await interaction.editReply({
+          content: 'You\'re not a group leader!',
+        });
+        return;
+      }
+
+      statId = stat.id;
+      roleId = stat.role[0].roleId;
+    }
+
+    if (await userInStats(statId, user.id)) {
+      await interaction.editReply({
+        content: `${user} is already in this group!`,
+      });
+      return;
+    }
+
+    const member = guild.members.cache.get(user.id);
+
+    if (member === undefined) {
+      await interaction.editReply({
+        content: 'Could not fetch the member!',
+      });
+      return;
+    }
+
+    await updateUser(member);
+
+    await addStatUser(statId, user.id);
+
+    await member.roles.add(roleId);
+
+    await interaction.editReply({
+      content: `Added ${user} to the group!`,
     });
   }
 }

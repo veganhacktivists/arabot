@@ -106,6 +106,48 @@ export async function getStatGroups(eventId: number) {
   return stats;
 }
 
+export async function getStatFromRole(roleId: Snowflake) {
+  const group = await container.database.statRole.findFirst({
+    where: {
+      roleId,
+    },
+    include: { stat: true },
+  });
+
+  return group;
+}
+
+export async function getStatFromLeader(leaderId: Snowflake) {
+  const event = await getCurrentEvent();
+
+  if (event === null) {
+    return null;
+  }
+
+  const group = await container.database.stat.findFirst({
+    where: {
+      leaderId,
+      eventId: event.id,
+    },
+    include: { role: true },
+  });
+
+  return group;
+}
+
+export async function userInStats(statId: number, userId: Snowflake) {
+  const stat = await container.database.participantStat.findUnique({
+    where: {
+      statId_userId: {
+        statId,
+        userId,
+      },
+    },
+  });
+
+  return stat !== null;
+}
+
 // Misc
 export async function countTypes() {
   const count = await container.database.eventType.count();
