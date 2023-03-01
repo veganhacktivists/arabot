@@ -139,6 +139,14 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
+    if (!mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+      await interaction.reply({
+        content: 'You need to be an Outreach Coordinator to run this command!',
+        ephemeral: true,
+      });
+      return;
+    }
+
     if (await checkActiveEvent()) {
       await interaction.reply({
         content: 'There is already an active event!',
