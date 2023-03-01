@@ -229,6 +229,11 @@ export async function restrictRun(
     }
   }
 
+  if (member !== undefined
+    && member.voice.channelId !== null) {
+    await member.voice.disconnect();
+  }
+
   // Restrict the user on the database
   await restrict(userId, modId, reason, section);
 
