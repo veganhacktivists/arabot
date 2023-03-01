@@ -25,7 +25,7 @@ import {
   addStatUser,
   checkActiveEvent,
   createEvent,
-  createStat,
+  createStat, endEvent,
   getCurrentEvent,
   getStatFromLeader,
   getStatFromRole,
@@ -117,10 +117,10 @@ export class OutreachCommand extends Subcommand {
 
   public async eventCreate(interaction: Subcommand.ChatInputCommandInteraction) {
     // const start = interaction.options.getBoolean('start');
-    const modInteraction = interaction.member;
+    const modUser = interaction.user;
     const { guild } = interaction;
 
-    if (modInteraction === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
         content: 'Mod or guild was not found!',
         ephemeral: true,
@@ -128,7 +128,7 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    const mod = guild.members.cache.get(modInteraction.user.id);
+    const mod = guild.members.cache.get(modUser.id);
 
     if (mod === undefined) {
       await interaction.reply({
@@ -148,7 +148,62 @@ export class OutreachCommand extends Subcommand {
 
     await updateUser(mod);
 
-    await createEvent(modInteraction.user.id);
+    await createEvent(modUser.id);
+
+    await interaction.reply({
+      content: 'Created the event!',
+      ephemeral: true,
+    });
+  }
+
+  public async eventEnd(interaction: Subcommand.ChatInputCommandInteraction) {
+    const modUser = interaction.user;
+    const { guild } = interaction;
+
+    if (guild === null) {
+      await interaction.reply({
+        content: 'Guild not found!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    const mod = guild.members.cache.get(modUser.id);
+
+    if (mod === undefined) {
+      await interaction.reply({
+        content: 'Your guild member was not found!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    if (mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+      await interaction.reply({
+        content: 'You need to be an Outreach Coordinator to run this command!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await interaction.deferReply({ ephemeral: true });
+
+    const event = await getCurrentEvent();
+
+    if (event === null) {
+      await interaction.editReply('There is currently no event!');
+      return;
+    }
+
+    const [stat] = await Promise.all([getStatGroups(event.id)]);
+
+    stat.forEach((group) => {
+      guild.roles.delete(group.role[0].roleId);
+    });
+
+    await endEvent(event.id);
+
+    await interaction.editReply('Event has now ended!');
   }
 
   public async groupCreate(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -177,18 +232,20 @@ export class OutreachCommand extends Subcommand {
     const statGroups = await getStatGroups(event.id);
     const groupNo = statGroups.length + 1;
 
-    const role = await guild.roles.create({ name: `Outreach Group ${groupNo}` });
-
-    await createStat(event.id, leader.id, role.id);
-
     const leaderMember = await guild.members.cache.get(leader.id);
 
     if (leaderMember === undefined) {
       await interaction.editReply({
-        content: `Created a group with the leader being ${leader}, however could not give the role.`,
+        content: `Could not find ${leader}'s guild member.`,
       });
       return;
     }
+
+    await updateUser(leaderMember);
+
+    const role = await guild.roles.create({ name: `Outreach Group ${groupNo}` });
+
+    await createStat(event.id, leader.id, role.id);
 
     await leaderMember.roles.add(role);
 

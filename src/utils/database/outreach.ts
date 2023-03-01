@@ -2,15 +2,13 @@ import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
 
 // Events
-export async function createEvent(
-  modId: Snowflake,
-) {
+export async function createEvent(leaderId: Snowflake) {
   // Add the user to the database
   const event = await container.database.event.create({
     data: {
       leader: {
         connect: {
-          id: modId,
+          id: leaderId,
         },
       },
       type: {
@@ -22,6 +20,27 @@ export async function createEvent(
   });
 
   return event.id;
+}
+
+export async function endEvent(eventId: number) {
+  await container.database.event.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      endTime: new Date(),
+    },
+  });
+
+  await container.database.statRole.deleteMany({
+    where: {
+      stat: {
+        event: {
+          id: eventId,
+        },
+      },
+    },
+  });
 }
 
 export async function checkActiveEvent() {
@@ -139,6 +158,7 @@ export async function getStatGroups(eventId: number) {
     orderBy: {
       id: 'asc',
     },
+    include: { role: true },
   });
 
   return stats;
