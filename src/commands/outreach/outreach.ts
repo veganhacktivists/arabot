@@ -48,7 +48,7 @@ export class OutreachCommand extends Subcommand {
           type: 'group',
           entries: [
             { name: 'create', chatInputRun: 'eventCreate' },
-            { name: 'start', chatInputRun: 'eventStart' },
+            // { name: 'start', chatInputRun: 'eventStart' },
             { name: 'end', chatInputRun: 'eventEnd' },
           ],
         },
@@ -75,13 +75,17 @@ export class OutreachCommand extends Subcommand {
         .addSubcommandGroup((group) => group.setName('event')
           .setDescription('Commands to do with outreach events')
           .addSubcommand((command) => command.setName('create')
-            .setDescription('Start an outreach event')
+            .setDescription('Start an outreach event')))
+        /*
+        TODO add this back at a later date
+
             .addBooleanOption((option) => option.setName('start')
-              .setDescription('Start the event immediately')))
+              .setDescription('Start the event immediately'))
           .addSubcommand((command) => command.setName('start')
             .setDescription('Start an outreach event'))
           .addSubcommand((command) => command.setName('end')
             .setDescription('End an outreach event')))
+         */
         .addSubcommandGroup((group) => group.setName('group')
           .setDescription('Commands to do with groups')
           .addSubcommand((command) => command.setName('create')
