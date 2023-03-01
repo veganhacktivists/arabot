@@ -93,6 +93,44 @@ export async function createStat(eventId: number, leaderId: Snowflake, roleId: S
   });
 }
 
+export async function updateStats(
+  statId: number,
+  stats: {
+    vegan: number,
+    considered: number,
+    antiVegan: number,
+    thanked: number,
+    documentary: number,
+    educated: number,
+  },
+) {
+  await container.database.stat.update({
+    where: {
+      id: statId,
+    },
+    data: {
+      vegan: {
+        increment: stats.vegan,
+      },
+      considered: {
+        increment: stats.considered,
+      },
+      antivegan: {
+        increment: stats.antiVegan,
+      },
+      thanked: {
+        increment: stats.thanked,
+      },
+      documentary: {
+        increment: stats.documentary,
+      },
+      educated: {
+        increment: stats.educated,
+      },
+    },
+  });
+}
+
 export async function getStatGroups(eventId: number) {
   const stats = await container.database.stat.findMany({
     where: {

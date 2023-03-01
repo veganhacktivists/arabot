@@ -26,7 +26,12 @@ import {
   checkActiveEvent,
   createEvent,
   createStat,
-  getCurrentEvent, getStatFromLeader, getStatFromRole, getStatGroups, userInStats,
+  getCurrentEvent,
+  getStatFromLeader,
+  getStatFromRole,
+  getStatGroups,
+  updateStats,
+  userInStats,
 } from '#utils/database/outreach';
 import IDs from '#utils/ids';
 
@@ -96,6 +101,8 @@ export class OutreachCommand extends Subcommand {
               .setDescription('How many said would go vegan?'))
             .addIntegerOption((option) => option.setName('considered')
               .setDescription('How many seriously considered being vegan?'))
+            .addIntegerOption((option) => option.setName('anti-vegan')
+              .setDescription('How many people had anti-vegan viewpoints?'))
             .addIntegerOption((option) => option.setName('thanked')
               .setDescription('How many thanked you for the conversation?'))
             .addIntegerOption((option) => option.setName('documentary')
@@ -278,6 +285,50 @@ export class OutreachCommand extends Subcommand {
 
     await interaction.editReply({
       content: `Added ${user} to the group!`,
+    });
+  }
+
+  public async groupUpdate(interaction: Subcommand.ChatInputCommandInteraction) {
+    const vegan = interaction.options.getInteger('vegan');
+    const considered = interaction.options.getInteger('considered');
+    const antiVegan = interaction.options.getInteger('anti-vegan');
+    const thanked = interaction.options.getInteger('thanked');
+    const documentary = interaction.options.getInteger('documentary');
+    const educated = interaction.options.getInteger('educated');
+    const leader = interaction.user;
+
+    const stats = {
+      vegan: vegan !== null ? vegan : 0,
+      considered: considered !== null ? considered : 0,
+      antiVegan: antiVegan !== null ? antiVegan : 0,
+      thanked: thanked !== null ? thanked : 0,
+      documentary: documentary !== null ? documentary : 0,
+      educated: educated !== null ? educated : 0,
+    };
+
+    if (leader === null) {
+      await interaction.reply({
+        content: 'Could not find your user!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    await interaction.deferReply({ ephemeral: true });
+
+    const stat = await getStatFromLeader(leader.id);
+
+    if (stat === null) {
+      await interaction.editReply({
+        content: 'You\'re not the leader of a group!',
+      });
+      return;
+    }
+
+    await updateStats(stat.id, stats);
+
+    await interaction.editReply({
+      content: 'Updated the database with the stats!',
     });
   }
 }
