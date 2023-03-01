@@ -93,7 +93,7 @@ export class TempBanCommand extends Command {
 
     const ban = await this.ban(user.id, mod.user.id, time, reason, guild);
 
-    await interaction.reply({ content: ban.message });
+    await interaction.editReply({ content: ban.message });
   }
 
   // Non Application Command method of banning a user

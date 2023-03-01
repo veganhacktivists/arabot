@@ -78,7 +78,7 @@ export class UnbanCommand extends Command {
 
     const unban = await this.unban(user.id, mod.user.id, guild);
 
-    await interaction.reply({ content: unban.message });
+    await interaction.editReply({ content: unban.message });
   }
 
   // Non Application Command method of banning a user

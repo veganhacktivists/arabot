@@ -316,9 +316,8 @@ export class RestrictCommand extends Command {
 
     const info = await restrictRun(user?.id, mod.user.id, reason, guild);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: info.message,
-      fetchReply: true,
     });
   }
 
