@@ -98,8 +98,9 @@ export class ClearCommand extends Command {
 
     await channel.bulkDelete(messages);
 
-    await message.reply(`Successfully deleted ${messages} messages!`);
-
-    await message.react('✅');
+    await message.reply({
+      content: `Successfully deleted ${messages} messages!`,
+      failIfNotExists: false,
+    });
   }
 }
