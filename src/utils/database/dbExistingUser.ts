@@ -201,3 +201,19 @@ export async function logLeaving(member: GuildMember) {
     },
   });
 }
+
+export async function getLeaveRoles(userId: Snowflake) {
+  const roles = container.database.leaveLog.findFirst({
+    where: {
+      userId,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+    select: {
+      roles: true,
+    },
+  });
+
+  return roles;
+}

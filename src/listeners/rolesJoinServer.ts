@@ -19,10 +19,11 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember, Snowflake } from 'discord.js';
-import { fetchRoles } from '#utils/database/dbExistingUser';
-import IDs from '#utils/ids';
+import { fetchRoles, getLeaveRoles } from '#utils/database/dbExistingUser';
 import { blockTime } from '#utils/database/verification';
 import { checkActive, getSection } from '#utils/database/restriction';
+import blockedRoles from '#utils/blockedRoles';
+import IDs from '#utils/ids';
 
 export class RolesJoinServerListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -40,8 +41,14 @@ export class RolesJoinServerListener extends Listener {
       const section = await getSection(member.id);
       roles.push(IDs.roles.restrictions.restricted[section - 1]);
     } else {
+      const logRoles = await getLeaveRoles(member.id);
+
       // Add roles if not restricted
-      roles = await fetchRoles(member.id);
+      if (logRoles === null) {
+        roles = await fetchRoles(member.id);
+      } else {
+        roles = logRoles.roles.filter(this.blockedRole);
+      }
     }
 
     // Check if the user has a verification block
@@ -54,5 +61,9 @@ export class RolesJoinServerListener extends Listener {
     if (roles.length > 0) {
       await member.roles.add(roles);
     }
+  }
+
+  private blockedRole(role: Snowflake) {
+    return !blockedRoles.includes(role);
   }
 }
