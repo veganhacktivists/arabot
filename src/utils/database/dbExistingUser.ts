@@ -181,3 +181,23 @@ export async function fetchRoles(userId: Snowflake) {
 
   return roles;
 }
+
+export async function logLeaving(member: GuildMember) {
+  const roles: Snowflake[] = [];
+  member.roles.cache.forEach((role) => {
+    if (role.id !== member.guild.id) {
+      roles.push(role.id);
+    }
+  });
+
+  await container.database.leaveLog.create({
+    data: {
+      user: {
+        connect: {
+          id: member.id,
+        },
+      },
+      roles,
+    },
+  });
+}

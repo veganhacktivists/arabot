@@ -37,6 +37,7 @@ model User {
   muted                 Boolean           @default(false)
   VerifyUser            Verify[]          @relation("verUser")
   VerifyVerifier        Verify[]          @relation("verVerifier")
+  LeaveLog              LeaveLog[]
   EventLeader           Event[]           @relation("eventLeader")
   StatLeader            Stat[]            @relation("statLeader")
   OutreachParticipation ParticipantStat[] @relation("participantUser")
@@ -85,6 +86,14 @@ model Verify {
   life        Int?
   food        Int?
   notes       String?
+}
+
+model LeaveLog {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  time   DateTime @default(now())
+  roles  String[]
 }
 
 model Event {
