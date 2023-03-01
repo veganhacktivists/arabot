@@ -235,6 +235,19 @@ export async function restrictRun(
   info.message = `Restricted ${user}`;
   info.success = true;
 
+  // DM the reason
+
+  const dmEmbed = new EmbedBuilder()
+    .setColor('#FF6700')
+    .setAuthor({ name: 'You\'ve been restricted!', iconURL: `${user.displayAvatarURL()}` })
+    .addFields(
+      { name: 'Reason', value: reason },
+    )
+    .setTimestamp();
+
+  await user.send({ embeds: [dmEmbed] })
+    .catch(() => {});
+
   // Log the ban
   let logChannel = guild.channels.cache
     .get(IDs.channels.logs.restricted) as TextChannel | undefined;
