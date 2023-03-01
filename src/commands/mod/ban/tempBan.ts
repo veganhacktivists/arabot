@@ -186,6 +186,96 @@ export class TempBanCommand extends Command {
     return info;
   }
 
+  // Non Application Command method of banning a user
+  public async messageRun(message: Message, args: Args) {
+    // Get arguments
+    let user: User;
+    try {
+      user = await args.pick('user');
+    } catch {
+      await message.react('❌');
+      await message.reply('User was not provided!');
+      return;
+    }
+    const arg = args.finished ? null : await args.rest('string');
+    const mod = message.member;
+
+    if (arg === null) {
+      await message.react('❌');
+      await message.reply('Ban reason was not provided!');
+      return;
+    }
+
+    if (mod === null) {
+      await message.react('❌');
+      await message.reply('Moderator not found! Try again or contact a developer!');
+      return;
+    }
+
+    const { duration, reason } = this.findTimeAndReason(arg);
+
+    if (Number.isNaN(duration.offset)) {
+      await message.react('❌');
+      await message.reply('Invalid time length for ban!');
+      return;
+    }
+
+    if (reason.length === 0) {
+      await message.react('❌');
+      await message.reply('Reason was not provided!');
+      return;
+    }
+
+    const { guild } = message;
+
+    if (guild === null) {
+      await message.react('❌');
+      await message.reply('Guild not found! Try again or contact a developer!');
+      return;
+    }
+
+    if (message.channel.id !== IDs.channels.restricted.moderators) {
+      await message.react('❌');
+      await message.reply(`You can only run this command in <#${IDs.channels.restricted.moderators}> `
+        + 'or alternatively use the slash command!');
+      return;
+    }
+
+    const ban = await this.ban(user.id, mod.user.id, duration, reason, guild);
+
+    await message.reply(ban.message);
+    await message.react(ban.success ? '✅' : '❌');
+  }
+
+  private findTimeAndReason(args: string) {
+    const info = {
+      duration: new Duration(''),
+      reason: '',
+    };
+
+    if (Number.isNaN(new Duration(args).offset)) {
+      return info;
+    }
+
+    const spliced = args.split(' ');
+    let time = '';
+    for (let i = 0; i < spliced.length; i += 1) {
+      if (!Number.isNaN(new Duration(spliced[i]).offset)) {
+        time += spliced[i];
+      } else {
+        info.reason = args.slice(args.indexOf(spliced[i]));
+        break;
+      }
+    }
+
+    if (time.length === 0) {
+      return info;
+    }
+
+    info.duration = new Duration(time);
+    return info;
+  }
+
   private async ban(
     userId: Snowflake,
     modId: Snowflake,
