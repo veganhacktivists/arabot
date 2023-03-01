@@ -68,7 +68,6 @@ export class UnRestrictCommand extends Command {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -77,9 +76,8 @@ export class UnRestrictCommand extends Command {
 
     const info = await this.unRestrictRun(user?.id, mod.user.id, guild);
 
-    await interaction.reply({
+    await interaction.editReply({
       content: info.message,
-      fetchReply: true,
     });
   }
 
@@ -111,16 +109,26 @@ export class UnRestrictCommand extends Command {
       return;
     }
 
-    const info = await this.unRestrictRun(user?.id, mod.user.id, guild);
+    const channelRun = message.channel;
 
-    await message.reply(info.message);
-    await message.react(info.success ? '✅' : '❌');
+    const info = await this.unRestrictRun(user?.id, mod.user.id, guild, channelRun.id);
+
+    if (!info.runInVeganRestrict) {
+      await message.reply(info.message);
+      await message.react(info.success ? '✅' : '❌');
+    }
   }
 
-  private async unRestrictRun(userId: Snowflake, modId: Snowflake, guild: Guild) {
+  private async unRestrictRun(
+    userId: Snowflake,
+    modId: Snowflake,
+    guild: Guild,
+    channelRun: Snowflake | null = null,
+  ) {
     const info = {
       message: '',
       success: false,
+      runInVeganRestrict: false,
     };
 
     let user = guild.client.users.cache.get(userId);
@@ -206,6 +214,9 @@ export class UnRestrictCommand extends Command {
           const textChannel = c as TextChannel;
           // Checks if the channel topic has the user's snowflake
           if (textChannel.topic?.includes(userId)) {
+            if (textChannel.id === channelRun) {
+              info.runInVeganRestrict = true;
+            }
             topic = textChannel.topic.split(' ');
             const vcId = topic[topic.indexOf(userId) + 1];
             const voiceChannel = guild.channels.cache.get(vcId);
