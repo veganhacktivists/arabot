@@ -271,6 +271,11 @@ export class OutreachCommand extends Subcommand {
 
     await interaction.deferReply({ ephemeral: true });
 
+    if (await getStatFromLeader(leader.id) !== null) {
+      await interaction.editReply(`${leader} is already a leader for another group!`);
+      return;
+    }
+
     const event = await getCurrentEvent();
 
     if (event === null) {
