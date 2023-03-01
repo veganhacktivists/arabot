@@ -41,7 +41,7 @@ export class DbLeaveServerListener extends Listener {
       IDs.roles.nonvegan.nonvegan,
     )) {
       await updateUser(member);
-    } else if (await userExists(member.id)) {
+    } else if (!await userExists(member.id)) {
       await addEmptyUser(member.id);
     }
 
