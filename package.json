@@ -1,6 +1,6 @@
 {
   "name": "arabot",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "A Discord bot for Animal Rights Advocates",
   "main": "dist/index.js",
   "scripts": {
