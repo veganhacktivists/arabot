@@ -37,6 +37,10 @@ model User {
   muted                 Boolean           @default(false)
   VerifyUser            Verify[]          @relation("verUser")
   VerifyVerifier        Verify[]          @relation("verVerifier")
+  Balance               Balance?
+  Daily                 Daily[]
+  SendPayment           Payment[]         @relation("sendPayment")
+  RecievePayment        Payment[]         @relation("recievePayment")
   LeaveLog              LeaveLog[]
   EventLeader           Event[]           @relation("eventLeader")
   StatLeader            Stat[]            @relation("statLeader")
@@ -87,6 +91,35 @@ model Verify {
   food        Int?
   notes       String?
 }
+
+// Economy
+
+model Balance {
+  user    User   @relation(fields: [userId], references: [id])
+  userId  String @id
+  balance Int
+}
+
+model Daily {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation(fields: [userId], references: [id])
+  userId String
+  amount Int
+  time   DateTime @default(now())
+}
+
+model Payment {
+  id          Int      @id @default(autoincrement())
+  sender      User     @relation("sendPayment", fields: [senderId], references: [id])
+  senderId    String
+  recipient   User     @relation("recievePayment", fields: [recipientId], references: [id])
+  recipientId String
+  amount      Int
+  reason      String
+  time        DateTime @default(now())
+}
+
+// Tracking roles for leaving the server
 
 model LeaveLog {
   id     Int      @id @default(autoincrement())
