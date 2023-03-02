@@ -96,6 +96,8 @@ model LeaveLog {
   roles  String[]
 }
 
+// Outreach
+
 model Event {
   id        Int       @id @default(autoincrement())
   type      EventType @relation(fields: [eventType], references: [type])
@@ -125,7 +127,7 @@ model Stat {
   documentary  Int               @default(0)
   educated     Int               @default(0)
   participants ParticipantStat[]
-  role         StatRole[]
+  role         StatRole?
 }
 
 model StatRole {
@@ -142,6 +144,8 @@ model ParticipantStat {
 
   @@id([statId, userId])
 }
+
+// Moderation
 
 model Sus {
   id     Int      @id @default(autoincrement())

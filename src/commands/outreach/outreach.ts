@@ -75,7 +75,7 @@ export class OutreachCommand extends Subcommand {
         .addSubcommandGroup((group) => group.setName('event')
           .setDescription('Commands to do with outreach events')
           .addSubcommand((command) => command.setName('create')
-            .setDescription('Start an outreach event')))
+            .setDescription('Start an outreach event'))
         /*
         TODO add this back at a later date
 
@@ -83,9 +83,9 @@ export class OutreachCommand extends Subcommand {
               .setDescription('Start the event immediately'))
           .addSubcommand((command) => command.setName('start')
             .setDescription('Start an outreach event'))
+         */
           .addSubcommand((command) => command.setName('end')
             .setDescription('End an outreach event')))
-         */
         .addSubcommandGroup((group) => group.setName('group')
           .setDescription('Commands to do with groups')
           .addSubcommand((command) => command.setName('create')
@@ -210,8 +210,10 @@ export class OutreachCommand extends Subcommand {
 
     const [stat] = await Promise.all([getStatGroups(event.id)]);
 
-    stat.forEach((group) => {
-      guild.roles.delete(group.role[0].roleId);
+    stat.forEach(({ role }) => {
+      if (role !== null) {
+        guild.roles.delete(role.roleId);
+      }
     });
 
     await endEvent(event.id);
@@ -331,7 +333,7 @@ export class OutreachCommand extends Subcommand {
     await interaction.deferReply({ ephemeral: true });
 
     let statId: number;
-    let roleId: Snowflake;
+    let roleId: Snowflake | undefined;
 
     // Find group from role
     if (group !== null) {
@@ -375,7 +377,7 @@ export class OutreachCommand extends Subcommand {
       }
 
       statId = stat.id;
-      roleId = stat.role[0].roleId;
+      roleId = stat.role?.roleId;
     }
 
     if (await userInStats(statId, user.id)) {
@@ -398,7 +400,9 @@ export class OutreachCommand extends Subcommand {
 
     await addStatUser(statId, user.id);
 
-    await member.roles.add(roleId);
+    if (roleId !== undefined) {
+      await member.roles.add(roleId);
+    }
 
     await interaction.editReply({
       content: `Added ${user} to the group!`,
