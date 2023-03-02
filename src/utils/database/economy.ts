@@ -29,6 +29,58 @@ export async function getBalance(userId: Snowflake) {
   return balance;
 }
 
+// Pay
+
+export async function transfer(
+  userId: Snowflake,
+  recipientId: Snowflake,
+  amount: number,
+  reason: string,
+) {
+  const user = container.database.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      Balance: {
+        update: {
+          balance: { decrement: amount },
+        },
+      },
+      SendPayment: {
+        create: {
+          recipient: {
+            connect: {
+              id: recipientId,
+            },
+          },
+          amount,
+          reason,
+        },
+      },
+    },
+  });
+
+  const recipient = container.database.balance.upsert({
+    where: {
+      userId: recipientId,
+    },
+    update: {
+      balance: { increment: amount },
+    },
+    create: {
+      user: {
+        connect: {
+          id: recipientId,
+        },
+      },
+      balance: amount,
+    },
+  });
+
+  await container.database.$transaction([user, recipient]);
+}
+
 // Daily
 
 export async function daily(userId: Snowflake, amount: number) {
