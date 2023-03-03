@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class GuestCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,7 +49,6 @@ export class GuestCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -127,11 +127,13 @@ export class GuestCommand extends Command {
     if (member.roles.cache.has(IDs.roles.guest)) {
       // Remove the Guest role from the user
       await member.roles.remove(guest);
+      await roleRemoveLog(user.id, mod.id, guest);
       info.message = `Removed the ${guest.name} role from ${user}`;
       return info;
     }
     // Add Guest role to the user
     await member.roles.add(guest);
+    await roleAddLog(user.id, mod.id, guest);
     info.message = `Gave ${user} the ${guest.name} role!`;
 
     await user.send(`You have been given the ${guest.name} role by ${mod}!`)

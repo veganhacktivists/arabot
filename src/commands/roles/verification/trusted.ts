@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class TrustedCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class TrustedCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -128,11 +128,13 @@ export class TrustedCommand extends Command {
     if (member.roles.cache.has(IDs.roles.trusted)) {
       // Remove the Trusted role from the user
       await member.roles.remove(trusted);
+      await roleRemoveLog(user.id, mod.id, trusted);
       info.message = `Removed the ${trusted.name} role from ${user}`;
       return info;
     }
     // Add Trusted role to the user
     await member.roles.add(trusted);
+    await roleAddLog(user.id, mod.id, trusted);
     info.message = `Gave ${user} the ${trusted.name} role!`;
 
     await user.send(`You have been given the ${trusted.name} role by ${mod}!`

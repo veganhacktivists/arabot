@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class ActivistCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class ActivistCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -142,12 +142,14 @@ export class ActivistCommand extends Command {
 
       // Remove the Activist role from the user
       await member.roles.remove(activist);
+      await roleRemoveLog(user.id, mod.id, activist);
       info.message = `Removed the ${activist.name} role from ${user}`;
       return info;
     }
 
     // Add Activist role to the user
     await member.roles.add(activist);
+    await roleAddLog(user.id, mod.id, activist);
     info.message = `Gave ${user} the ${activist.name} role!`;
 
     await user.send(

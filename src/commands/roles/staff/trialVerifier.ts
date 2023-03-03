@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class TrialVerifierCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,7 +49,6 @@ export class TrialVerifierCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -127,11 +127,13 @@ export class TrialVerifierCommand extends Command {
     if (member.roles.cache.has(IDs.roles.staff.trialVerifier)) {
       // Remove the Trial Verifier role from the user
       await member.roles.remove(trialVerifier);
+      await roleRemoveLog(user.id, mod.id, trialVerifier, true);
       info.message = `Removed the ${trialVerifier.name} role from ${user}`;
       return info;
     }
     // Add Trial Verifier role to the user
     await member.roles.add(trialVerifier);
+    await roleAddLog(user.id, mod.id, trialVerifier, true);
     info.message = `Gave ${user} the ${trialVerifier.name} role!`;
 
     await user.send(`You have been given the ${trialVerifier.name} role by ${mod}!`)

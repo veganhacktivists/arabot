@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class DebateHostCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -127,11 +128,13 @@ export class DebateHostCommand extends Command {
     if (member.roles.cache.has(IDs.roles.debateHost)) {
       // Remove the Debate Host role from the user
       await member.roles.remove(debateHost);
+      await roleRemoveLog(user.id, mod.id, debateHost);
       info.message = `Removed the ${debateHost.name} role from ${user}`;
       return info;
     }
     // Add Debate Host role to the user
     await member.roles.add(debateHost);
+    await roleAddLog(user.id, mod.id, debateHost);
     info.message = `Gave ${user} the ${debateHost.name} role!`;
 
     await user.send(`You have been given the ${debateHost.name} role by ${mod}!`)

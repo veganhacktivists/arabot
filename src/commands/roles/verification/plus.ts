@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class PlusCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class PlusCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -128,11 +128,13 @@ export class PlusCommand extends Command {
     if (member.roles.cache.has(IDs.roles.vegan.plus)) {
       // Remove the Plus role from the user
       await member.roles.remove(plus);
+      await roleRemoveLog(user.id, mod.id, plus);
       info.message = `Removed the ${plus.name} role from ${user}`;
       return info;
     }
     // Add Plus role to the user
     await member.roles.add(plus);
+    await roleAddLog(user.id, mod.id, plus);
     info.message = `Gave ${user} the ${plus.name} role!`;
 
     await user.send(`You have been given the ${plus.name} role by ${mod}!`)

@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class ConvincedCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class ConvincedCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -133,11 +133,13 @@ export class ConvincedCommand extends Command {
     if (member.roles.cache.has(IDs.roles.nonvegan.convinced)) {
       // Remove the Convinced role from the user
       await member.roles.remove(convinced);
+      await roleRemoveLog(user.id, mod.id, convinced);
       info.message = `Removed the ${convinced.name} role from ${user}`;
       return info;
     }
     // Add Convinced role to the user
     await member.roles.add(convinced);
+    await roleAddLog(user.id, mod.id, convinced);
     info.message = `Gave ${user} the ${convinced.name} role!`;
 
     await user.send(`You have been given the ${convinced.name} role by ${mod}!`

@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class VeganCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class VeganCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -146,6 +146,7 @@ export class VeganCommand extends Command {
         vegan,
         IDs.roles.vegan.activist,
       ]);
+      await roleRemoveLog(user.id, mod.id, vegan);
       info.message = `Removed the ${vegan.name} role from ${user}`;
       return info;
     }
@@ -157,6 +158,7 @@ export class VeganCommand extends Command {
       IDs.roles.nonvegan.convinced,
       IDs.roles.nonvegan.vegCurious,
     ]);
+    await roleAddLog(user.id, mod.id, vegan);
     info.message = `Gave ${user} the ${vegan.name} role!`;
 
     await user.send(`You have been given the ${vegan.name} role by ${mod}!`)

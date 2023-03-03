@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class BookClubCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,7 +49,6 @@ export class BookClubCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -127,11 +127,13 @@ export class BookClubCommand extends Command {
     if (member.roles.cache.has(IDs.roles.bookClub)) {
       // Remove the Book Club role from the user
       await member.roles.remove(bookClub);
+      await roleRemoveLog(user.id, mod.id, bookClub);
       info.message = `Removed the ${bookClub.name} role from ${user}`;
       return info;
     }
     // Add Book Club role to the user
     await member.roles.add(bookClub);
+    await roleAddLog(user.id, mod.id, bookClub);
     info.message = `Gave ${user} the ${bookClub.name} role!`;
 
     await user.send(`You have been given the ${bookClub.name} role by ${mod}!`)
