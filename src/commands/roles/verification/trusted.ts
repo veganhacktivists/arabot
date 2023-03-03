@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class TrustedCommand extends Command {
@@ -51,73 +51,43 @@ export class TrustedCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const trusted = guild.roles.cache.get(IDs.roles.trusted);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined || trusted === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageTrusted(user, mod, guild);
 
-    // Checks if the user has Trusted and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.trusted)) {
-      // Remove the Trusted role from the user
-      await guildMember.roles.remove(trusted);
-      await interaction.reply({
-        content: `Removed the ${trusted.name} role from ${user}`,
-        fetchReply: true,
-      });
-      return;
-    }
-    // Add Trusted role to the user
-    await guildMember.roles.add(trusted);
-    await interaction.reply({
-      content: `Gave ${user} the ${trusted.name} role!`,
-      fetchReply: true,
-    });
-    await user.send(`You have been given the ${trusted.name} role by ${mod}!`
-      + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
-      + '\nMake sure that you follow the rules, don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
-      + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
-      .catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const mod = message.author;
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply('Mod not found! Try again or contact a developer!');
       return;
     }
 
@@ -129,34 +99,48 @@ export class TrustedCommand extends Command {
       return;
     }
 
+    const info = await this.manageTrusted(user, mod, guild);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageTrusted(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
     const trusted = guild.roles.cache.get(IDs.roles.trusted);
 
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
+    }
+
     if (trusted === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+      info.message = 'Error fetching trusted role from cache!';
+      return info;
     }
 
     // Checks if the user has Trusted and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.trusted)) {
-      // Remove the Veg Curious role from the user
-      await user.roles.remove(trusted);
-      await message.reply({
-        content: `Removed the ${trusted.name} role from ${user}`,
-      });
-    } else {
-      // Give Trusted role to the user
-      await user.roles.add(trusted);
-      await message.reply({
-        content: `Gave ${user} the ${trusted.name} role!`,
-      });
-      await user.send(`You have been given the ${trusted.name} role by ${mod}!`
-        + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
-        + '\nMake sure that you follow the rules, and don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
-        + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
-        .catch(() => {});
+    if (member.roles.cache.has(IDs.roles.trusted)) {
+      // Remove the Trusted role from the user
+      await member.roles.remove(trusted);
+      info.message = `Removed the ${trusted.name} role from ${user}`;
+      return info;
     }
+    // Add Trusted role to the user
+    await member.roles.add(trusted);
+    info.message = `Gave ${user} the ${trusted.name} role!`;
 
-    await message.react('✅');
+    await user.send(`You have been given the ${trusted.name} role by ${mod}!`
+      + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
+      + '\nMake sure that you follow the rules, and don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
+      + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
+      .catch(() => {});
+    info.success = true;
+    return info;
   }
 }

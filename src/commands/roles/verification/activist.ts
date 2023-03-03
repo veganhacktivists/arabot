@@ -18,7 +18,7 @@
  */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class ActivistCommand extends Command {
@@ -51,98 +51,43 @@ export class ActivistCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || mod === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const modMember = guild.members.cache.get(mod.user.id);
-    const activist = guild.roles.cache.get(IDs.roles.vegan.activist);
-    const verCoordinator = guild.roles.cache.get(IDs.roles.staff.verifierCoordinator);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined
-      || modMember === undefined
-      || activist === undefined
-      || verCoordinator === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageActivist(user, mod, guild);
 
-    // Checks if the user is an activist
-    if (guildMember.roles.cache.has(IDs.roles.vegan.activist)
-      && !(modMember.roles.cache.has(IDs.roles.staff.verifierCoordinator)
-      || modMember.roles.cache.has(IDs.roles.staff.modCoordinator))) {
-      await interaction.reply({
-        content: `${user} is an activist, only ${verCoordinator.name} can run this!`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Checks if the user has Activist and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.vegan.activist)) {
-      // Remove the Activist role from the user
-      await guildMember.roles.remove(activist);
-      await interaction.reply({
-        content: `Removed the ${activist.name} role from ${user}`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Add Activist role to the user
-    await guildMember.roles.add(activist);
-    await interaction.reply({
-      content: `Gave ${user} the ${activist.name} role!`,
-      ephemeral: true,
-      fetchReply: true,
-    });
-
-    const activistMsg = `${user} you have been given the ${activist.name} role by ${mod}! `
-      + `This means that if you'd wish to engage with non-vegans in <#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
-      + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
-      + '2. Don\'t discuss social topics while activism is happening\n'
-      + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
-      + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
-      + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
-    await guildMember.send(activistMsg)
-      .catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const mod = message.author;
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Verifier not found! Try again or contact a developer!');
+      await message.reply('Staff not found! Try again or contact a developer!');
       return;
     }
 
@@ -154,48 +99,67 @@ export class ActivistCommand extends Command {
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
+    const info = await this.manageActivist(user, mod, guild);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageActivist(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
+    const modMember = guild.members.cache.get(mod.id);
     const activist = guild.roles.cache.get(IDs.roles.vegan.activist);
-    const verCoordinator = guild.roles.cache.get(IDs.roles.staff.verifierCoordinator);
 
-    if (activist === undefined
-      || verCoordinator === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
     }
 
-    // Checks if the user is an activist
-    if (user.roles.cache.has(IDs.roles.vegan.activist)
-      && !(mod.roles.cache.has(IDs.roles.staff.verifierCoordinator)
-      || mod.roles.cache.has(IDs.roles.staff.modCoordinator))) {
-      await message.reply({
-        content: `${user} is an activist, only ${verCoordinator.name} can run this!`,
-      });
-      await message.react('❌');
-      return;
+    if (modMember === undefined) {
+      info.message = 'Error fetching the staff\'s guild member!';
+      return info;
     }
 
-    // Checks if the user has Activist and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.vegan.activist)) {
+    if (activist === undefined) {
+      info.message = 'Error fetching activist role from cache!';
+      return info;
+    }
+
+    // Checks if the user is Activist and to give them or remove them based on if they have it
+    if (member.roles.cache.has(IDs.roles.vegan.activist)) {
+      if (!modMember.roles.cache.hasAny(
+        IDs.roles.staff.verifierCoordinator,
+        IDs.roles.staff.modCoordinator,
+      )) {
+        info.message = 'You need to be a verifier coordinator to remove this role!';
+        return info;
+      }
+
       // Remove the Activist role from the user
-      await user.roles.remove(activist);
-      await message.react('✅');
-      return;
+      await member.roles.remove(activist);
+      info.message = `Removed the ${activist.name} role from ${user}`;
+      return info;
     }
 
     // Add Activist role to the user
-    await user.roles.add(activist);
-    await message.react('✅');
+    await member.roles.add(activist);
+    info.message = `Gave ${user} the ${activist.name} role!`;
 
-    const activistMsg = `${user} you have been given the ${activist.name} role by ${mod}! `
+    await user.send(
+      `${user} you have been given the ${activist.name} role by ${mod}! `
       + `This means that if you'd wish to engage with non-vegans in <#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
       + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
       + '2. Don\'t discuss social topics while activism is happening\n'
       + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
       + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
-      + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
-    await user.send(activistMsg)
-      .catch(() => {});
+      + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans',
+    ).catch(() => {});
+    info.success = true;
+    return info;
   }
 }

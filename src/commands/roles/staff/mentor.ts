@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class MentorCommand extends Command {
@@ -51,66 +51,39 @@ export class MentorCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const mentor = guild.roles.cache.get(IDs.roles.staff.mentor);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined || mentor === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageMentor(user, mod, guild);
 
-    // Checks if the user has Mentor and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.staff.mentor)) {
-      // Remove the Mentor role from the user
-      await guildMember.roles.remove(mentor);
-      await interaction.reply({
-        content: `Removed the ${mentor.name} role from ${user}`,
-        fetchReply: true,
-      });
-      return;
-    }
-    // Add Mentor role to the user
-    await guildMember.roles.add(mentor);
-    await interaction.reply({
-      content: `Gave ${user} the ${mentor.name} role!`,
-      fetchReply: true,
-    });
-    await user.send(`You have been given the ${mentor.name} role by ${mod}!`)
-      .catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const mod = message.author;
 
     if (mod === null) {
       await message.react('❌');
@@ -126,31 +99,45 @@ export class MentorCommand extends Command {
       return;
     }
 
+    const info = await this.manageMentor(user, mod, guild);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageMentor(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
     const mentor = guild.roles.cache.get(IDs.roles.staff.mentor);
 
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
+    }
+
     if (mentor === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+      info.message = 'Error fetching mentor role from cache!';
+      return info;
     }
 
     // Checks if the user has Mentor and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.staff.mentor)) {
+    if (member.roles.cache.has(IDs.roles.staff.mentor)) {
       // Remove the Mentor role from the user
-      await user.roles.remove(mentor);
-      await message.reply({
-        content: `Removed the ${mentor.name} role from ${user}`,
-      });
-    } else {
-      // Give Mentor role to the user
-      await user.roles.add(mentor);
-      await message.reply({
-        content: `Gave ${user} the ${mentor.name} role!`,
-      });
-      await user.send(`You have been given the ${mentor.name} role by ${mod}!`)
-        .catch(() => {});
+      await member.roles.remove(mentor);
+      info.message = `Removed the ${mentor.name} role from ${user}`;
+      return info;
     }
+    // Add Mentor role to the user
+    await member.roles.add(mentor);
+    info.message = `Gave ${user} the ${mentor.name} role!`;
 
-    await message.react('✅');
+    await user.send(`You have been given the ${mentor.name} role by ${mod}!`)
+      .catch(() => {});
+    info.success = true;
+    return info;
   }
 }

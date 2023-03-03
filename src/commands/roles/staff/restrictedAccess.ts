@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RestrictedAccessCommand extends Command {
@@ -51,70 +51,43 @@ export class RestrictedAccessCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const restrictedAccess = guild.roles.cache.get(IDs.roles.staff.restricted);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined || restrictedAccess === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageRestrictedAccess(user, mod, guild);
 
-    // Checks if the user has RA and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.staff.restricted)) {
-      // Remove the Restricted Access role from the user
-      await guildMember.roles.remove(restrictedAccess);
-      await interaction.reply({
-        content: `Removed the ${restrictedAccess.name} role from ${user}`,
-        fetchReply: true,
-      });
-      return;
-    }
-    // Add Restricted Access role to the user
-    await guildMember.roles.add(restrictedAccess);
-    await interaction.reply({
-      content: `Gave ${user} the ${restrictedAccess.name} role!`,
-      fetchReply: true,
-    });
-    await user.send(`You have been given the ${restrictedAccess.name} role by ${mod}!`)
-      .catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const mod = message.author;
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator coordinator not found! Try again or contact a developer!');
+      await message.reply('Mod coordinator not found! Try again or contact a developer!');
       return;
     }
 
@@ -126,31 +99,45 @@ export class RestrictedAccessCommand extends Command {
       return;
     }
 
-    const restrictedAccess = guild.roles.cache.get(IDs.roles.staff.restricted);
+    const info = await this.manageRestrictedAccess(user, mod, guild);
 
-    if (restrictedAccess === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageRestrictedAccess(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
+    const restricted = guild.roles.cache.get(IDs.roles.staff.restricted);
+
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
+    }
+
+    if (restricted === undefined) {
+      info.message = 'Error fetching the restricted access role from cache!';
+      return info;
     }
 
     // Checks if the user has RA and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.staff.restricted)) {
+    if (member.roles.cache.has(IDs.roles.staff.restricted)) {
       // Remove the Restricted Access role from the user
-      await user.roles.remove(restrictedAccess);
-      await message.reply({
-        content: `Removed the ${restrictedAccess.name} role from ${user}`,
-      });
-    } else {
-      // Give Restricted Access role to the user
-      await user.roles.add(restrictedAccess);
-      await message.reply({
-        content: `Gave ${user} the ${restrictedAccess.name} role!`,
-      });
-      await user.send(`You have been given the ${restrictedAccess.name} role by ${mod}!`)
-        .catch(() => {});
+      await member.roles.remove(restricted);
+      info.message = `Removed the ${restricted.name} role from ${user}`;
+      return info;
     }
+    // Add Restricted Access role to the user
+    await member.roles.add(restricted);
+    info.message = `Gave ${user} the ${restricted.name} role!`;
 
-    await message.react('✅');
+    await user.send(`You have been given the ${restricted.name} role by ${mod}!`)
+      .catch(() => {});
+    info.success = true;
+    return info;
   }
 }

@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class ConvincedCommand extends Command {
@@ -51,82 +51,43 @@ export class ConvincedCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const convinced = guild.roles.cache.get(IDs.roles.nonvegan.convinced);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined || convinced === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageConvinced(user, mod, guild);
 
-    // Checks if the user is vegan
-    if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)) {
-      await interaction.reply({
-        content: `${user} is already vegan!`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-    }
-
-    // Checks if the user has Convinced and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.nonvegan.convinced)) {
-      // Remove the Veg Curious role from the user
-      await guildMember.roles.remove(convinced);
-      await interaction.reply({
-        content: `Removed the ${convinced.name} role from ${user}`,
-        fetchReply: true,
-      });
-      return;
-    }
-    // Add Convinced role to the user
-    await guildMember.roles.add(convinced);
-    await interaction.reply({
-      content: `Gave ${user} the ${convinced.name} role!`,
-      fetchReply: true,
-    });
-    await user.send(`You have been given the ${convinced.name} role by ${mod}!`
-      + '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan '
-      + 'and other parts of the server! :)'
-      + '\n\nThank you for caring about the animals 💚')
-      .catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mod = message.member;
+    const mod = message.author;
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply('Mod not found! Try again or contact a developer!');
       return;
     }
 
@@ -138,48 +99,54 @@ export class ConvincedCommand extends Command {
       return;
     }
 
+    const info = await this.manageConvinced(user, mod, guild);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageConvinced(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
     const convinced = guild.roles.cache.get(IDs.roles.nonvegan.convinced);
 
-    if (convinced === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
     }
 
-    // Checks if the user is vegan
-    if (user.roles.cache.has(IDs.roles.vegan.vegan)) {
-      await message.reply({
-        content: `${user} is already vegan!`,
-      });
-      await message.react('❌');
-      return;
+    if (convinced === undefined) {
+      info.message = 'Error fetching coordinator role from cache!';
+      return info;
+    }
+
+    if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+      info.message = `${user} is already vegan, cannot give the ${convinced.name} role!`;
+      return info;
     }
 
     // Checks if the user has Convinced and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.nonvegan.convinced)) {
-      // Remove the Veg Curious role from the user
-      await user.roles.remove(convinced);
-      await message.reply({
-        content: `Removed the ${convinced.name} role from ${user}`,
-      });
-    } else {
-      // Give Convinced role to the user
-      await user.roles.add(convinced);
-      await message.reply({
-        content: `Gave ${user} the ${convinced.name} role!`,
-      });
-      await user.send(`You have been given the ${convinced.name} role by ${mod}!`
-        + '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan '
-        + 'and other parts of the server! :)'
-        + '\n\nThank you for caring about the animals 💚')
-        .catch(() => message.reply('User\'s DMs are closed.'));
+    if (member.roles.cache.has(IDs.roles.nonvegan.convinced)) {
+      // Remove the Convinced role from the user
+      await member.roles.remove(convinced);
+      info.message = `Removed the ${convinced.name} role from ${user}`;
+      return info;
     }
+    // Add Convinced role to the user
+    await member.roles.add(convinced);
+    info.message = `Gave ${user} the ${convinced.name} role!`;
 
-    // Checks if the user is xlevra to send a very kind message
-    if (mod.id === '259624904746467329') {
-      await message.reply('Moist!');
-    }
+    await user.send(`You have been given the ${convinced.name} role by ${mod}!`
+      + '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan '
+      + 'and other parts of the server! :)'
+      + '\n\nThank you for caring about the animals 💚')
+      .catch(() => {});
 
-    await message.react('✅');
+    info.success = true;
+    return info;
   }
 }

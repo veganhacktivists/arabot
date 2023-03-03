@@ -18,7 +18,7 @@
  */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class VegCuriousCommand extends Command {
@@ -51,92 +51,43 @@ export class VegCuriousCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mentor = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || mentor === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const mentorMember = guild.members.cache.get(mentor.user.id);
-    const vegCurious = guild.roles.cache.get(IDs.roles.nonvegan.vegCurious);
-    const mentorCoordinator = guild.roles.cache.get(IDs.roles.staff.mentorCoordinator);
-    const dietSupport = guild.channels.cache.get(IDs.channels.dietSupport.main);
+    await interaction.deferReply({ ephemeral: true });
 
-    // Checks if guildMember is null
-    if (guildMember === undefined
-      || mentorMember === undefined
-      || vegCurious === undefined
-      || mentorCoordinator === undefined
-      || dietSupport === undefined) {
-      await interaction.reply({
-        content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
+    const info = await this.manageVegCurious(user, mod, guild);
 
-    // Checks if the user is vegan
-    if (guildMember.roles.cache.has(IDs.roles.vegan.vegan)
-      && !mentorMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
-      await interaction.reply({
-        content: `${user} is vegan, only ${mentorCoordinator.name} can run this!`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Checks if the user has Veg Curious and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
-      // Remove the Veg Curious role from the user
-      await guildMember.roles.remove(vegCurious);
-      await interaction.reply({
-        content: `Removed the ${vegCurious.name} role from ${user}`,
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
-    // Add Veg Curious role to the user
-    await guildMember.roles.add(vegCurious);
-    await interaction.reply({
-      content: `Gave ${user} the ${vegCurious.name} role!`,
-      ephemeral: true,
-      fetchReply: true,
-    });
-
-    await guildMember.send(`You have been given the ${vegCurious.name} role by ${mentor.user} `
-      + `which gives you access to ${dietSupport}`).catch(() => {});
+    await interaction.editReply(info.message);
   }
 
   public async messageRun(message: Message, args: Args) {
     // Get arguments
-    let user: GuildMember;
+    let user: User;
     try {
-      user = await args.pick('member');
+      user = await args.pick('user');
     } catch {
       await message.react('❌');
       await message.reply('User was not provided!');
       return;
     }
 
-    const mentor = message.member;
+    const mod = message.author;
 
-    if (mentor === null) {
+    if (mod === null) {
       await message.react('❌');
-      await message.reply('Mentor not found! Try again or contact a developer!');
+      await message.reply('Staff not found! Try again or contact a developer!');
       return;
     }
 
@@ -148,41 +99,57 @@ export class VegCuriousCommand extends Command {
       return;
     }
 
+    const info = await this.manageVegCurious(user, mod, guild);
+
+    await message.reply(info.message);
+    await message.react(info.success ? '✅' : '❌');
+  }
+
+  private async manageVegCurious(user: User, mod: User, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+    const member = guild.members.cache.get(user.id);
+    const modMember = guild.members.cache.get(mod.id);
     const vegCurious = guild.roles.cache.get(IDs.roles.nonvegan.vegCurious);
-    const mentorCoordinator = guild.roles.cache.get(IDs.roles.staff.mentorCoordinator);
-    const dietSupport = guild.channels.cache.get(IDs.channels.dietSupport.main);
 
-    if (vegCurious === undefined
-      || mentorCoordinator === undefined
-      || dietSupport === undefined) {
-      await message.react('❌');
-      await message.reply('Role not found! Try again or contact a developer!');
-      return;
+    // Checks if user's GuildMember was found in cache
+    if (member === undefined) {
+      info.message = 'Error fetching guild member for the user!';
+      return info;
     }
 
-    // Checks if the user is vegan
-    if (user.roles.cache.has(IDs.roles.vegan.vegan)
-      && !mentor.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
-      await message.reply({
-        content: `${user} is vegan, only ${mentorCoordinator.name} can run this!`,
-      });
-      await message.react('❌');
-      return;
+    if (modMember === undefined) {
+      info.message = 'Error fetching the staff\'s guild member!';
+      return info;
     }
 
-    // Checks if the user has Veg Curious and to give them or remove them based on if they have it
-    if (user.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
+    if (vegCurious === undefined) {
+      info.message = 'Error fetching veg curious role from cache!';
+      return info;
+    }
+
+    // Checks if the user is Veg Curious and to give them or remove them based on if they have it
+    if (member.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
+      if (!modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
+        info.message = 'You need to be a mentor coordinator to remove this role!';
+        return info;
+      }
+
       // Remove the Veg Curious role from the user
-      await user.roles.remove(vegCurious);
-      await message.react('✅');
-      return;
+      await member.roles.remove(vegCurious);
+      info.message = `Removed the ${vegCurious.name} role from ${user}`;
+      return info;
     }
 
     // Add Veg Curious role to the user
-    await user.roles.add(vegCurious);
-    await message.react('✅');
+    await member.roles.add(vegCurious);
+    info.message = `Gave ${user} the ${vegCurious.name} role!`;
 
-    await user.send(`You have been given the ${vegCurious.name} role by ${mentor.user} `
-      + `which gives you access to ${dietSupport}`).catch(() => {});
+    await user.send(`You have been given the ${vegCurious.name} role by ${mod} `
+      + 'which gives you access to the diet support section').catch(() => {});
+    info.success = true;
+    return info;
   }
 }
