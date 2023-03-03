@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class StageHostCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,7 +49,6 @@ export class StageHostCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -127,11 +127,13 @@ export class StageHostCommand extends Command {
     if (member.roles.cache.has(IDs.roles.stageHost)) {
       // Remove the Stage Host role from the user
       await member.roles.remove(stageHost);
+      await roleRemoveLog(user.id, mod.id, stageHost, true);
       info.message = `Removed the ${stageHost.name} role from ${user}`;
       return info;
     }
     // Add Stage Host role to the user
     await member.roles.add(stageHost);
+    await roleAddLog(user.id, mod.id, stageHost, true);
     info.message = `Gave ${user} the ${stageHost.name} role!`;
 
     await user.send(`You have been given the ${stageHost.name} role by ${mod}!`)

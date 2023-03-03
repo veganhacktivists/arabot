@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class MentorCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class MentorCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -128,11 +128,13 @@ export class MentorCommand extends Command {
     if (member.roles.cache.has(IDs.roles.staff.mentor)) {
       // Remove the Mentor role from the user
       await member.roles.remove(mentor);
+      await roleRemoveLog(user.id, mod.id, mentor, true);
       info.message = `Removed the ${mentor.name} role from ${user}`;
       return info;
     }
     // Add Mentor role to the user
     await member.roles.add(mentor);
+    await roleAddLog(user.id, mod.id, mentor, true);
     info.message = `Gave ${user} the ${mentor.name} role!`;
 
     await user.send(`You have been given the ${mentor.name} role by ${mod}!`)

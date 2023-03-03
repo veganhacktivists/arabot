@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { Guild, User, Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
 export class RestrictedAccessCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -49,7 +50,6 @@ export class RestrictedAccessCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const mod = interaction.user;
@@ -128,11 +128,13 @@ export class RestrictedAccessCommand extends Command {
     if (member.roles.cache.has(IDs.roles.staff.restricted)) {
       // Remove the Restricted Access role from the user
       await member.roles.remove(restricted);
+      await roleRemoveLog(user.id, mod.id, restricted, true);
       info.message = `Removed the ${restricted.name} role from ${user}`;
       return info;
     }
     // Add Restricted Access role to the user
     await member.roles.add(restricted);
+    await roleAddLog(user.id, mod.id, restricted, true);
     info.message = `Gave ${user} the ${restricted.name} role!`;
 
     await user.send(`You have been given the ${restricted.name} role by ${mod}!`)
