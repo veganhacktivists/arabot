@@ -24,14 +24,14 @@ import IDs from '#utils/ids';
 // Checks if the user exists on the database
 export async function userExists(userId: Snowflake) {
   // Counts if the user is on the database by their snowflake
-  const userQuery = await container.database.user.count({
+  const userQuery = await container.database.user.findFirst({
     where: {
       id: userId,
     },
   });
 
   // If the user is found on the database, then return true, otherwise, false.
-  return userQuery > 0;
+  return userQuery !== null;
 }
 
 function getRoles(roles: GuildMemberRoleManager) {
@@ -52,15 +52,8 @@ function getRoles(roles: GuildMemberRoleManager) {
 
 // Adds the user to the database if they were already on the server before the bot/database
 export async function addExistingUser(member: GuildMember) {
-  // Counts if the user is on the database by their snowflake
-  const userQuery = await container.database.user.count({
-    where: {
-      id: member.id,
-    },
-  });
-
-  // If the user is already in the database
-  if (userQuery > 0) {
+  // Checks if user exists on the database
+  if (await userExists(member.id)) {
     return;
   }
 
@@ -85,15 +78,8 @@ export async function addExistingUser(member: GuildMember) {
 
 // Add an empty user to database in case they are not on the server
 export async function addEmptyUser(userId: Snowflake) {
-  // Counts if the user is on the database by their snowflake
-  const userQuery = await container.database.user.count({
-    where: {
-      id: userId,
-    },
-  });
-
-  // If the user is already in the database
-  if (userQuery > 0) {
+  // Checks if the user exists on the database
+  if (await userExists(userId)) {
     return;
   }
 
@@ -106,20 +92,24 @@ export async function addEmptyUser(userId: Snowflake) {
 }
 
 export async function updateUser(member: GuildMember) {
-  // Check if the user is already on the database
-  if (!(await userExists(member.id))) {
-    await addExistingUser(member);
-    return;
-  }
-
   // Parse all the roles into a dictionary
   const roles = getRoles(member.roles);
 
-  await container.database.user.update({
+  await container.database.user.upsert({
     where: {
       id: member.id,
     },
-    data: {
+    update: {
+      vegan: roles.vegan,
+      trusted: roles.trusted,
+      activist: roles.activist,
+      plus: roles.plus,
+      notVegan: roles.notVegan,
+      vegCurious: roles.vegCurious,
+      convinced: roles.convinced,
+      muted: roles.muted,
+    },
+    create: {
       id: member.id,
       vegan: roles.vegan,
       trusted: roles.trusted,
