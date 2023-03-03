@@ -42,6 +42,8 @@ model User {
   SendPayment           Payment[]         @relation("sendPayment")
   RecievePayment        Payment[]         @relation("recievePayment")
   LeaveLog              LeaveLog[]
+  UserRoleLog           RoleLog[]         @relation("userRoleLog")
+  ModRoleLog            RoleLog[]         @relation("modRoleLog")
   EventLeader           Event[]           @relation("eventLeader")
   StatLeader            Stat[]            @relation("statLeader")
   OutreachParticipation ParticipantStat[] @relation("participantUser")
@@ -127,6 +129,25 @@ model LeaveLog {
   userId String
   time   DateTime @default(now())
   roles  String[]
+}
+
+model RoleLog {
+  id     Int      @id @default(autoincrement())
+  user   User     @relation("userRoleLog", fields: [userId], references: [id])
+  userId String
+  mod    User     @relation("modRoleLog", fields: [modId], references: [id])
+  modId  String
+  role   Role     @relation(fields: [roleId], references: [id])
+  roleId String
+  add    Boolean  @default(false)
+  time   DateTime @default(now())
+}
+
+model Role {
+  id      String    @id
+  name    String
+  staff   Boolean
+  RoleLog RoleLog[]
 }
 
 // Outreach
