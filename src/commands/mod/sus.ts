@@ -114,69 +114,64 @@ export class SusCommand extends Subcommand {
   // Subcommand to add sus note
   public async addNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const note = interaction.options.getString('note');
+    const user = interaction.options.getUser('user', true);
+    const note = interaction.options.getString('note', true);
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || interaction.member === null || note === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
-    const mod = interaction.member.user;
-
     // Add the data to the database
 
     // Check if the user exists on the database
-    const userGuildMember = guild.members.cache.get(user.id);
-    const modGuildMember = guild.members.cache.get(mod.id);
-    // TODO potentially add a method to add user by Snowflake
-    if (userGuildMember === undefined || modGuildMember === undefined) {
+    const member = guild.members.cache.get(user.id);
+    const modMember = guild.members.cache.get(mod.id);
+
+    if (member === undefined || modMember === undefined) {
       await interaction.reply({
         content: 'Error fetching users!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
     // Check if user and mod are on the database
-    if (!await userExists(userGuildMember.id)) {
-      await addExistingUser(userGuildMember);
+    if (!await userExists(member.id)) {
+      await addExistingUser(member);
     }
-    if (!await userExists(modGuildMember.id)) {
-      await addExistingUser(modGuildMember);
+    if (!await userExists(modMember.id)) {
+      await addExistingUser(modMember);
     }
     await addToDatabase(user.id, mod.id, note);
 
     // Give the user the sus role they don't already have the sus note
-    if (!userGuildMember.roles.cache.has(IDs.roles.restrictions.sus)) {
-      await userGuildMember.roles.add(IDs.roles.restrictions.sus);
+    if (!member.roles.cache.has(IDs.roles.restrictions.sus)) {
+      await member.roles.add(IDs.roles.restrictions.sus);
     }
 
     await interaction.reply({
       content: `${user} note: ${note}`,
       ephemeral: true,
-      fetchReply: true,
     });
   }
 
   public async listNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
-    const user = interaction.options.getUser('user');
+    const user = interaction.options.getUser('user', true);
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild == null) {
+    if (guild == null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
@@ -212,11 +207,12 @@ export class SusCommand extends Subcommand {
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
       // Get mod name
-      const modGuildMember = guild.members.cache.get(notes[i].modId);
       let mod = notes[i].modId;
-      if (modGuildMember !== undefined) {
-        mod = modGuildMember!.displayName;
+      const modMember = guild.members.cache.get(mod);
+      if (modMember !== undefined) {
+        mod = modMember.displayName;
       }
+
       // Add sus note to embed
       noteEmbed.addFields({
         name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
@@ -234,13 +230,13 @@ export class SusCommand extends Subcommand {
 
   public async removeNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
-    const noteId = interaction.options.getInteger('id');
+    const noteId = interaction.options.getInteger('id', true);
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (noteId === null || guild === null || channel === null || interaction.member === null) {
+    if (guild === null || channel === null) {
       await interaction.reply({
-        content: 'Error fetching id from Discord!',
+        content: 'Error fetching guild or channel!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -261,11 +257,11 @@ export class SusCommand extends Subcommand {
     }
 
     // Get user GuildMembers for user and mod and person who ran command
-    const user = await guild.members.cache.get(note.userId);
+    const member = await guild.members.cache.get(note.userId);
     const mod = await guild.members.cache.get(note.modId);
 
     // TODO fix if user left the server
-    if (user === undefined || mod === undefined) {
+    if (member === undefined || mod === undefined) {
       await interaction.reply({
         content: 'Error fetching users from Discord!',
         ephemeral: true,
@@ -276,8 +272,8 @@ export class SusCommand extends Subcommand {
 
     // Get user's name
     let userName = note.userId;
-    if (user !== undefined) {
-      userName = user.displayName;
+    if (member !== undefined) {
+      userName = member.displayName;
     }
 
     // Get mod name
@@ -290,7 +286,7 @@ export class SusCommand extends Subcommand {
     const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
       .setTitle(`Sus note for ${userName}`)
-      .setThumbnail(user.avatarURL()!) // TODO avatar does not show when run
+      .setThumbnail(member.displayAvatarURL())
       .addFields({
         name: `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note.time.getTime() / 1000)}>`,
         value: note.note,
@@ -334,17 +330,17 @@ export class SusCommand extends Subcommand {
       if (button.customId === `delete${noteId}`) {
         await deactivateNote(noteId);
         await interaction.editReply({
-          content: `${user}'s sus note (ID: ${noteId}) has been successfully removed`,
+          content: `${member}'s sus note (ID: ${noteId}) has been successfully removed`,
           embeds: [],
         });
 
         // TODO create a new Prisma function to only count and not to get a whole list of sus notes
         // Check how many notes the user has and if 0, then remove sus note
-        const notes = await findNotes(user.id, true);
+        const notes = await findNotes(member.id, true);
 
         // Checks if there are no notes on the user and if there's none, remove the sus role
         if (notes.length === 0) {
-          await user.roles.remove(IDs.roles.restrictions.sus);
+          await member.roles.remove(IDs.roles.restrictions.sus);
         }
       }
     });
@@ -359,23 +355,23 @@ export class SusCommand extends Subcommand {
 
   public async removeAllNotes(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
-    const user = interaction.options.getUser('user');
+    const user = interaction.options.getUser('user', true);
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || channel === null) {
+    if (guild === null || channel === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild or channel!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    const userGuildMember = guild.members.cache.get(user.id);
+    const member = guild.members.cache.get(user.id);
 
     // Checks if managed to find GuildMember for the user
-    if (userGuildMember === undefined) {
+    if (member === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
         ephemeral: true,
@@ -407,8 +403,8 @@ export class SusCommand extends Subcommand {
     // Add up to 10 of the latest sus notes to the embed
     for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
       // Get mod name
-      const modGuildMember = guild.members.cache.get(notes[i].modId);
       let mod = notes[i].modId;
+      const modGuildMember = guild.members.cache.get(mod);
       if (modGuildMember !== undefined) {
         mod = modGuildMember.displayName;
       }
@@ -458,7 +454,7 @@ export class SusCommand extends Subcommand {
         // Remove sus note from database
         await deactivateAllNotes(user.id);
         await interaction.editReply({
-          content: `Removed all of ${userGuildMember}'s sus notes successfully`,
+          content: `Removed all of ${member}'s sus notes successfully`,
           embeds: [],
         });
       }
@@ -472,7 +468,7 @@ export class SusCommand extends Subcommand {
     });
 
     // Remove sus role from the user
-    await userGuildMember.roles.remove(IDs.roles.restrictions.sus);
+    await member.roles.remove(IDs.roles.restrictions.sus);
   }
 
   // Non Application Command method of adding a sus note
