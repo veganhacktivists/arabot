@@ -28,6 +28,9 @@ export async function userExists(userId: Snowflake) {
     where: {
       id: userId,
     },
+    select: {
+      id: true,
+    },
   });
 
   // If the user is found on the database, then return true, otherwise, false.
