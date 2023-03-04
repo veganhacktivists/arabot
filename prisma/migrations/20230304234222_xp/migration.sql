@@ -1,0 +1,13 @@
+-- CreateTable
+CREATE TABLE "Xp" (
+    "userId" TEXT NOT NULL,
+    "level" INTEGER NOT NULL DEFAULT 0,
+    "xp" INTEGER NOT NULL DEFAULT 0,
+    "messageCount" INTEGER NOT NULL DEFAULT 0,
+    "lastMessage" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Xp_pkey" PRIMARY KEY ("userId")
+);
+
+-- AddForeignKey
+ALTER TABLE "Xp" ADD CONSTRAINT "Xp_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -37,6 +37,7 @@ model User {
   muted                 Boolean           @default(false)
   VerifyUser            Verify[]          @relation("verUser")
   VerifyVerifier        Verify[]          @relation("verVerifier")
+  Xp                    Xp?
   Balance               Balance?
   Daily                 Daily[]
   SendPayment           Payment[]         @relation("sendPayment")
@@ -92,6 +93,15 @@ model Verify {
   life        Int?
   food        Int?
   notes       String?
+}
+
+model Xp {
+  user         User     @relation(fields: [userId], references: [id])
+  userId       String   @id
+  level        Int      @default(0)
+  xp           Int      @default(0)
+  messageCount Int      @default(0)
+  lastMessage  DateTime @default(now())
 }
 
 // Economy
