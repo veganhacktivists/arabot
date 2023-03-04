@@ -19,10 +19,16 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
-import type { User, Guild, Message } from 'discord.js';
+import type {
+  User,
+  Guild,
+  GuildMember,
+  Message,
+} from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { daily, getLastDaily } from '#utils/database/economy';
 import { EmbedBuilder } from 'discord.js';
+import IDs from '#utils/ids';
 
 export class DailyCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -116,18 +122,26 @@ export class DailyCommand extends Command {
       return info;
     }
 
+    // Give bonus for the user
+    const bonus = await this.giveBonus(member);
+
     await updateUser(member);
 
-    const [db] = await Promise.all([daily(user.id, amount)]);
+    const [db] = await Promise.all([daily(user.id, amount + bonus)]);
 
     const balance = db.Balance?.balance;
 
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
       .setAuthor({ name: 'Daily Reward', iconURL: `${user.displayAvatarURL()}` })
-      .addFields(
-        { name: 'Collected', value: `${amount} ARA` },
+      .addFields({ name: 'Collected', value: `${amount} ARA`, inline: bonus > 0 });
+
+    if (bonus > 0) {
+      embed.addFields(
+        { name: 'Bonus', value: `${bonus} ARA`, inline: true },
+        { name: '\u200B', value: 'Thank you for contributing to ARA! :D' },
       );
+    }
 
     if (balance !== undefined) {
       embed.setFooter({ text: `New Balance: ${balance}` });
@@ -136,5 +150,32 @@ export class DailyCommand extends Command {
     info.success = true;
     info.embeds.push(embed);
     return info;
+  }
+
+  private async giveBonus(member: GuildMember) {
+    let bonus = 0;
+
+    const amount = [
+      { role: member.roles.premiumSubscriberRole?.id, amount: 5 },
+      { role: IDs.roles.staff.coordinator, amount: 2 },
+      { role: IDs.roles.staff.moderator, amount: 2 },
+      { role: IDs.roles.staff.trialModerator, amount: 2 },
+      { role: IDs.roles.staff.restricted, amount: 1 },
+      { role: IDs.roles.staff.verifier, amount: 2 },
+      { role: IDs.roles.staff.trialVerifier, amount: 2 },
+      { role: IDs.roles.staff.developer, amount: 2 },
+      { role: IDs.roles.staff.mentor, amount: 2 },
+      { role: IDs.roles.stageHost, amount: 1 },
+    ];
+
+    member.roles.cache.forEach((role) => {
+      amount.forEach((check) => {
+        if (role.id === check.role) {
+          bonus += check.amount;
+        }
+      });
+    });
+
+    return bonus;
   }
 }
