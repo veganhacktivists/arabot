@@ -22,7 +22,7 @@ import type { GuildBan } from 'discord.js';
 import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
 import { addBan, checkBan } from '#utils/database/ban';
 import IDs from '#utils/ids';
-import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class BanListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -90,9 +90,7 @@ export class BanListener extends Listener {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     if (await checkBan(user.id)) {
       this.container.logger.error('BanListener: got past the checkActive at the start.');
@@ -100,9 +98,7 @@ export class BanListener extends Listener {
     }
 
     // Check if user and mod are on the database
-    if (!await userExists(user.id)) {
-      await addEmptyUser(user.id);
-    }
+    await addEmptyUser(user.id);
 
     let { reason } = banLog;
 

@@ -27,7 +27,7 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import { fetchRoles, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { fetchRoles, addExistingUser } from '#utils/database/dbExistingUser';
 import { unRestrict, checkActive, unRestrictLegacy } from '#utils/database/restriction';
 
 export class UnRestrictCommand extends Command {
@@ -151,9 +151,7 @@ export class UnRestrictCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(modId)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     // Gets guildMember
     let member = guild.members.cache.get(userId);
@@ -169,9 +167,7 @@ export class UnRestrictCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(userId)) {
-      await addExistingUser(member);
-    }
+    await addExistingUser(member);
 
     const restrictRoles = IDs.roles.restrictions.restricted;
 

@@ -30,7 +30,7 @@ import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 import { removeBan, checkBan, addBan } from '#utils/database/ban';
 import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
-import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class UnbanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -131,9 +131,7 @@ export class UnbanCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(modId)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     let user = guild.client.users.cache.get(userId);
 
@@ -167,9 +165,7 @@ export class UnbanCommand extends Command {
       }
 
       // Check if user and mod are on the database
-      if (!await userExists(user.id)) {
-        await addEmptyUser(user.id);
-      }
+      await addEmptyUser(user.id);
 
       // Add missing ban
       await addBan(userId, modId, `(Mod who banned is not accurate) - ${reason}`);

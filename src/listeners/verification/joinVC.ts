@@ -46,7 +46,7 @@ import {
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
 import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
 import { findNotes } from '#utils/database/sus';
-import { userExists, addExistingUser } from '#utils/database/dbExistingUser';
+import { addExistingUser } from '#utils/database/dbExistingUser';
 import { rolesToString } from '#utils/formatter';
 import IDs from '#utils/ids';
 
@@ -449,9 +449,7 @@ export class VerificationJoinVCListener extends Listener {
           return;
         }
         // Add verifier to database if they're not on the database
-        if (!(await userExists(verifierGuildMember.id))) {
-          await addExistingUser(verifierGuildMember);
-        }
+        await addExistingUser(verifierGuildMember);
 
         // Add verification data to database
         await finishVerification(verId, button.user.id, info);

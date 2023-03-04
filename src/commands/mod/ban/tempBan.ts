@@ -28,7 +28,7 @@ import type {
 import { EmbedBuilder, Message } from 'discord.js';
 import IDs from '#utils/ids';
 import { addTempBan, checkTempBan } from '#utils/database/tempBan';
-import { addEmptyUser, updateUser, userExists } from '#utils/database/dbExistingUser';
+import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
 
 export class TempBanCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -247,7 +247,7 @@ export class TempBanCommand extends Command {
 
       // Ban the user
       await member.ban({ reason });
-    } else if (!await userExists(userId)) {
+    } else {
       await addEmptyUser(userId);
     }
 

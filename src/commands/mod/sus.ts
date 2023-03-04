@@ -29,7 +29,7 @@ import {
 } from 'discord.js';
 import type { Message, GuildMember, TextChannel } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
-import { addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addExistingUser } from '#utils/database/dbExistingUser';
 import {
   addToDatabase,
   findNotes,
@@ -143,12 +143,9 @@ export class SusCommand extends Subcommand {
     }
 
     // Check if user and mod are on the database
-    if (!await userExists(member.id)) {
-      await addExistingUser(member);
-    }
-    if (!await userExists(modMember.id)) {
-      await addExistingUser(modMember);
-    }
+    await addExistingUser(member);
+    await addExistingUser(modMember);
+
     await addToDatabase(user.id, mod.id, note);
 
     // Give the user the sus role they don't already have the sus note
@@ -499,12 +496,9 @@ export class SusCommand extends Subcommand {
     }
 
     // Check if user and mod are on the database
-    if (!await userExists(user.id)) {
-      await addExistingUser(user);
-    }
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(user);
+    await addExistingUser(mod);
+
     await addToDatabase(user.id, mod.id, note);
 
     // Give the user the sus role they don't already have the sus note

@@ -20,12 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
-import {
-  addEmptyUser,
-  logLeaving,
-  updateUser,
-  userExists,
-} from '#utils/database/dbExistingUser';
+import { addEmptyUser, logLeaving, updateUser } from '#utils/database/dbExistingUser';
 
 export class DbLeaveServerListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -41,7 +36,7 @@ export class DbLeaveServerListener extends Listener {
       IDs.roles.nonvegan.nonvegan,
     )) {
       await updateUser(member);
-    } else if (!await userExists(member.id)) {
+    } else {
       await addEmptyUser(member.id);
     }
 

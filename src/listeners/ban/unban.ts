@@ -22,7 +22,7 @@ import type { GuildBan } from 'discord.js';
 import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
 import { addBan, checkBan, removeBan } from '#utils/database/ban';
 import IDs from '#utils/ids';
-import { addEmptyUser, addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class UnbanListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
@@ -81,16 +81,13 @@ export class UnbanListener extends Listener {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     // Check for missing ban on database
     if (!await checkBan(user.id)) {
       // Check if user and mod are on the database
-      if (!await userExists(user.id)) {
-        await addEmptyUser(user.id);
-      }
+      await addEmptyUser(user.id);
+
       // Add missing ban
       await addBan(user.id, mod.id, '(Mod who banned is not accurate) - ');
     }

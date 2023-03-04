@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
 import { addMute, removeMute, checkActive } from '#utils/database/vcMute';
-import { addExistingUser, userExists } from '#utils/database/dbExistingUser';
+import { addExistingUser } from '#utils/database/dbExistingUser';
 
 export class VCMuteCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -98,9 +98,7 @@ export class VCMuteCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     // Add VC Mute
     if (member.voice.channel !== null) {
@@ -147,9 +145,7 @@ export class VCMuteCommand extends Command {
     }
 
     // Check if mod is in database
-    if (!await userExists(mod.id)) {
-      await addExistingUser(mod);
-    }
+    await addExistingUser(mod);
 
     // Add VC Mute
     if (member.voice.channel !== null) {

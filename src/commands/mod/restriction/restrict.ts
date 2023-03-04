@@ -37,12 +37,7 @@ import type {
   Snowflake,
 } from 'discord.js';
 import IDs from '#utils/ids';
-import {
-  addEmptyUser,
-  updateUser,
-  userExists,
-  fetchRoles,
-} from '#utils/database/dbExistingUser';
+import { addEmptyUser, updateUser, fetchRoles } from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
 import { randint } from '#utils/maths';
 
@@ -220,9 +215,8 @@ export async function restrictRun(
       IDs.roles.nonvegan.convinced,
       IDs.roles.nonvegan.vegCurious,
     ]);
-  } else if (!await userExists(userId)) {
-    await addEmptyUser(userId);
   } else {
+    await addEmptyUser(userId);
     const dbRoles = await fetchRoles(userId);
     if (dbRoles.includes(IDs.roles.vegan.vegan)) {
       section = 5;

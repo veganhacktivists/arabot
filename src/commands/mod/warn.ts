@@ -24,7 +24,7 @@ import type {
   Snowflake,
   Guild,
 } from 'discord.js';
-import { addExistingUser, updateUser, userExists } from '#utils/database/dbExistingUser';
+import { addExistingUser, updateUser } from '#utils/database/dbExistingUser';
 import { addWarn } from '#utils/database/warnings';
 
 /*
@@ -115,9 +115,7 @@ export class WarnCommand extends Command {
       return info;
     }
 
-    if (!(await userExists(userId))) {
-      await addExistingUser(member);
-    }
+    await addExistingUser(member);
 
     await addWarn(userId, modId, reason);
 
