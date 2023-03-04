@@ -95,7 +95,10 @@ export class DailyCommand extends Command {
       content: info.message,
       embeds: info.embeds,
     });
-    await message.react(info.success ? '✅' : '❌');
+
+    if (!info.success) {
+      await message.react('❌');
+    }
   }
 
   private async runDaily(user: User, guild: Guild) {
