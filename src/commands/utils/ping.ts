@@ -19,6 +19,7 @@
 
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
+import type { Message } from 'discord.js';
 
 export class PingCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -47,5 +48,14 @@ export class PingCommand extends Command {
     }
 
     return interaction.editReply('Failed to retrieve ping :(');
+  }
+
+  public async messageRun(message: Message) {
+    const msg = await message.channel.send('Ping?');
+
+    const diff = msg.createdTimestamp - message.createdTimestamp;
+    const ping = Math.round(this.container.client.ws.ping);
+
+    return msg.edit(`Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`);
   }
 }
