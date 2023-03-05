@@ -6,7 +6,7 @@ function xpToNextLevel(level: number, xp: number) {
   return 5 * (level * level) + (50 * level) + 100 - xp;
 }
 
-export async function addXp(userId: Snowflake, xp: number) {
+export async function getUser(userId: Snowflake) {
   const user = await container.database.xp.findUnique({
     where: {
       userId,
@@ -16,6 +16,11 @@ export async function addXp(userId: Snowflake, xp: number) {
       level: true,
     },
   });
+  return user;
+}
+
+export async function addXp(userId: Snowflake, xp: number) {
+  const user = await getUser(userId);
 
   let level = 0;
   if (user !== null
@@ -67,4 +72,48 @@ export async function checkCanAddXp(userId: Snowflake) {
   const cooldown = Time.Minute;
 
   return Date.now() - message.lastMessage.getTime() > cooldown;
+}
+
+export async function getRank(userId: Snowflake) {
+  const user = await getUser(userId);
+
+  const info = {
+    rank: 0,
+    level: 0,
+    xp: 0,
+  };
+
+  if (user === null) {
+    return info;
+  }
+
+  info.rank = await container.database.xp.count({
+    where: {
+      xp: {
+        gte: user.xp,
+      },
+    },
+    orderBy: {
+      xp: 'desc',
+    },
+  });
+
+  const xp = await container.database.xp.findUnique({
+    where: {
+      userId,
+    },
+    select: {
+      level: true,
+      xp: true,
+    },
+  });
+
+  if (xp === null) {
+    return info;
+  }
+
+  info.level = xp.level;
+  info.xp = xp.xp;
+
+  return info;
 }
