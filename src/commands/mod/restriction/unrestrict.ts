@@ -166,7 +166,7 @@ export class UnRestrictCommand extends Command {
       return info;
     }
 
-    // Check if mod is in database
+    // Check if user is in database
     await addExistingUser(member);
 
     const restrictRoles = IDs.roles.restrictions.restricted;

@@ -31,7 +31,7 @@ export class DbLeaveServerListener extends Listener {
   }
 
   public async run(member: GuildMember) {
-    if (!member.roles.cache.hasAny(
+    if (member.roles.cache.hasAny(
       IDs.roles.vegan.vegan,
       IDs.roles.nonvegan.nonvegan,
     )) {
