@@ -1,6 +1,6 @@
 {
   "name": "arabot",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "A Discord bot for Animal Rights Advocates",
   "main": "dist/index.js",
   "scripts": {
@@ -39,8 +39,8 @@
     "@sapphire/time-utilities": "^1.7.8",
     "@sapphire/ts-config": "^3.3.4",
     "@sapphire/utilities": "^3.11.0",
-    "@types/node": "^18.14.2",
-    "bullmq": "^3.9.0",
+    "@types/node": "^18.14.6",
+    "bullmq": "^3.10.1",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "ts-node": "^10.9.1",
@@ -48,8 +48,8 @@
   },
   "devDependencies": {
     "@types/ioredis": "^5.0.0",
-    "@typescript-eslint/eslint-plugin": "^5.54.0",
-    "@typescript-eslint/parser": "^5.54.0",
+    "@typescript-eslint/eslint-plugin": "^5.54.1",
+    "@typescript-eslint/parser": "^5.54.1",
     "eslint": "8.35.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
