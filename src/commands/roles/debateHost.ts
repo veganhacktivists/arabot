@@ -130,6 +130,7 @@ export class DebateHostCommand extends Command {
       await member.roles.remove(debateHost);
       await roleRemoveLog(user.id, mod.id, debateHost);
       info.message = `Removed the ${debateHost.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Debate Host role to the user

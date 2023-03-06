@@ -130,6 +130,7 @@ export class TrustedCommand extends Command {
       await member.roles.remove(trusted);
       await roleRemoveLog(user.id, mod.id, trusted);
       info.message = `Removed the ${trusted.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Trusted role to the user

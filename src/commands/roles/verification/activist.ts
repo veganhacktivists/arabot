@@ -144,6 +144,7 @@ export class ActivistCommand extends Command {
       await member.roles.remove(activist);
       await roleRemoveLog(user.id, mod.id, activist);
       info.message = `Removed the ${activist.name} role from ${user}`;
+      info.success = true;
       return info;
     }
 

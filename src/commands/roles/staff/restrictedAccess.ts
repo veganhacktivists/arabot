@@ -130,6 +130,7 @@ export class RestrictedAccessCommand extends Command {
       await member.roles.remove(restricted);
       await roleRemoveLog(user.id, mod.id, restricted, true);
       info.message = `Removed the ${restricted.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Restricted Access role to the user

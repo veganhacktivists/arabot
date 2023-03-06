@@ -129,6 +129,7 @@ export class BookClubCommand extends Command {
       await member.roles.remove(bookClub);
       await roleRemoveLog(user.id, mod.id, bookClub);
       info.message = `Removed the ${bookClub.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Book Club role to the user

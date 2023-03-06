@@ -129,6 +129,7 @@ export class TrialVerifierCommand extends Command {
       await member.roles.remove(trialVerifier);
       await roleRemoveLog(user.id, mod.id, trialVerifier, true);
       info.message = `Removed the ${trialVerifier.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Trial Verifier role to the user

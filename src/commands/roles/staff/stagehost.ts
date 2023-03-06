@@ -129,6 +129,7 @@ export class StageHostCommand extends Command {
       await member.roles.remove(stageHost);
       await roleRemoveLog(user.id, mod.id, stageHost, true);
       info.message = `Removed the ${stageHost.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Stage Host role to the user

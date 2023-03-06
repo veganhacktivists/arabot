@@ -130,6 +130,7 @@ export class PlusCommand extends Command {
       await member.roles.remove(plus);
       await roleRemoveLog(user.id, mod.id, plus);
       info.message = `Removed the ${plus.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Plus role to the user

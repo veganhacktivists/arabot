@@ -129,6 +129,7 @@ export class GuestCommand extends Command {
       await member.roles.remove(guest);
       await roleRemoveLog(user.id, mod.id, guest);
       info.message = `Removed the ${guest.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Guest role to the user

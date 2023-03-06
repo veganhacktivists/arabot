@@ -129,6 +129,7 @@ export class GameNightHostCommand extends Command {
       await member.roles.remove(gameNightHost);
       await roleRemoveLog(user.id, mod.id, gameNightHost);
       info.message = `Removed the ${gameNightHost.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Game Night Host role to the user

@@ -129,6 +129,7 @@ export class VerifierCommand extends Command {
       await member.roles.remove(verifier);
       await roleRemoveLog(user.id, mod.id, verifier, true);
       info.message = `Removed the ${verifier.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Verifier role to the user

@@ -135,6 +135,7 @@ export class ConvincedCommand extends Command {
       await member.roles.remove(convinced);
       await roleRemoveLog(user.id, mod.id, convinced);
       info.message = `Removed the ${convinced.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Convinced role to the user

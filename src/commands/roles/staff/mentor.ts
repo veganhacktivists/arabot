@@ -130,6 +130,7 @@ export class MentorCommand extends Command {
       await member.roles.remove(mentor);
       await roleRemoveLog(user.id, mod.id, mentor, true);
       info.message = `Removed the ${mentor.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Mentor role to the user

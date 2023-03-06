@@ -141,6 +141,7 @@ export class VegCuriousCommand extends Command {
       await member.roles.remove(vegCurious);
       await roleRemoveLog(user.id, mod.id, vegCurious);
       info.message = `Removed the ${vegCurious.name} role from ${user}`;
+      info.success = true;
       return info;
     }
 

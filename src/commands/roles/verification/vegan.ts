@@ -148,6 +148,7 @@ export class VeganCommand extends Command {
       ]);
       await roleRemoveLog(user.id, mod.id, vegan);
       info.message = `Removed the ${vegan.name} role from ${user}`;
+      info.success = true;
       return info;
     }
 

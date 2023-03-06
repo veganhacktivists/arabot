@@ -129,6 +129,7 @@ export class ModCommand extends Command {
       await member.roles.remove(moderator);
       await roleRemoveLog(user.id, mod.id, moderator, true);
       info.message = `Removed the ${moderator.name} role from ${user}`;
+      info.success = true;
       return info;
     }
     // Add Mod role to the user
