@@ -18,7 +18,14 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import type { GuildMember, Snowflake } from 'discord.js';
+import type {
+  GuildMember,
+  Snowflake,
+  CategoryChannel,
+  Guild,
+  TextChannel,
+} from 'discord.js';
+import { ChannelType } from 'discord.js';
 import { fetchRoles, getLeaveRoles } from '#utils/database/dbExistingUser';
 import { blockTime } from '#utils/database/verification';
 import { checkActive, getSection } from '#utils/database/restriction';
@@ -36,10 +43,26 @@ export class RolesJoinServerListener extends Listener {
   public async run(member: GuildMember) {
     let roles: Snowflake[] = [];
 
+    const privateCategory = member.guild.channels.cache.get(IDs.categories.private);
+
+    if (privateCategory !== undefined
+      && privateCategory.type === ChannelType.GuildCategory) {
+      await this.privateRun(member.id, privateCategory, member.guild);
+    }
+
     // Check if the user is restricted
     if (await checkActive(member.id)) {
       const section = await getSection(member.id);
       roles.push(IDs.roles.restrictions.restricted[section - 1]);
+
+      // Add user to the restricted vegan channel
+      if (section === 5) {
+        const restrictedCategory = member.guild.channels.cache.get(IDs.categories.restricted);
+        if (restrictedCategory !== undefined
+          && restrictedCategory.type === ChannelType.GuildCategory) {
+          await this.restrictRun(member.id, restrictedCategory, member.guild);
+        }
+      }
     } else {
       const logRoles = await getLeaveRoles(member.id);
 
@@ -55,12 +78,57 @@ export class RolesJoinServerListener extends Listener {
     const timeout = await blockTime(member.id);
     if (timeout > 0) {
       roles.push(IDs.roles.verifyBlock);
+    } else if (roles.includes(IDs.roles.verifyBlock)) {
+      const pos = roles.indexOf(IDs.roles.verifyBlock);
+      roles.splice(pos, pos);
     }
 
     // Add roles if they don't have verification block
     if (roles.length > 0) {
       await member.roles.add(roles);
     }
+  }
+
+  private async restrictRun(userId: Snowflake, category: CategoryChannel, guild: Guild) {
+    const textChannels = category.children.cache
+      .filter((c) => c.type === ChannelType.GuildText);
+    textChannels.forEach((c) => {
+      const textChannel = c as TextChannel;
+      // Checks if the channel topic has the user's snowflake
+      if (textChannel.topic?.includes(userId)) {
+        const topic = textChannel.topic.split(' ');
+        const vcId = topic[topic.indexOf(userId) + 1];
+        const voiceChannel = guild.channels.cache.get(vcId);
+
+        if (voiceChannel !== undefined
+          && voiceChannel.parentId === IDs.categories.restricted
+          && voiceChannel.isVoiceBased()) {
+          voiceChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
+        }
+        textChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
+      }
+    });
+  }
+
+  private async privateRun(userId: Snowflake, category: CategoryChannel, guild: Guild) {
+    const textChannels = category.children.cache
+      .filter((c) => c.type === ChannelType.GuildText);
+    textChannels.forEach((c) => {
+      const textChannel = c as TextChannel;
+      // Checks if the channel topic has the user's snowflake
+      if (textChannel.topic?.includes(userId)) {
+        const topic = textChannel.topic.split(' ');
+        const vcId = topic[topic.indexOf(userId) + 2];
+        const voiceChannel = guild.channels.cache.get(vcId);
+
+        if (voiceChannel !== undefined
+          && voiceChannel.parentId === IDs.categories.private
+          && voiceChannel.isVoiceBased()) {
+          voiceChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
+        }
+        textChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
+      }
+    });
   }
 
   private blockedRole(role: Snowflake) {
