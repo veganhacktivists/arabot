@@ -45,6 +45,8 @@ model User {
   LeaveLog              LeaveLog[]
   UserRoleLog           RoleLog[]         @relation("userRoleLog")
   ModRoleLog            RoleLog[]         @relation("modRoleLog")
+  FunLogSender          FunLog[]          @relation("sendFunLog")
+  FunLogReciever        FunLog[]          @relation("receiveFunLog")
   EventLeader           Event[]           @relation("eventLeader")
   StatLeader            Stat[]            @relation("statLeader")
   OutreachParticipation ParticipantStat[] @relation("participantUser")
@@ -158,6 +160,22 @@ model Role {
   name    String
   staff   Boolean
   RoleLog RoleLog[]
+}
+
+model FunLog {
+  id            Int     @id @default(autoincrement())
+  sendUser      User    @relation("sendFunLog", fields: [sendUserId], references: [id])
+  sendUserId    String
+  receiveUser   User?   @relation("receiveFunLog", fields: [receiveUserId], references: [id])
+  receiveUserId String?
+  type          FunType @relation(fields: [typeId], references: [id])
+  typeId        Int
+}
+
+model FunType {
+  id     Int      @id @default(autoincrement())
+  name   String   @unique
+  FunLog FunLog[]
 }
 
 // Outreach
