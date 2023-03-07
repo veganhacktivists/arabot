@@ -20,6 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Hugs } from '#utils/gifs';
+import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class HugCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,19 +49,21 @@ export class HugCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
-    // TODO exception handling
-    const user = interaction.options.getUser('user')!;
-    const hugger = interaction.member!.user;
-    const huggerGuildMember = interaction.guild!.members.cache.get(hugger.id)!;
+    const user = interaction.options.getUser('user', true);
+    const hugger = interaction.user;
+
+    await addFunLog(hugger.id, 'hug', user.id);
+    const count = await countTotal(hugger.id, 'hug', user.id);
 
     // Creates the embed for the hug
     const randomHug = Hugs[Math.floor(Math.random() * Hugs.length)];
     const hugEmbed = new EmbedBuilder()
       .setColor('#0099ff')
-      .setTitle(`Hug from ${huggerGuildMember.displayName}`)
-      .setImage(randomHug);
+      .setTitle(`Hug from ${hugger.username}`)
+      .setImage(randomHug)
+      .setFooter({ text: `Amount of hugs given from ${hugger.username} to you: ${count}` });
 
     // Send the hug
-    await interaction.reply({ content: `<@${user.id}>`, embeds: [hugEmbed], fetchReply: true });
+    await interaction.reply({ content: `${user.id}`, embeds: [hugEmbed], fetchReply: true });
   }
 }

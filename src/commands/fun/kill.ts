@@ -20,6 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Kill } from '#utils/gifs';
+import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class KillCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -48,19 +49,26 @@ export class KillCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
-    // TODO exception handling
-    const user = interaction.options.getUser('user')!;
-    const killer = interaction.member!.user;
-    const killerGuildMember = interaction.guild!.members.cache.get(killer.id)!;
+    const user = interaction.options.getUser('user', true)!;
+    const sender = interaction.user;
+
+    if (user.id === sender.id) {
+      await interaction.reply('You changed your mind');
+      return;
+    }
+
+    await addFunLog(sender.id, 'kill', user.id);
+    const count = await countTotal(sender.id, 'kill', user.id);
 
     // Creates the embed for the kill
     const randomKill = Kill[Math.floor(Math.random() * Kill.length)];
     const killEmbed = new EmbedBuilder()
       .setColor('#ff0000')
-      .setTitle(`Kill from ${killerGuildMember.displayName}`)
-      .setImage(randomKill);
+      .setTitle(`Kill from ${sender.username}`)
+      .setImage(randomKill)
+      .setFooter({ text: `Amount of kills from ${sender.username} to you: ${count}` });
 
     // Send the kill
-    await interaction.reply({ content: `<@${user.id}>`, embeds: [killEmbed], fetchReply: true });
+    await interaction.reply({ content: `${user.id}`, embeds: [killEmbed], fetchReply: true });
   }
 }

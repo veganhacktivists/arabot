@@ -20,6 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { N1984 } from '#utils/gifs';
+import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class N1984Command extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -46,9 +47,10 @@ export class N1984Command extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
-    // TODO exception handling
-    const member = interaction.member!.user;
-    const memberGuildMember = interaction.guild!.members.cache.get(member.id)!;
+    const { user } = interaction;
+
+    await addFunLog(user.id, '1984');
+    const count = await countTotal(user.id, '1984');
 
     // Creates the embed for the 1984 reaction
     // Add a 1 in 1000 chance of Dantas literally making ARA 1984
@@ -56,8 +58,9 @@ export class N1984Command extends Command {
       : N1984[Math.floor(Math.random() * N1984.length)];
     const n1984Embed = new EmbedBuilder()
       .setColor('#ffffff')
-      .setTitle(`${memberGuildMember.displayName} is happy!`)
-      .setImage(random1984);
+      .setTitle(`${user.username} is happy!`)
+      .setImage(random1984)
+      .setFooter({ text: `${user.username}'s 1984 count: ${count}` });
 
     // Send the embed
     await interaction.reply({ embeds: [n1984Embed], fetchReply: true });

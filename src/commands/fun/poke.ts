@@ -20,6 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import { Poke } from '#utils/gifs';
+import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class PokeCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -27,7 +28,6 @@ export class PokeCommand extends Command {
       ...options,
       name: 'poke',
       description: 'Poke a user',
-      preconditions: [['CoordinatorOnly', 'PatreonOnly']],
     });
   }
 
@@ -49,17 +49,19 @@ export class PokeCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
-    // TODO exception handling
-    const user = interaction.options.getUser('user')!;
-    const poker = interaction.member!.user;
-    const pokerGuildMember = interaction.guild!.members.cache.get(poker.id)!;
+    const user = interaction.options.getUser('user', true)!;
+    const sender = interaction.user;
+
+    await addFunLog(sender.id, 'poke', user.id);
+    const count = await countTotal(sender.id, 'poke', user.id);
 
     // Creates the embed for the poke
     const randomPoke = Poke[Math.floor(Math.random() * Poke.length)];
     const pokeEmbed = new EmbedBuilder()
       .setColor('#0099ff')
-      .setTitle(`Poke from ${pokerGuildMember.displayName}`)
-      .setImage(randomPoke);
+      .setTitle(`Poke from ${sender.username}`)
+      .setImage(randomPoke)
+      .setFooter({ text: `Amount of pokes from ${sender.username} to you: ${count}` });
 
     // Send the poke
     await interaction.reply({ content: `<@${user.id}>`, embeds: [pokeEmbed], fetchReply: true });
