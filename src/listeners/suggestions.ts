@@ -46,10 +46,8 @@ export class Suggestions extends Listener {
 
     const suggestion = new EmbedBuilder()
       .setColor('#FFFFFF')
-      .setAuthor({ name: `Suggestion from ${message.author.tag}`, iconURL: `${message.author.displayAvatarURL()}` })
-      .addFields(
-        { name: 'Suggestion:', value: message.content },
-      )
+      .setAuthor({ name: `Suggestion from ${message.author.tag}:`, iconURL: `${message.author.displayAvatarURL()}` })
+      .setDescription(message.content)
       .setTimestamp();
 
     const sent = await mailbox.send({ embeds: [suggestion], content: message.author.toString() });
