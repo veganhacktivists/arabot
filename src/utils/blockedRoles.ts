@@ -19,7 +19,7 @@
 
 import IDs from '#utils/ids';
 
-const blockedRoles = [
+export const blockedRoles = [
   IDs.roles.staff.verifierCoordinator,
   IDs.roles.staff.mentorCoordinator,
   IDs.roles.staff.moderator,
@@ -30,4 +30,13 @@ const blockedRoles = [
   IDs.roles.stageHost,
 ];
 
-export default blockedRoles;
+export const blockedRestrictedRoles = [
+  IDs.roles.vegan.vegan,
+  IDs.roles.vegan.plus,
+  IDs.roles.vegan.activist,
+  IDs.roles.vegan.nvAccess,
+  IDs.roles.trusted,
+  IDs.roles.nonvegan.nonvegan,
+  IDs.roles.nonvegan.convinced,
+  IDs.roles.nonvegan.vegCurious,
+];

@@ -29,7 +29,7 @@ import { ChannelType } from 'discord.js';
 import { fetchRoles, getLeaveRoles } from '#utils/database/dbExistingUser';
 import { blockTime } from '#utils/database/verification';
 import { checkActive, getSection } from '#utils/database/restriction';
-import blockedRoles from '#utils/blockedRoles';
+import { blockedRoles, blockedRestrictedRoles } from '#utils/blockedRoles';
 import IDs from '#utils/ids';
 
 export class RolesJoinServerListener extends Listener {
@@ -41,19 +41,33 @@ export class RolesJoinServerListener extends Listener {
   }
 
   public async run(member: GuildMember) {
-    let roles: Snowflake[] = [];
+    let roles: Snowflake[];
+    const logRoles = await getLeaveRoles(member.id);
 
-    const privateCategory = member.guild.channels.cache.get(IDs.categories.private);
-
-    if (privateCategory !== undefined
-      && privateCategory.type === ChannelType.GuildCategory) {
-      await this.privateRun(member.id, privateCategory, member.guild);
+    // Add roles if not restricted
+    if (logRoles === null) {
+      roles = await fetchRoles(member.id);
+    } else {
+      roles = logRoles.roles.filter(this.blockedRole);
     }
 
     // Check if the user is restricted
     if (await checkActive(member.id)) {
       const section = await getSection(member.id);
-      roles.push(IDs.roles.restrictions.restricted[section - 1]);
+      roles = roles.filter(this.blockedRestrictedRole);
+
+      let includesRestricted = false;
+      roles.forEach((role) => {
+        for (let i = 0; i < IDs.roles.restrictions.restricted.length; i += 1) {
+          if (role === IDs.roles.restrictions.restricted[i]) {
+            includesRestricted = true;
+          }
+        }
+      });
+
+      if (!includesRestricted) {
+        roles.push(IDs.roles.restrictions.restricted[section - 1]);
+      }
 
       // Add user to the restricted vegan channel
       if (section === 5) {
@@ -62,15 +76,6 @@ export class RolesJoinServerListener extends Listener {
           && restrictedCategory.type === ChannelType.GuildCategory) {
           await this.restrictRun(member.id, restrictedCategory, member.guild);
         }
-      }
-    } else {
-      const logRoles = await getLeaveRoles(member.id);
-
-      // Add roles if not restricted
-      if (logRoles === null) {
-        roles = await fetchRoles(member.id);
-      } else {
-        roles = logRoles.roles.filter(this.blockedRole);
       }
     }
 
@@ -86,6 +91,13 @@ export class RolesJoinServerListener extends Listener {
     // Add roles if they don't have verification block
     if (roles.length > 0) {
       await member.roles.add(roles);
+    }
+
+    const privateCategory = member.guild.channels.cache.get(IDs.categories.private);
+
+    if (privateCategory !== undefined
+      && privateCategory.type === ChannelType.GuildCategory) {
+      await this.privateRun(member.id, privateCategory, member.guild);
     }
   }
 
@@ -133,5 +145,9 @@ export class RolesJoinServerListener extends Listener {
 
   private blockedRole(role: Snowflake) {
     return !blockedRoles.includes(role);
+  }
+
+  private blockedRestrictedRole(role: Snowflake) {
+    return !blockedRestrictedRoles.includes(role);
   }
 }
