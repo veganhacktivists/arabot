@@ -40,6 +40,7 @@ import IDs from '#utils/ids';
 import { addEmptyUser, updateUser, fetchRoles } from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
 import { randint } from '#utils/maths';
+import { blockedRolesAfterRestricted } from '#utils/blockedRoles';
 
 export async function restrictRun(
   userId: Snowflake,
@@ -205,16 +206,7 @@ export async function restrictRun(
       await restrictedChannel.send({ embeds: [embed] });
     }
 
-    await member.roles.remove([
-      IDs.roles.vegan.vegan,
-      IDs.roles.vegan.plus,
-      IDs.roles.vegan.activist,
-      IDs.roles.vegan.nvAccess,
-      IDs.roles.trusted,
-      IDs.roles.nonvegan.nonvegan,
-      IDs.roles.nonvegan.convinced,
-      IDs.roles.nonvegan.vegCurious,
-    ]);
+    await member.roles.remove(blockedRolesAfterRestricted);
   } else {
     await addEmptyUser(userId);
     const dbRoles = await fetchRoles(userId);

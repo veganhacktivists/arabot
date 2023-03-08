@@ -29,7 +29,7 @@ import { ChannelType } from 'discord.js';
 import { fetchRoles, getLeaveRoles } from '#utils/database/dbExistingUser';
 import { blockTime } from '#utils/database/verification';
 import { checkActive, getSection } from '#utils/database/restriction';
-import { blockedRoles, blockedRestrictedRoles } from '#utils/blockedRoles';
+import { blockedRoles, blockedRolesAfterRestricted } from '#utils/blockedRoles';
 import IDs from '#utils/ids';
 
 export class RolesJoinServerListener extends Listener {
@@ -148,6 +148,6 @@ export class RolesJoinServerListener extends Listener {
   }
 
   private blockedRestrictedRole(role: Snowflake) {
-    return !blockedRestrictedRoles.includes(role);
+    return !blockedRolesAfterRestricted.includes(role);
   }
 }

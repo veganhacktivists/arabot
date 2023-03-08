@@ -30,7 +30,7 @@ export const blockedRoles = [
   IDs.roles.stageHost,
 ];
 
-export const blockedRestrictedRoles = [
+export const blockedRolesAfterRestricted = [
   IDs.roles.vegan.vegan,
   IDs.roles.vegan.plus,
   IDs.roles.vegan.activist,
