@@ -64,6 +64,6 @@ export class HugCommand extends Command {
       .setFooter({ text: `Amount of hugs given from ${hugger.username} to you: ${count}` });
 
     // Send the hug
-    await interaction.reply({ content: `${user.id}`, embeds: [hugEmbed], fetchReply: true });
+    await interaction.reply({ content: `${user}`, embeds: [hugEmbed], fetchReply: true });
   }
 }

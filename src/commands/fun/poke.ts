@@ -64,6 +64,6 @@ export class PokeCommand extends Command {
       .setFooter({ text: `Amount of pokes from ${sender.username} to you: ${count}` });
 
     // Send the poke
-    await interaction.reply({ content: `<@${user.id}>`, embeds: [pokeEmbed], fetchReply: true });
+    await interaction.reply({ content: `${user}`, embeds: [pokeEmbed], fetchReply: true });
   }
 }

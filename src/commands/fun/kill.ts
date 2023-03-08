@@ -69,6 +69,6 @@ export class KillCommand extends Command {
       .setFooter({ text: `Amount of kills from ${sender.username} to you: ${count}` });
 
     // Send the kill
-    await interaction.reply({ content: `${user.id}`, embeds: [killEmbed], fetchReply: true });
+    await interaction.reply({ content: `${user}`, embeds: [killEmbed], fetchReply: true });
   }
 }
