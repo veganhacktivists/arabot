@@ -44,13 +44,36 @@ export class Suggestions extends Listener {
       return;
     }
 
+    const attachments: string[] = [];
+    let attachmentsString = '';
+
+    message.attachments.forEach((attachment) => {
+      attachments.push(attachment.url);
+      attachmentsString += `${attachment.url}\n`;
+    });
+
     const suggestion = new EmbedBuilder()
       .setColor('#FFFFFF')
       .setAuthor({ name: `Suggestion from ${message.author.tag}:`, iconURL: `${message.author.displayAvatarURL()}` })
-      .setDescription(message.content)
       .setTimestamp();
 
-    const sent = await mailbox.send({ embeds: [suggestion], content: message.author.toString() });
+    if (message.content.length > 0) {
+      suggestion.setDescription(message.content);
+    } else if (attachments.length > 0) {
+      suggestion.setFields({ name: 'Attachments', value: attachmentsString });
+    } else {
+      await message.delete();
+      await message.author.send({
+        content: 'There was an error sending your suggestion, please try again later or contact the devs!',
+      }).catch(() => {});
+      return;
+    }
+
+    const sent = await mailbox.send({
+      embeds: [suggestion],
+      content: message.author.toString(),
+      files: attachments,
+    });
     await message.delete();
 
     await sent.react('👍');
@@ -61,6 +84,7 @@ export class Suggestions extends Listener {
     await message.author.send({
       content: 'Your suggestion has been sent!',
       embeds: [suggestion],
+      files: attachments,
     }).catch(() => {});
   }
 }
