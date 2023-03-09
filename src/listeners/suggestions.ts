@@ -59,6 +59,9 @@ export class Suggestions extends Listener {
 
     if (message.content.length > 0) {
       suggestion.setDescription(message.content);
+      if (attachments.length > 0) {
+        suggestion.setFields({ name: 'Attachments', value: attachmentsString });
+      }
     } else if (attachments.length > 0) {
       suggestion.setFields({ name: 'Attachments', value: attachmentsString });
     } else {
