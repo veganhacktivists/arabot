@@ -13,6 +13,7 @@ export async function getUser(userId: Snowflake) {
     },
     select: {
       xp: true,
+      xpToNextLevel: true,
       level: true,
     },
   });
@@ -21,11 +22,17 @@ export async function getUser(userId: Snowflake) {
 
 export async function addXp(userId: Snowflake, xp: number) {
   const user = await getUser(userId);
+  let xpNextLevel = xp;
 
   let level = 0;
-  if (user !== null
-    && xpToNextLevel(user.level, user.xp + xp) < 0) {
-    level = 1;
+  if (user !== null) {
+    xpNextLevel = xpToNextLevel(user.level, user.xpToNextLevel + xp);
+    if (xpNextLevel < 0) {
+      xpNextLevel = -xpNextLevel;
+      level = 1;
+    } else {
+      xpNextLevel = user.xpToNextLevel + xp;
+    }
   }
 
   await container.database.xp.upsert({
@@ -34,6 +41,7 @@ export async function addXp(userId: Snowflake, xp: number) {
     },
     update: {
       xp: { increment: xp },
+      xpToNextLevel: xpNextLevel,
       level: { increment: level },
       messageCount: { increment: 1 },
       lastMessage: new Date(),
@@ -51,6 +59,7 @@ export async function addXp(userId: Snowflake, xp: number) {
       },
       messageCount: 1,
       xp,
+      xpToNextLevel: xp,
     },
   });
 }
@@ -98,22 +107,8 @@ export async function getRank(userId: Snowflake) {
     },
   });
 
-  const xp = await container.database.xp.findUnique({
-    where: {
-      userId,
-    },
-    select: {
-      level: true,
-      xp: true,
-    },
-  });
-
-  if (xp === null) {
-    return info;
-  }
-
-  info.level = xp.level;
-  info.xp = xp.xp;
+  info.level = user.level;
+  info.xp = user.xp;
 
   return info;
 }

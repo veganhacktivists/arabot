@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Xp" ADD COLUMN     "xpToNextLevel" INTEGER NOT NULL DEFAULT 0;
