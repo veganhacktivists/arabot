@@ -13,7 +13,7 @@ export async function getUser(userId: Snowflake) {
     },
     select: {
       xp: true,
-      xpToNextLevel: true,
+      xpForNextLevel: true,
       level: true,
     },
   });
@@ -22,16 +22,16 @@ export async function getUser(userId: Snowflake) {
 
 export async function addXp(userId: Snowflake, xp: number) {
   const user = await getUser(userId);
-  let xpNextLevel = xp;
+  let xpForNextLevel = xp;
 
   let level = 0;
   if (user !== null) {
-    xpNextLevel = xpToNextLevel(user.level, user.xpToNextLevel + xp);
-    if (xpNextLevel < 0) {
-      xpNextLevel = -xpNextLevel;
+    xpForNextLevel = xpToNextLevel(user.level, user.xpForNextLevel + xp);
+    if (xpForNextLevel < 0) {
+      xpForNextLevel = -xpForNextLevel;
       level = 1;
     } else {
-      xpNextLevel = user.xpToNextLevel + xp;
+      xpForNextLevel = user.xpForNextLevel + xp;
     }
   }
 
@@ -41,7 +41,7 @@ export async function addXp(userId: Snowflake, xp: number) {
     },
     update: {
       xp: { increment: xp },
-      xpToNextLevel: xpNextLevel,
+      xpForNextLevel,
       level: { increment: level },
       messageCount: { increment: 1 },
       lastMessage: new Date(),
@@ -59,7 +59,7 @@ export async function addXp(userId: Snowflake, xp: number) {
       },
       messageCount: 1,
       xp,
-      xpToNextLevel: xp,
+      xpForNextLevel: xp,
     },
   });
 }

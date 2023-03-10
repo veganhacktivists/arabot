@@ -98,13 +98,13 @@ model Verify {
 }
 
 model Xp {
-  user          User     @relation(fields: [userId], references: [id])
-  userId        String   @id
-  level         Int      @default(0)
-  xp            Int      @default(0)
-  xpToNextLevel Int      @default(0)
-  messageCount  Int      @default(0)
-  lastMessage   DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id])
+  userId         String   @id
+  level          Int      @default(0)
+  xp             Int      @default(0)
+  xpForNextLevel Int      @default(0)
+  messageCount   Int      @default(0)
+  lastMessage    DateTime @default(now())
 }
 
 // Economy
