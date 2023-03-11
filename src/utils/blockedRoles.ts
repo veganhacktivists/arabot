@@ -22,6 +22,7 @@ import IDs from '#utils/ids';
 export const blockedRoles = [
   IDs.roles.staff.verifierCoordinator,
   IDs.roles.staff.mentorCoordinator,
+  IDs.roles.staff.restricted,
   IDs.roles.staff.moderator,
   IDs.roles.staff.trialModerator,
   IDs.roles.staff.verifier,
