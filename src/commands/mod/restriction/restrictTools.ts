@@ -66,25 +66,14 @@ export class RestrictToolsCommand extends Subcommand {
   public async deleteChannel(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
-    const modInteraction = interaction.member;
     const { guild, channel } = interaction;
 
     await interaction.deferReply({ ephemeral: true });
 
     // Checks if all the variables are of the right type
-    if (modInteraction === null || guild === null || channel === null) {
+    if (guild === null || channel === null) {
       await interaction.editReply({
         content: 'Error fetching user!',
-      });
-      return;
-    }
-
-    const mod = guild.members.cache.get(modInteraction.user.id);
-
-    // Checks if guildMember is null
-    if (mod === undefined) {
-      await interaction.editReply({
-        content: 'Error fetching moderator!',
       });
       return;
     }

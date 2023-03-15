@@ -68,7 +68,7 @@ export class RenameUserCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    const member = guild.members.cache.get(user?.id);
+    const member = guild.members.cache.get(user.id);
 
     // Checks if guildMember is null
     if (member === undefined) {

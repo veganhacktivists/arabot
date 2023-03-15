@@ -62,21 +62,21 @@ export class VerifyCommand extends Command {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const roles = interaction.options.getString('roles', true);
-    const verifier = interaction.member;
+    const verifier = interaction.user;
     const { guild } = interaction;
     const messageId = interaction.id;
 
     // Checks if all the variables are of the right type
-    if (verifier === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching moderator or guild!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
       return;
     }
 
-    const verify = await this.verify(user, verifier.user.id, roles, messageId, guild);
+    const verify = await this.verify(user, verifier.id, roles, messageId, guild);
 
     await interaction.reply({
       content: verify.message,
@@ -103,13 +103,7 @@ export class VerifyCommand extends Command {
       return;
     }
 
-    const verifier = message.member;
-
-    if (verifier === null) {
-      await message.react('❌');
-      await message.reply('Verifier not found! Try again or contact a developer!');
-      return;
-    }
+    const verifier = message.author;
 
     const { guild } = message;
 
@@ -119,7 +113,7 @@ export class VerifyCommand extends Command {
       return;
     }
 
-    const verify = await this.verify(user, verifier.user.id, roles, message.id, guild);
+    const verify = await this.verify(user, verifier.id, roles, message.id, guild);
 
     await message.reply(verify.message);
     await message.react(verify.success ? '✅' : '❌');

@@ -62,16 +62,14 @@ export class AccessCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
-    const permission = interaction.options.getString('permission');
-    const parsedChannel = interaction.options.getChannel('channel');
+    const permission = interaction.options.getString('permission', true);
+    const parsedChannel = interaction.options.getChannel('channel', true);
     const user = interaction.options.getUser('user');
     const role = interaction.options.getRole('role');
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (permission === null
-      || parsedChannel === null
-      || guild === null
+    if (guild === null
       || (user === null && role === null)) {
       await interaction.reply({
         content: 'Error fetching slash command data!',

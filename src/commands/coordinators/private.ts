@@ -73,34 +73,34 @@ export class PrivateCommand extends Subcommand {
 
   public async create(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
-    const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const user = interaction.options.getUser('user', true);
+    const modUser = interaction.user;
     const { guild } = interaction;
 
     await interaction.deferReply({ ephemeral: true });
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.editReply({
-        content: 'Error fetching user!',
+        content: 'Error fetching mod!',
       });
       return;
     }
 
-    const guildMember = guild.members.cache.get(user.id);
-    const modGuildMember = guild.members.cache.get(mod.user.id);
+    const member = guild.members.cache.get(user.id);
+    const mod = guild.members.cache.get(modUser.id);
 
     // Checks if guildMember is null
-    if (guildMember === undefined || modGuildMember === undefined) {
+    if (member === undefined || mod === undefined) {
       await interaction.editReply({
         content: 'Error fetching users!',
       });
       return;
     }
 
-    const [name, coordinator] = this.getCoordinator(modGuildMember);
+    const [name, coordinator] = this.getCoordinator(mod);
 
-    if (this.checkPrivate(guildMember.id, coordinator, guild)) {
+    if (this.checkPrivate(member.id, coordinator, guild)) {
       await interaction.editReply({
         content: 'A private channel already exists!',
       });
@@ -134,7 +134,7 @@ export class PrivateCommand extends Subcommand {
     let bannedName = false;
     try {
       privateChannel = await guild.channels.create({
-        name: `🍂┃${guildMember.user.username}-private-${name}`,
+        name: `🍂┃${member.user.username}-private-${name}`,
         type: ChannelType.GuildText,
         topic: `Private channel. ${user.id} ${coordinator} ${voiceChannel.id} (Please do not change this)`,
         parent: IDs.categories.private,
@@ -157,7 +157,7 @@ export class PrivateCommand extends Subcommand {
       });
     } catch {
       privateChannel = await guild.channels.create({
-        name: `🍂┃${guildMember.user.id}-private-${name}`,
+        name: `🍂┃${member.user.id}-private-${name}`,
         type: ChannelType.GuildText,
         topic: `Private channel. ${user.id} ${coordinator} ${voiceChannel.id} (Please do not change this)`,
         parent: IDs.categories.private,
@@ -182,19 +182,19 @@ export class PrivateCommand extends Subcommand {
     }
 
     if (!bannedName) {
-      await voiceChannel.setName(`${guildMember.user.username}-private-${name}`);
+      await voiceChannel.setName(`${member.user.username}-private-${name}`);
     } else {
-      await voiceChannel.setName(`${guildMember.user.id}-private-${name}`);
+      await voiceChannel.setName(`${member.user.id}-private-${name}`);
     }
 
-    const joinTime = time(guildMember.joinedAt!);
-    const registerTime = time(guildMember.user.createdAt);
+    const joinTime = time(member.joinedAt!);
+    const registerTime = time(member.user.createdAt);
 
     const embed = new EmbedBuilder()
-      .setColor(guildMember.displayHexColor)
-      .setTitle(`Private channel for ${guildMember.user.username}`)
-      .setDescription(`${guildMember}`)
-      .setThumbnail(guildMember.user.displayAvatarURL())
+      .setColor(member.displayHexColor)
+      .setTitle(`Private channel for ${member.user.username}`)
+      .setDescription(`${member}`)
+      .setThumbnail(member.user.displayAvatarURL())
       .addFields(
         { name: 'Joined:', value: `${joinTime}`, inline: true },
         { name: 'Created:', value: `${registerTime}`, inline: true },
@@ -210,30 +210,30 @@ export class PrivateCommand extends Subcommand {
   public async delete(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
-    const mod = interaction.member;
+    const modUser = interaction.user;
     const { guild, channel } = interaction;
 
     await interaction.deferReply({ ephemeral: true });
 
     // Checks if all the variables are of the right type
-    if (mod === null || guild === null || channel === null) {
+    if (guild === null || channel === null) {
       await interaction.editReply({
         content: 'Error fetching user!',
       });
       return;
     }
 
-    const modGuildMember = guild.members.cache.get(mod.user.id);
+    const mod = guild.members.cache.get(modUser.id);
 
     // Checks if guildMember is null
-    if (modGuildMember === undefined) {
+    if (mod === undefined) {
       await interaction.editReply({
         content: 'Error fetching users!',
       });
       return;
     }
 
-    const coordinatorInfo = this.getCoordinator(modGuildMember);
+    const coordinatorInfo = this.getCoordinator(mod);
     const coordinator = coordinatorInfo[1];
     let topic: string[];
 

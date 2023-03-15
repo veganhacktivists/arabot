@@ -60,13 +60,13 @@ export class UnRestrictCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
-    const mod = interaction.member;
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
       });
       return;
@@ -74,7 +74,7 @@ export class UnRestrictCommand extends Command {
 
     await interaction.deferReply();
 
-    const info = await this.unRestrictRun(user?.id, mod.user.id, guild);
+    const info = await this.unRestrictRun(user?.id, mod.id, guild);
 
     await interaction.editReply({
       content: info.message,
@@ -93,13 +93,7 @@ export class UnRestrictCommand extends Command {
       return;
     }
 
-    const mod = message.member;
-
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
-      return;
-    }
+    const mod = message.author;
 
     const { guild } = message;
 
@@ -111,7 +105,7 @@ export class UnRestrictCommand extends Command {
 
     const channelRun = message.channel;
 
-    const info = await this.unRestrictRun(user?.id, mod.user.id, guild, channelRun.id);
+    const info = await this.unRestrictRun(user?.id, mod.id, guild, channelRun.id);
 
     if (!info.runInVeganRestrict) {
       await message.reply(info.message);

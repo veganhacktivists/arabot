@@ -17,6 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+// TODO This file needs a MASSIVE refactor
+
 import { Args, container, RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import {

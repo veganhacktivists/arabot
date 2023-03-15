@@ -64,13 +64,13 @@ export class BanCommand extends Command {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const reason = interaction.options.getString('reason', true);
-    const mod = interaction.member;
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -79,7 +79,7 @@ export class BanCommand extends Command {
 
     await interaction.deferReply();
 
-    const ban = await this.ban(user.id, mod.user.id, reason, guild);
+    const ban = await this.ban(user.id, mod.id, reason, guild);
 
     await interaction.editReply({ content: ban.message });
   }
@@ -96,17 +96,11 @@ export class BanCommand extends Command {
       return;
     }
     const reason = args.finished ? null : await args.rest('string');
-    const mod = message.member;
+    const mod = message.author;
 
     if (reason === null) {
       await message.react('❌');
       await message.reply('Ban reason was not provided!');
-      return;
-    }
-
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
       return;
     }
 
@@ -125,7 +119,7 @@ export class BanCommand extends Command {
       return;
     }
 
-    const ban = await this.ban(user.id, mod.user.id, reason, guild);
+    const ban = await this.ban(user.id, mod.id, reason, guild);
 
     await message.reply(ban.message);
     await message.react(ban.success ? '✅' : '❌');

@@ -61,13 +61,13 @@ export class UnbanCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
-    const mod = interaction.member;
+    const mod = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -76,7 +76,7 @@ export class UnbanCommand extends Command {
 
     await interaction.deferReply();
 
-    const unban = await this.unban(user.id, mod.user.id, guild);
+    const unban = await this.unban(user.id, mod.id, guild);
 
     await interaction.editReply({ content: unban.message });
   }
@@ -93,13 +93,7 @@ export class UnbanCommand extends Command {
       return;
     }
 
-    const mod = message.member;
-
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
-      return;
-    }
+    const mod = message.author;
 
     const { guild } = message;
 
@@ -109,7 +103,7 @@ export class UnbanCommand extends Command {
       return;
     }
 
-    const unban = await this.unban(user.id, mod.user.id, guild);
+    const unban = await this.unban(user.id, mod.id, guild);
 
     await message.reply(unban.message);
     await message.react(unban.success ? '✅' : '❌');

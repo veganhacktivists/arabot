@@ -55,13 +55,13 @@ export class VCMuteCommand extends Command {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const reason = interaction.options.getString('reason');
-    const modUser = interaction.member;
+    const modUser = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (modUser === null || guild === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching guild!',
         ephemeral: true,
         fetchReply: true,
       });
@@ -70,7 +70,7 @@ export class VCMuteCommand extends Command {
 
     // Gets guildMember whilst removing the ability of each other variables being null
     const member = guild.members.cache.get(user.id);
-    const mod = guild.members.cache.get(modUser.user.id);
+    const mod = guild.members.cache.get(modUser.id);
 
     // Checks if guildMember is null
     if (member === undefined || mod === undefined) {
