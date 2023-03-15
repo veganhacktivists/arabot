@@ -17,7 +17,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { Command, RegisterBehavior } from '@sapphire/framework';
+import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Guild, Message } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import { getRank } from '#utils/database/xp';
@@ -36,7 +36,9 @@ export class RankCommand extends Command {
     registry.registerChatInputCommand(
       (builder) => builder
         .setName(this.name)
-        .setDescription(this.description),
+        .setDescription(this.description)
+        .addUserOption((option) => option.setName('user')
+          .setDescription('User to show rank for')),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -45,7 +47,8 @@ export class RankCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    const { user, guild } = interaction;
+    let user = interaction.options.getUser('user');
+    const { guild } = interaction;
 
     if (guild === null) {
       await interaction.reply({
@@ -53,6 +56,10 @@ export class RankCommand extends Command {
         ephemeral: true,
       });
       return;
+    }
+
+    if (user === null) {
+      user = interaction.user;
     }
 
     await interaction.deferReply();
@@ -65,15 +72,15 @@ export class RankCommand extends Command {
     });
   }
 
-  public async messageRun(message: Message) {
-    const user = message.member?.user;
-    const { guild } = message;
-
-    if (user === undefined) {
-      await message.react('❌');
-      await message.reply('Could not find your user!');
-      return;
+  public async messageRun(message: Message, args: Args) {
+    let user: User;
+    try {
+      user = await args.pick('user');
+    } catch {
+      user = message.author;
     }
+
+    const { guild } = message;
 
     if (guild === null) {
       await message.react('❌');
@@ -99,11 +106,15 @@ export class RankCommand extends Command {
       success: false,
     };
 
-    const member = guild.members.cache.get(user.id);
+    let member = guild.members.cache.get(user.id);
 
     if (member === undefined) {
-      info.message = 'Could not find your guild member!';
-      return info;
+      member = await guild.members.fetch(user.id)
+        .catch(() => undefined);
+      if (member === undefined) {
+        info.message = 'The user is not on this server!';
+        return info;
+      }
     }
 
     const rank = await getRank(user.id);
