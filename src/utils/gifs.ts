@@ -9,7 +9,7 @@ export const Hugs = [
   'https://c.tenor.com/16n9S22q870AAAAC/cute-boy.gif',
   'https://c.tenor.com/cdk8SjH32okAAAAC/dog-pig.gif',
   'https://c.tenor.com/9mLPT5v1ah8AAAAd/how-to-introduce-your-cat-to-a-bunny-cat.gif',
-  'https://tenor.com/view/bear-bruh-bearr-bearrrr-gif-22701476', // Thanks to Jonquil (277429709711605761) <3
+  'https://media.tenor.com/QnzyFMrXfr0AAAAC/bear-bruh.gif', // Thanks to Jonquil (277429709711605761) <3
 ];
 
 export const Kill = [
@@ -18,7 +18,7 @@ export const Kill = [
   'https://c.tenor.com/OzKRQVQWOxgAAAAC/penguin-push.gif',
   'https://c.tenor.com/P3ISPtq4tyMAAAAC/horse-animals.gif',
   'https://c.tenor.com/6BtYZBaOTjsAAAAC/kangaroos-fun.gif',
-  'https://tenor.com/view/kitten-cat-picachu-pokemon-push-gif-17529809',
+  'https://media.tenor.com/ntRZRkjP_2MAAAAC/kitten-cat.gif',
   'https://c.tenor.com/8TfmfQv5lqgAAAAC/doggo-killing-cat.gif',
   'https://c.tenor.com/N1eC5_O9KiAAAAAd/justketh-goose-attack.gif',
   'https://c.tenor.com/lSGhAaUU2iQAAAAC/honk-honk-am-goose-cute.gif',
