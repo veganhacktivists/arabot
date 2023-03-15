@@ -2,7 +2,7 @@ import { container } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import type { Snowflake } from 'discord.js';
 
-function xpToNextLevel(level: number, xp: number) {
+export function xpToNextLevel(level: number, xp: number) {
   return 5 * (level * level) + (50 * level) + 100 - xp;
 }
 
@@ -90,6 +90,7 @@ export async function getRank(userId: Snowflake) {
     rank: 0,
     level: 0,
     xp: 0,
+    xpNextLevel: 0,
   };
 
   if (user === null) {
@@ -109,6 +110,7 @@ export async function getRank(userId: Snowflake) {
 
   info.level = user.level;
   info.xp = user.xp;
+  info.xpNextLevel = user.xpForNextLevel;
 
   return info;
 }

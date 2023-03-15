@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Guild, Message } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
-import { getRank } from '#utils/database/xp';
+import { getRank, xpToNextLevel } from '#utils/database/xp';
 
 export class RankCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -119,13 +119,16 @@ export class RankCommand extends Command {
 
     const rank = await getRank(user.id);
 
+    const xpNextLevel = xpToNextLevel(rank.level, 0);
+
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
       .setAuthor({ name: `${member.displayName}'s Rank`, iconURL: `${user.displayAvatarURL()}` })
       .addFields(
         { name: 'Rank', value: `${rank.rank}` },
-        { name: 'Level', value: `${rank.level}`, inline: true },
-        { name: 'XP', value: `${rank.xp}`, inline: true },
+        { name: 'Level', value: `${rank.level} (${rank.xpNextLevel}/${xpNextLevel} XP)`, inline: true },
+        { name: 'Total XP', value: `${rank.xp}`, inline: true },
+        { name: 'Total messages', value: `${rank.xpNextLevel}` },
       );
 
     info.success = true;
