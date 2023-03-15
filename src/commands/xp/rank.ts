@@ -128,7 +128,7 @@ export class RankCommand extends Command {
         { name: 'Rank', value: `${rank.rank}` },
         { name: 'Level', value: `${rank.level} (${rank.xpNextLevel}/${xpNextLevel} XP)`, inline: true },
         { name: 'Total XP', value: `${rank.xp}`, inline: true },
-        { name: 'Total messages', value: `${rank.xpNextLevel}` },
+        { name: 'Total messages', value: `${rank.messages}` },
       );
 
     info.success = true;

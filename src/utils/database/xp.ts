@@ -15,6 +15,7 @@ export async function getUser(userId: Snowflake) {
       xp: true,
       xpForNextLevel: true,
       level: true,
+      messageCount: true,
     },
   });
   return user;
@@ -91,6 +92,7 @@ export async function getRank(userId: Snowflake) {
     level: 0,
     xp: 0,
     xpNextLevel: 0,
+    messages: 0,
   };
 
   if (user === null) {
@@ -111,6 +113,7 @@ export async function getRank(userId: Snowflake) {
   info.level = user.level;
   info.xp = user.xp;
   info.xpNextLevel = user.xpForNextLevel;
+  info.messages = user.messageCount;
 
   return info;
 }
