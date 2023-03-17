@@ -191,10 +191,11 @@ export class BalanceCommand extends Command {
       }
     }
 
-    embed
+    const logEmbed = new EmbedBuilder(embed.data);
+    logEmbed
       .setTimestamp()
       .setFooter({ text: `ID: ${user.id}` });
-    await logChannel.send({ embeds: [embed] });
+    await logChannel.send({ embeds: [logEmbed] });
     return info;
   }
 }
