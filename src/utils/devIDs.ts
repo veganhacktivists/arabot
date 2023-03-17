@@ -118,6 +118,7 @@ const devIDs = {
     },
     logs: {
       restricted: '999431681217937513',
+      economy: '999431681599623198',
     },
   },
   categories: {

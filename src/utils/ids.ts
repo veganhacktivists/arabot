@@ -121,6 +121,7 @@ let IDs = {
     },
     logs: {
       restricted: '920993034462715925',
+      economy: '932050015034159174',
     },
   },
   categories: {

@@ -21,7 +21,8 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Guild, Message } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { getBalance, transfer } from '#utils/database/economy';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, TextChannel } from 'discord.js';
+import IDs from '#utils/ids';
 
 export class BalanceCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -176,6 +177,24 @@ export class BalanceCommand extends Command {
 
     info.success = true;
     info.embeds.push(embed);
+
+    // Log the payment in the server
+    let logChannel = guild.channels.cache
+      .get(IDs.channels.logs.economy) as TextChannel | undefined;
+
+    if (logChannel === undefined) {
+      logChannel = await guild.channels
+        .fetch(IDs.channels.logs.economy) as TextChannel | undefined;
+      if (logChannel === undefined) {
+        this.container.logger.error('Pay Error: Could not fetch log channel');
+        return info;
+      }
+    }
+
+    embed
+      .setTimestamp()
+      .setFooter({ text: `ID: ${user.id}` });
+    await logChannel.send({ embeds: [embed] });
     return info;
   }
 }
