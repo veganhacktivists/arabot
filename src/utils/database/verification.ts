@@ -229,3 +229,24 @@ export async function blockTime(userId: Snowflake) {
   // Creates the length of the time for the ban
   return (fibonacci(count) * 3600_000) - timeOff;
 }
+
+// Checks if the last verification was completed
+export async function checkVerificationFinish(userId: Snowflake) {
+  const verification = await container.database.verify.findFirst({
+    where: {
+      userId,
+    },
+    orderBy: {
+      id: 'desc',
+    },
+    select: {
+      finishTime: true,
+    },
+  });
+
+  if (verification === null) {
+    return false;
+  }
+
+  return verification.finishTime !== null;
+}
