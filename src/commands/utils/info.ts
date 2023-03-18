@@ -18,7 +18,6 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import IDs from '#utils/ids';
 
 export class InfoCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -28,9 +27,6 @@ export class InfoCommand extends Command {
       description: 'Get more information about this server',
     });
   }
-
-  message = 'If you want to help out in ARA and support animals at the same time, '
-    + 'apply here: https://forms.gle/kgBHbB7LHFUJXhui6 and we\'ll try to get back as soon as possible!';
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
@@ -75,10 +71,12 @@ export class InfoCommand extends Command {
           + 'you can have the role. This depends on your behaviour on the server.';
         break;
       case 'vegCurious':
-        message = 'The veg curious role gives users access to the veg support section where they can access resources '
-          + `from mentors. This allows users to ask for diet related questions in <#${IDs.channels.dietSupport.main}>.\n\n`
-          + 'This role is for for users who are genuinely interested in learning more about a plant-based diet. '
-          + 'If you\'re genuinely interested, approach a member of staff and ask for the role.';
+        message = 'Would you like the Veg Curious role? It will allow you access to our diet support section where our '
+          + 'mentors can assist you. Mentors can provide product or substitution suggestions as well as other advice. '
+          + 'They also host a stage that highlights new recipes weekly which you will get pinged for.\n\n'
+          + 'If you\'re interested in the role, ask a member of staff or DM ModMail for the role. This role is '
+          + 'available for non-vegans and vegans that are genuinely interested in learning more about plant-based '
+          + 'diets!';
         break;
       case 'verification':
         message = 'If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
@@ -86,8 +84,7 @@ export class InfoCommand extends Command {
           + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.';
         break;
       default:
-        message = 'You\'re not supposed to find this here\'s a virtual vegan cookie. Try again or contact a developer '
-          + 'if this continues happening';
+        message = 'You\'re not supposed to find this, here\'s a virtual vegan cookie! :D';
     }
 
     await interaction.reply({
