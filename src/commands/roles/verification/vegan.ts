@@ -145,6 +145,7 @@ export class VeganCommand extends Command {
       await member.roles.remove([
         vegan,
         IDs.roles.vegan.activist,
+        IDs.roles.vegan.nvAccess,
       ]);
       await roleRemoveLog(user.id, mod.id, vegan);
       info.message = `Removed the ${vegan.name} role from ${user}`;
@@ -153,7 +154,8 @@ export class VeganCommand extends Command {
     }
 
     // Add Vegan role to the user
-    await member.roles.add(vegan);
+    await member.roles.add([vegan,
+      IDs.roles.vegan.nvAccess]);
     await member.roles.remove([
       IDs.roles.nonvegan.nonvegan,
       IDs.roles.nonvegan.convinced,
