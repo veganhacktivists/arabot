@@ -74,7 +74,7 @@ export class InfoCommand extends Command {
       case 'vegCurious':
         message = 'Would you like the Veg Curious role? It will allow you access to our diet support section where our '
           + 'mentors can assist you. Mentors can provide product or substitution suggestions as well as other advice. '
-          + 'They also host a stage that highlights new recipes weekly which you will get pinged for.\n\n'
+          + 'They also host a stage that highlights new recipes weekly, which you will get pinged for.\n\n'
           + 'If you\'re interested in the role, ask a member of staff or DM ModMail for the role. This role is '
           + 'available for non-vegans and vegans that are genuinely interested in learning more about plant-based '
           + 'diets!';
