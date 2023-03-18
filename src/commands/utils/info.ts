@@ -41,6 +41,7 @@ export class InfoCommand extends Command {
             { name: 'Trusted', value: 'trusted' },
             { name: 'Veg Curious', value: 'vegCurious' },
             { name: 'Verification', value: 'verification' },
+            { name: 'ModMail', value: 'modMail' },
           ))
         .addBooleanOption((option) => option.setName('visible')
           .setDescription('If you want this this information visible to everyone')),
@@ -82,6 +83,14 @@ export class InfoCommand extends Command {
         message = 'If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
           + 'To do this, hop into the \'Verification\' voice channel.'
           + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.';
+        break;
+      case 'modMail':
+        message = 'If you would like to contact the Moderators privately, the best way to do so would be to send a '
+          + 'ModMail.\n\n'
+          + 'To do so, you will have to DM <@575252669443211264> then send it a message and it will prompt you to '
+          + 'set up ModMail. Once you have set up ModMail, you can send a message and you will have to select this '
+          + 'server to send it to. You will get a message from ModMail saying \'Message Sent\' when we have received '
+          + 'your message!';
         break;
       default:
         message = 'You\'re not supposed to find this, here\'s a virtual vegan cookie! :D';
