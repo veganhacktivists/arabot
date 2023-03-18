@@ -99,6 +99,8 @@ export class RolesJoinServerListener extends Listener {
       && privateCategory.type === ChannelType.GuildCategory) {
       await this.privateRun(member.id, privateCategory, member.guild);
     }
+
+    // TODO add access back to diversity team
   }
 
   private async restrictRun(userId: Snowflake, category: CategoryChannel, guild: Guild) {
