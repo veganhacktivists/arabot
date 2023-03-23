@@ -5,7 +5,8 @@
 - `/ping`/`?ping` - Checks if the bot is alive and the ping of the bot.
 - `/apply`/`?apply` - Gives you the link to where you can apply to be a Moderator or Verifier.
 - `/count`/`?count` - Tells you how many vegans and non-vegans there are on the server.
-- `/info <info>` - Gives you information based on what you pick in `<info>`.
+- `/info <info> <optional: visible>` - Gives you information based on what you pick in `<info>`. If you make `visible` 
+true, it will make the information visible to everyone.
 
 ## Economy
 
