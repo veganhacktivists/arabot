@@ -7,6 +7,7 @@
 - `/count`/`?count` - Tells you how many vegans and non-vegans there are on the server.
 - `/info <info> <optional: visible>` - Gives you information based on what you pick in `<info>`. If you make `visible` 
 true, it will make the information visible to everyone.
+- `/help`/`?help` - Gives a link (here) to all the commands.
 
 ## Economy
 
