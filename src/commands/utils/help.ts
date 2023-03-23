@@ -15,6 +15,7 @@
  */
 
 import { Command } from '@sapphire/framework';
+import { EmbedBuilder } from 'discord.js';
 import type { Message } from 'discord.js';
 
 export class HelpCommand extends Command {
@@ -33,14 +34,16 @@ export class HelpCommand extends Command {
       .setDescription(this.description));
   }
 
-  message = 'For a list of all the commands, visit: https://github.com/veganhacktivists/arabot/blob/main/docs/COMMANDS.md';
+  embed = new EmbedBuilder()
+    .setColor(0x0099FF)
+    .setDescription('For a list of all the commands, click [here](https://github.com/veganhacktivists/arabot/blob/main/docs/COMMANDS.md)');
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    return interaction.reply(this.message);
+    return interaction.reply({ embeds: [this.embed] });
   }
 
   public async messageRun(message: Message) {
-    return message.channel.send(this.message);
+    return message.reply({ embeds: [this.embed] });
   }
 }
