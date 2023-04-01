@@ -35,9 +35,15 @@ export class VerifyReminder extends ScheduledTask {
 
     const channel = client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel;
 
+    await channel.send('H-hewwo?? If uu want to haz da vegan ow activist wowe, uu\'ww need to do a voice vewification. To do this, hop into da \'Vewification\' voice channew.\n'
+      + '\n'
+      + 'If thewe awen\'t any vewifiews avaiwabwe, uu\'ww be disconnected, and uu can wejoin watew. (๑•́ ₃ •̀๑)');
+
+    /*
     await channel.send('If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
       + 'To do this, hop into the \'Verification\' voice channel.'
       + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.');
+     */
   }
 }
 
