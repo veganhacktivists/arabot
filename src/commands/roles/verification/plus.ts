@@ -29,7 +29,7 @@ export class PlusCommand extends Command {
       name: 'plus',
       aliases: ['+'],
       description: 'Give/remove the plus role',
-      preconditions: ['CoordinatorOnly'],
+      preconditions: [['CoordinatorOnly', 'ModOnly']],
     });
   }
 
@@ -60,12 +60,11 @@ export class PlusCommand extends Command {
       await interaction.reply({
         content: 'Error fetching guild!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
 
     const info = await this.managePlus(user, mod, guild);
 
