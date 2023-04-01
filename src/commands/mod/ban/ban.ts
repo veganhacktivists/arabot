@@ -77,7 +77,7 @@ export class BanCommand extends Command {
       return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const ban = await this.ban(user.id, mod.id, reason, guild);
 

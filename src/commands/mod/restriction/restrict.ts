@@ -316,7 +316,7 @@ export class RestrictCommand extends Command {
       return;
     }
 
-    await interaction.deferReply();
+    await interaction.deferReply({ ephemeral: true });
 
     const info = await restrictRun(user?.id, mod.id, reason, guild);
 
