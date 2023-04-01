@@ -31,7 +31,7 @@ export class AprilMessageListener extends Listener {
   public async run(message: Message) {
     if (Math.random() < 0.01) {
       await message.react('<a:dantasvibe:976309036754538676>');
-    } else if (Math.random() > 0.098) {
+    } else if (Math.random() > 0.98) {
       await message.channel.send('anthony is the worst coordinator, fucking demote them already');
     } else if (Math.random() > 0.99) {
       await message.reply('owo');
