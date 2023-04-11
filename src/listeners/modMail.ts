@@ -20,6 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import { ChannelType, EmbedBuilder } from 'discord.js';
 import type { GuildChannel } from 'discord.js';
+import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
 import { getRestrictions } from '#utils/database/restriction';
 import { findNotes } from '#utils/database/sus';
@@ -28,7 +29,6 @@ export class ModMailCreateListener extends Listener {
   public constructor(context: Listener.Context, options: Listener.Options) {
     super(context, {
       ...options,
-      once: true,
       event: 'channelCreate',
     });
   }
@@ -45,11 +45,11 @@ export class ModMailCreateListener extends Listener {
     const { guild } = channel;
 
     // Get the channel topic
-    const { topic } = channel;
-    if (topic === null) return;
+    if (channel.topic === null) return;
+    const topic = channel.topic.split(' ');
 
     // Get the user's ID
-    const userId = topic.split(' ')[2];
+    const userId = topic[2];
 
     // Check if the user is restricted on the database
     const restrictions = await getRestrictions(userId);
@@ -118,6 +118,8 @@ export class ModMailCreateListener extends Listener {
       });
     }
 
-    channel.send({ embeds: [restrictEmbed, susEmbed] });
+    // Set a timeout for 1 second and then send the 2 embeds
+    await setTimeout(1000);
+    await channel.send({ embeds: [restrictEmbed, susEmbed] });
   }
 }

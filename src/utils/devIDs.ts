@@ -123,7 +123,7 @@ const devIDs = {
   },
   categories: {
     staff: '999431676058927253',
-    modMail: '999431676633563236',
+    modMail: '1095453371411996762',
     verification: '999431677006860409',
     diversity: '999431679053660185',
     private: '999431679527628818',
