@@ -22,7 +22,7 @@ import { ChannelType, EmbedBuilder } from 'discord.js';
 import type { GuildChannel } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
-import { getRestrictions } from '#utils/database/restriction';
+import { checkActive, getRestrictions } from '#utils/database/restriction';
 import { findNotes } from '#utils/database/sus';
 
 export class ModMailCreateListener extends Listener {
@@ -51,7 +51,10 @@ export class ModMailCreateListener extends Listener {
     // Get the user's ID
     const userId = topic[2];
 
-    // Check if the user is restricted on the database
+    // Check if the user is currently restricted on the database
+    if (!await checkActive(userId)) return;
+
+    // Get the restriction logs
     const restrictions = await getRestrictions(userId);
     if (restrictions.length === 0) return;
 
