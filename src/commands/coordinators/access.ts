@@ -170,42 +170,41 @@ export class AccessCommand extends Command {
           });
           return;
       }
-      return;
-    }
-
-    // Set permissions of text channel
-    switch (permission) {
-      case 'add':
-        await channel.permissionOverwrites.create(permId, {
-          ViewChannel: true,
-          SendMessages: true,
-          ReadMessageHistory: true,
-        });
-        break;
-      case 'view':
-        await channel.permissionOverwrites.create(permId, {
-          ViewChannel: true,
-          SendMessages: false,
-          AddReactions: false,
-          ReadMessageHistory: true,
-        });
-        break;
-      case 'remove':
-        await channel.permissionOverwrites.create(permId, {
-          ViewChannel: false,
-          SendMessages: false,
-          ReadMessageHistory: false,
-        });
-        break;
-      case 'reset':
-        await channel.permissionOverwrites.delete(permId);
-        break;
-      default:
-        await interaction.reply({
-          content: 'Incorrect permission option!',
-          ephemeral: true,
-        });
-        return;
+    } else {
+      // Set permissions of text channel
+      switch (permission) {
+        case 'add':
+          await channel.permissionOverwrites.create(permId, {
+            ViewChannel: true,
+            SendMessages: true,
+            ReadMessageHistory: true,
+          });
+          break;
+        case 'view':
+          await channel.permissionOverwrites.create(permId, {
+            ViewChannel: true,
+            SendMessages: false,
+            AddReactions: false,
+            ReadMessageHistory: true,
+          });
+          break;
+        case 'remove':
+          await channel.permissionOverwrites.create(permId, {
+            ViewChannel: false,
+            SendMessages: false,
+            ReadMessageHistory: false,
+          });
+          break;
+        case 'reset':
+          await channel.permissionOverwrites.delete(permId);
+          break;
+        default:
+          await interaction.reply({
+            content: 'Incorrect permission option!',
+            ephemeral: true,
+          });
+          return;
+      }
     }
 
     await interaction.reply(`Successfully updated permissions for ${channel}`);
