@@ -18,7 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, TextChannel, VoiceChannel } from 'discord.js';
+import { ChannelType } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class AccessCommand extends Command {
@@ -61,80 +61,63 @@ export class AccessCommand extends Command {
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
-    // Get the arguments
-    const permission = interaction.options.getString('permission', true);
-    const parsedChannel = interaction.options.getChannel('channel', true);
-    const user = interaction.options.getUser('user');
-    const role = interaction.options.getRole('role');
-    const { guild } = interaction;
-
-    // Checks if all the variables are of the right type
-    if (guild === null
-      || (user === null && role === null)) {
+    // Check that the command was run in the Guild
+    if (!interaction.inCachedGuild()) {
       await interaction.reply({
-        content: 'Error fetching slash command data!',
+        content: 'This command can only be run in a server!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
+    // Get the arguments
+    const permission = interaction.options.getString('permission', true);
+    const channel = interaction.options.getChannel('channel', true);
+    const user = interaction.options.getUser('user');
+    const role = interaction.options.getRole('role');
+
+    // Checks if all the variables are of the right type
+    if (user === null && role === null) {
+      await interaction.reply({
+        content: 'Error fetching slash command data!',
+        ephemeral: true,
+      });
+      return;
+    }
+
+    // If user and role is provided, the return an error
     if (user !== null && role !== null) {
       await interaction.reply({
         content: 'You have entered a user and a role at the same time! Please only enter one at a time.',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
-    if (parsedChannel.type !== ChannelType.GuildText
-      && parsedChannel.type !== ChannelType.GuildVoice) {
+    // Checks that the channel is a GuildText or GuildVoice, otherwise, return error
+    if (channel.type !== ChannelType.GuildText
+      && channel.type !== ChannelType.GuildVoice) {
       await interaction.reply({
         content: 'Please only select a text or voice channel!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
-    let channel: TextChannel | VoiceChannel | undefined;
-    if (parsedChannel.type === ChannelType.GuildVoice) {
-      channel = guild.channels.cache.get(parsedChannel.id) as VoiceChannel | undefined;
-    } else {
-      channel = guild.channels.cache.get(parsedChannel.id) as TextChannel | undefined;
-    }
-
-    if (channel === undefined) {
-      await interaction.reply({
-        content: 'Could not find channel!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
-    }
-
+    // If the channel is not in the categories ModMail, Private, Restricted, the return error
     if (channel.parentId !== IDs.categories.modMail
       && channel.parentId !== IDs.categories.private
       && channel.parentId !== IDs.categories.restricted) {
       await interaction.reply({
         content: 'Channel is not in ModMail/Private/Restricted category!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
+    // Create variable for either User or Role to update permissions for
     let permId: string;
     if (user !== null) {
-      if (user.id === undefined) {
-        await interaction.reply({
-          content: 'Error getting user id!',
-          ephemeral: true,
-          fetchReply: true,
-        });
-        return;
-      }
       permId = user.id;
     } else if (role !== null) {
       permId = role.id;
@@ -142,11 +125,11 @@ export class AccessCommand extends Command {
       await interaction.reply({
         content: 'Could not find the role to edit permissions!',
         ephemeral: true,
-        fetchReply: true,
       });
       return;
     }
 
+    // Set permissions of voice channel
     if (channel.type === ChannelType.GuildVoice) {
       switch (permission) {
         case 'add':
@@ -184,13 +167,13 @@ export class AccessCommand extends Command {
           await interaction.reply({
             content: 'Incorrect permission option!',
             ephemeral: true,
-            fetchReply: true,
           });
           return;
       }
       return;
     }
 
+    // Set permissions of text channel
     switch (permission) {
       case 'add':
         await channel.permissionOverwrites.create(permId, {
@@ -221,14 +204,10 @@ export class AccessCommand extends Command {
         await interaction.reply({
           content: 'Incorrect permission option!',
           ephemeral: true,
-          fetchReply: true,
         });
         return;
     }
 
-    await interaction.reply({
-      content: `Successfully updated permissions for ${channel}`,
-      fetchReply: true,
-    });
+    await interaction.reply(`Successfully updated permissions for ${channel}`);
   }
 }
