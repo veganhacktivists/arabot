@@ -22,7 +22,7 @@
 
 import { GatewayIntentBits } from 'discord.js';
 import { LogLevel, SapphireClient, container } from '@sapphire/framework';
-import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
+import '@sapphire/plugin-scheduled-tasks/register';
 import '@sapphire/plugin-logger/register';
 import { PrismaClient } from '@prisma/client';
 import 'dotenv/config';
@@ -47,14 +47,11 @@ const client = new SapphireClient({
     GatewayIntentBits.MessageContent,
   ],
   tasks: {
-    // Scheduler with redis
-    strategy: new ScheduledTaskRedisStrategy({
-      bull: {
-        connection: {
-          host: 'redis',
-        },
+    bull: {
+      connection: {
+        host: 'redis',
       },
-    }),
+    },
   },
 });
 
