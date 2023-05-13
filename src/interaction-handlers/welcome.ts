@@ -17,7 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { InteractionHandler, InteractionHandlerTypes, PieceContext } from '@sapphire/framework';
+import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
+import type { PieceContext } from '@sapphire/framework';
 import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 

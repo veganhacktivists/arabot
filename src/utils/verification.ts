@@ -22,12 +22,12 @@ import {
   CategoryChannel,
   ChannelType,
   GuildMember,
-  PermissionsBitField, Snowflake,
+  PermissionsBitField,
   TextChannel,
   time,
   User,
-  VoiceBasedChannel,
 } from 'discord.js';
+import type { Snowflake, VoiceBasedChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export async function createVerificationText(

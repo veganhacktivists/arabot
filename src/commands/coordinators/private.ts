@@ -19,13 +19,13 @@
 
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import type { Guild, TextChannel } from 'discord.js';
+import type { Guild, TextChannel, Snowflake } from 'discord.js';
 import {
   CategoryChannel,
   ChannelType,
   EmbedBuilder,
   GuildMember,
-  PermissionsBitField, Snowflake,
+  PermissionsBitField,
   time,
 } from 'discord.js';
 import IDs from '#utils/ids';

@@ -26,9 +26,8 @@ import {
   GuildMember,
   Message,
   PermissionsBitField,
-  Snowflake,
 } from 'discord.js';
-import type { TextChannel } from 'discord.js';
+import type { TextChannel, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class DiversityCommand extends Subcommand {

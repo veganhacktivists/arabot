@@ -26,6 +26,7 @@ import type {
   VoiceState,
   GuildMember,
   Guild,
+  Snowflake,
 } from 'discord.js';
 import {
   time,
@@ -35,7 +36,7 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ActionRowBuilder,
-  EmbedBuilder, Snowflake,
+  EmbedBuilder,
 } from 'discord.js';
 import {
   createVerificationText,
