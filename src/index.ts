@@ -50,7 +50,7 @@ const client = new SapphireClient({
   tasks: {
     bull: {
       connection: {
-        host: 'localhost',
+        host: process.env.BULLMQ_URL,
       },
     },
   },
