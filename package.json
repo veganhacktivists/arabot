@@ -43,6 +43,7 @@
     "bullmq": "^3.14.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
+    "redis": "^4.6.6",
     "ts-node": "^10.9.1",
     "typescript": "^5.0.4"
   },
