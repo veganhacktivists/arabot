@@ -25,7 +25,6 @@ import { LogLevel, SapphireClient, container } from '@sapphire/framework';
 import '@sapphire/plugin-scheduled-tasks/register';
 import '@sapphire/plugin-logger/register';
 import { PrismaClient } from '@prisma/client';
-import 'dotenv/config';
 
 // Setting up the Sapphire client
 const client = new SapphireClient({
@@ -49,7 +48,7 @@ const client = new SapphireClient({
   tasks: {
     bull: {
       connection: {
-        host: 'redis',
+        host: process.env.REDIS_URL,
       },
     },
   },
