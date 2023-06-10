@@ -30,7 +30,7 @@
   "homepage": "https://github.com/veganhacktivists/arabot#readme",
   "dependencies": {
     "@prisma/client": "^4.14.1",
-    "@sapphire/discord.js-utilities": "^6.1.0",
+    "@sapphire/discord.js-utilities": "^7.0.0",
     "@sapphire/framework": "^4.4.4",
     "@sapphire/plugin-logger": "^3.0.4",
     "@sapphire/plugin-scheduled-tasks": "^7.1.0",
