@@ -40,7 +40,7 @@
     "@sapphire/ts-config": "^4.0.0",
     "@sapphire/utilities": "^3.11.2",
     "@types/node": "^20.2.5",
-    "bullmq": "^3.14.0",
+    "bullmq": "^4.0.0",
     "discord.js": "^14.11.0",
     "dotenv": "^16.0.3",
     "redis": "^4.6.6",
