@@ -130,14 +130,24 @@ export class VegCuriousCommand extends Command {
       return info;
     }
 
-    // Checks if the user is Veg Curious and to give them or remove them based on if they have it
-    if (member.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
-      if (!modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
+    // Checks if the command can only be run by Mentor Coordinators
+    if (!modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
+      // Only Mentor Coordinators can remove Veg Curious role
+      if (member.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
         info.message = 'You need to be a mentor coordinator to remove this role!';
         return info;
       }
 
-      // Remove the Veg Curious role from the user
+      // Only Mentor Coordinators can give vegans Veg Curious role
+      if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        info.message = 'You need to be a mentor coordinator to give vegans this role!';
+        return info;
+      }
+    }
+
+    // Checks if the user is Veg Curious and to give them or remove them based on if they have it
+    // Remove the Veg Curious role from the user
+    if (member.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
       await member.roles.remove(vegCurious);
       await roleRemoveLog(user.id, mod.id, vegCurious);
       info.message = `Removed the ${vegCurious.name} role from ${user}`;
