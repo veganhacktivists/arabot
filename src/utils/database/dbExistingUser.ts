@@ -21,7 +21,11 @@ import type { GuildMember, GuildMemberRoleManager, Snowflake } from 'discord.js'
 import { container } from '@sapphire/framework';
 import IDs from '#utils/ids';
 
-// Checks if the user exists on the database
+/**
+ * Checks if the user exists on the User table in the database
+ * @param {string} userId Snowflake for the user being checked
+ * @return {boolean} If the user was found
+ */
 export async function userExists(userId: Snowflake) {
   // Counts if the user is on the database by their snowflake
   const userQuery = await container.database.user.findFirst({
@@ -37,6 +41,11 @@ export async function userExists(userId: Snowflake) {
   return userQuery !== null;
 }
 
+/**
+ * Convert GuildMemberRoleManager to a dictionary of roles
+ * @param roles The user's GuildMemberRoleManager
+ * @return Dictionary of roles specific for the server
+ */
 function getRoles(roles: GuildMemberRoleManager) {
   // Checks what roles the user has
   const rolesDict = {
@@ -53,7 +62,10 @@ function getRoles(roles: GuildMemberRoleManager) {
   return rolesDict;
 }
 
-// Adds the user to the database if they were already on the server before the bot/database
+/**
+ * Add user to the database, if they have not been added beforehand
+ * @param {GuildMember} member GuildMember for the user to be added to the database
+ */
 export async function addExistingUser(member: GuildMember) {
   // Checks if user exists on the database
   if (await userExists(member.id)) {
@@ -79,7 +91,12 @@ export async function addExistingUser(member: GuildMember) {
   });
 }
 
-// Add an empty user to database in case they are not on the server
+/**
+ * Only add the snowflake of the user to the User database. This could be used for
+ * cases where the user is not on the server, and they may have needed moderation
+ * action done on them.
+ * @param {string} userId Snowflake of the user to be added to the User table
+ */
 export async function addEmptyUser(userId: Snowflake) {
   // Checks if the user exists on the database
   if (await userExists(userId)) {
@@ -94,6 +111,11 @@ export async function addEmptyUser(userId: Snowflake) {
   });
 }
 
+/**
+ * Updates the roles of the user on the User table. This can also be used to create
+ * a user onto the User table if they do not exist.
+ * @param {GuildMember} member The user to be updated on the User table
+ */
 export async function updateUser(member: GuildMember) {
   // Parse all the roles into a dictionary
   const roles = getRoles(member.roles);
@@ -126,6 +148,11 @@ export async function updateUser(member: GuildMember) {
   });
 }
 
+/**
+ * Gets the roles that the user that is on the User table.
+ * @param {string} userId Snowflake of the user to fetch roles from
+ * @return {Snowflake[]} Array of Role Snowflakes
+ */
 export async function fetchRoles(userId: Snowflake) {
   // Get the user's roles
   const roleQuery = await container.database.user.findUnique({
@@ -175,6 +202,10 @@ export async function fetchRoles(userId: Snowflake) {
   return roles;
 }
 
+/**
+ * Log the roles that a user had when leaving the server onto the database.
+ * @param {GuildMember} member The user who left the server
+ */
 export async function logLeaving(member: GuildMember) {
   const roles: Snowflake[] = [];
   member.roles.cache.forEach((role) => {
@@ -195,6 +226,11 @@ export async function logLeaving(member: GuildMember) {
   });
 }
 
+/**
+ * Get the roles that the user had prior to when they left the server.
+ * @param {string} userId Snowflake of the user who joined the server
+ * @return {string[]} Array of Role Snowflakes
+ */
 export async function getLeaveRoles(userId: Snowflake) {
   const roles = container.database.leaveLog.findFirst({
     where: {
