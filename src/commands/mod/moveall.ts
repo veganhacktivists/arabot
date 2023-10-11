@@ -31,7 +31,7 @@ export class MoveAllCommand extends Command {
       name: 'moveall',
       aliases: ['mvall'],
       description: 'Moves everyone from one voice channel to the specified one',
-      preconditions: ['CoordinatorOnly'],
+      preconditions: [['CoordinatorOnly', 'ModOnly']],
     });
   }
 
