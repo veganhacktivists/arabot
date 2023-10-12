@@ -142,7 +142,7 @@ export class BalanceCommand extends Command {
 
     // Check the amount to be paid is greater than 0
     if (amount < 1) {
-      info.message = 'You need to actually give money, you can\'t send nothing or try to break the'
+      info.message = 'You need to actually give money, you can\'t send nothing or try to break the '
           + 'economy 😭';
       return info;
     }
