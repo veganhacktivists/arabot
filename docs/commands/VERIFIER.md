@@ -28,3 +28,4 @@ These are roles you can give/take away from users.
 
 - `/vegan <user>`/`?v <user>` - Give the vegan role
 - `/activist <user>`/`?a <user>` - Gives the activist role
+- `/aravegan <user`/`?aravegan <user>` - Gives the ARA vegan role
