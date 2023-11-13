@@ -29,3 +29,4 @@ a user, it will display that user's rank instead.
 - `/poke`
 - `/sad`
 - `/shrug`
+- `/cringe`

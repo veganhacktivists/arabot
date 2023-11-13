@@ -9,7 +9,7 @@ export const Hugs = [
   'https://c.tenor.com/16n9S22q870AAAAC/cute-boy.gif',
   'https://c.tenor.com/cdk8SjH32okAAAAC/dog-pig.gif',
   'https://c.tenor.com/9mLPT5v1ah8AAAAd/how-to-introduce-your-cat-to-a-bunny-cat.gif',
-  'https://media.tenor.com/QnzyFMrXfr0AAAAC/bear-bruh.gif', // Thanks to Jonquil (277429709711605761) <3
+  'https://c.tenor.com/QnzyFMrXfr0AAAAC/bear-bruh.gif', // Thanks to Jonquil (277429709711605761) <3
 ];
 
 export const Kill = [
@@ -18,7 +18,7 @@ export const Kill = [
   'https://c.tenor.com/OzKRQVQWOxgAAAAC/penguin-push.gif',
   'https://c.tenor.com/P3ISPtq4tyMAAAAC/horse-animals.gif',
   'https://c.tenor.com/6BtYZBaOTjsAAAAC/kangaroos-fun.gif',
-  'https://media.tenor.com/ntRZRkjP_2MAAAAC/kitten-cat.gif',
+  'https://c.tenor.com/ntRZRkjP_2MAAAAC/kitten-cat.gif',
   'https://c.tenor.com/8TfmfQv5lqgAAAAC/doggo-killing-cat.gif',
   'https://c.tenor.com/N1eC5_O9KiAAAAAd/justketh-goose-attack.gif',
   'https://c.tenor.com/lSGhAaUU2iQAAAAC/honk-honk-am-goose-cute.gif',
@@ -67,4 +67,17 @@ export const Shrug = [
 export const N1984 = [
   'https://c.tenor.com/dcxOO-080OcAAAAd/discord-moderators.gif',
   'https://c.tenor.com/-cUS-fPIEBsAAAAd/5second-slow-mode-1984.gif',
+];
+
+export const Cringe = [
+  'https://c.tenor.com/bgR1joaDW6AAAAAd/modcheck-discord.gif',
+  'https://c.tenor.com/cF6QU65nSpoAAAAd/cringe.gif',
+  'https://c.tenor.com/6COELe56B8IAAAAC/confused-turn-around.gif',
+  'https://c.tenor.com/tEEjB0RnxyAAAAAC/puppet-awkward.gif',
+  'https://c.tenor.com/VNlo9wZpYvsAAAAd/bruh.gif',
+  'https://c.tenor.com/BuS697n_PjMAAAAC/squidward-squidward-tentacles.gif',
+  'https://c.tenor.com/_BiwWBWhYucAAAAd/what-huh.gif',
+  'https://c.tenor.com/Zm4UTU5fw2UAAAAd/bruh.gif',
+  'https://c.tenor.com/d7Xd91nKnDUAAAAC/my-eyes-ugly.gif',
+  'https://c.tenor.com/bzpFHIbvpJMAAAAd/cat-bruh.gif',
 ];
