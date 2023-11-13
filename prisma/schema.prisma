@@ -47,6 +47,7 @@ model User {
   ModRoleLog            RoleLog[]         @relation("modRoleLog")
   FunLogSender          FunLog[]          @relation("sendFunLog")
   FunLogReciever        FunLog[]          @relation("receiveFunLog")
+  Counting              Counting[]        @relation("counting")
   EventLeader           Event[]           @relation("eventLeader")
   StatLeader            Stat[]            @relation("statLeader")
   OutreachParticipation ParticipantStat[] @relation("participantUser")
@@ -177,6 +178,13 @@ model FunType {
   id     Int      @id @default(autoincrement())
   name   String   @unique
   FunLog FunLog[]
+}
+
+model Counting {
+  id     Int    @id @default(autoincrement())
+  user   User   @relation("counting", fields: [userId], references: [id])
+  userId String
+  number Int // This is the number that the user has counted, if the count failed, the number should be 0
 }
 
 // Outreach

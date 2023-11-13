@@ -110,6 +110,9 @@ const devIDs = {
       potgm: '999431679053660189',
       disabilities: '999431679527628810',
     },
+    misc: {
+      counting: '1172905446227595314',
+    },
     restricted: {
       welcome: '999431679812845655',
       moderators: '999431679812845656',
