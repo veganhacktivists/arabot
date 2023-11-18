@@ -19,7 +19,6 @@
 
 import devIDs from '#utils/devIDs';
 
-// eslint-disable-next-line import/no-mutable-exports
 let IDs = {
   roles: {
     trusted: '731563158011117590',
@@ -136,8 +135,6 @@ let IDs = {
     restricted: '809765577236283472',
   },
 };
-
-require('dotenv').config();
 
 // Check if the bot is in development mode
 if (process.env.DEVELOPMENT === 'true') {
