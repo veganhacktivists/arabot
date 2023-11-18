@@ -20,10 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import { ButtonStyle, ActionRowBuilder, ButtonBuilder } from 'discord.js';
 
-import type {
-  Client,
-  TextChannel,
-} from 'discord.js';
+import type { Client, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class VerificationReady extends Listener {
@@ -37,9 +34,13 @@ export class VerificationReady extends Listener {
 
   public async run(client: Client) {
     // Get verification category
-    let welcome = client.channels.cache.get(IDs.channels.welcome) as TextChannel | undefined;
+    let welcome = client.channels.cache.get(IDs.channels.welcome) as
+      | TextChannel
+      | undefined;
     if (welcome === undefined) {
-      welcome = await client.channels.fetch(IDs.channels.welcome) as TextChannel | undefined;
+      welcome = (await client.channels.fetch(IDs.channels.welcome)) as
+        | TextChannel
+        | undefined;
       if (welcome === undefined) {
         this.container.logger.error('verifyStart: Welcome not found');
         return;
@@ -50,19 +51,19 @@ export class VerificationReady extends Listener {
     const messages = await welcome.messages.fetch();
     const message = messages.first();
 
-    const content = '**To continue and unlock more channels, please click \'Join\':**'
-      + '\n\n**Important:** If you want to get the vegan role, you will need to pass voice verification. '
-      + 'You can do this by joining the \'Verification\' voice channel after clicking the button below. '
-      + 'You\'ll chat with one of our verifiers who will just ask you a few questions before approving your Vegan role. '
-      + 'Vegans have access to more channels. Voice discussions may be recorded.';
+    const content =
+      "**To continue and unlock more channels, please click 'Join':**" +
+      '\n\n**Important:** If you want to get the vegan role, you will need to pass voice verification. ' +
+      "You can do this by joining the 'Verification' voice channel after clicking the button below. " +
+      "You'll chat with one of our verifiers who will just ask you a few questions before approving your Vegan role. " +
+      'Vegans have access to more channels. Voice discussions may be recorded.';
 
-    const button = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId('welcomeJoin')
-          .setLabel('Join')
-          .setStyle(ButtonStyle.Success),
-      );
+    const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId('welcomeJoin')
+        .setLabel('Join')
+        .setStyle(ButtonStyle.Success),
+    );
 
     if (message?.author.id !== botId) {
       await welcome.send({

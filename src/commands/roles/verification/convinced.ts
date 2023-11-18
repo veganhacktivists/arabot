@@ -36,12 +36,16 @@ export class ConvincedCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give convinced to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give convinced to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -143,10 +147,13 @@ export class ConvincedCommand extends Command {
     await roleAddLog(user.id, mod.id, convinced);
     info.message = `Gave ${user} the ${convinced.name} role!`;
 
-    await user.send(`You have been given the ${convinced.name} role by ${mod}!`
-      + '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan '
-      + 'and other parts of the server! :)'
-      + '\n\nThank you for caring about the animals 💚')
+    await user
+      .send(
+        `You have been given the ${convinced.name} role by ${mod}!` +
+          '\n\nThis role allows you to get access to the Diet Support section in this server that can help you go vegan ' +
+          'and other parts of the server! :)' +
+          '\n\nThank you for caring about the animals 💚',
+      )
       .catch(() => {});
 
     info.success = true;

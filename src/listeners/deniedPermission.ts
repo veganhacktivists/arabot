@@ -17,7 +17,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { UserError, ChatInputCommandDeniedPayload } from '@sapphire/framework';
+import type {
+  UserError,
+  ChatInputCommandDeniedPayload,
+} from '@sapphire/framework';
 import { Listener } from '@sapphire/framework';
 
 export class CommandDeniedListener extends Listener {

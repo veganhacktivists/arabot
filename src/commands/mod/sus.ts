@@ -75,36 +75,64 @@ export class SusCommand extends Subcommand {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        // Subcommand to add a sus note
-        .addSubcommand((command) => command.setName('add')
-          .setDescription('Add a sus note about a user')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to add the note')
-            .setRequired(true))
-          .addStringOption((option) => option.setName('note')
-            .setDescription('Note about the user')
-            .setRequired(true)))
-        // Subcommand to list sus notes
-        .addSubcommand((command) => command.setName('view')
-          .setDescription('View a sus note for a user')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to view the note of')
-            .setRequired(true)))
-        // Subcommand to remove a specific sus note
-        .addSubcommand((command) => command.setName('remove')
-          .setDescription('Remove a specific sus note')
-          .addIntegerOption((option) => option.setName('id')
-            .setDescription('Sus note ID')
-            .setRequired(true)))
-        // Subcommand to remove all sus notes
-        .addSubcommand((command) => command.setName('purge')
-          .setDescription('Remove all sus notes from a user')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to remove the note from')
-            .setRequired(true))),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          // Subcommand to add a sus note
+          .addSubcommand((command) =>
+            command
+              .setName('add')
+              .setDescription('Add a sus note about a user')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to add the note')
+                  .setRequired(true),
+              )
+              .addStringOption((option) =>
+                option
+                  .setName('note')
+                  .setDescription('Note about the user')
+                  .setRequired(true),
+              ),
+          )
+          // Subcommand to list sus notes
+          .addSubcommand((command) =>
+            command
+              .setName('view')
+              .setDescription('View a sus note for a user')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to view the note of')
+                  .setRequired(true),
+              ),
+          )
+          // Subcommand to remove a specific sus note
+          .addSubcommand((command) =>
+            command
+              .setName('remove')
+              .setDescription('Remove a specific sus note')
+              .addIntegerOption((option) =>
+                option
+                  .setName('id')
+                  .setDescription('Sus note ID')
+                  .setRequired(true),
+              ),
+          )
+          // Subcommand to remove all sus notes
+          .addSubcommand((command) =>
+            command
+              .setName('purge')
+              .setDescription('Remove all sus notes from a user')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to remove the note from')
+                  .setRequired(true),
+              ),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -202,7 +230,11 @@ export class SusCommand extends Subcommand {
       .setThumbnail(user.displayAvatarURL());
 
     // Add up to 10 of the latest sus notes to the embed
-    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+    for (
+      let i = notes.length > 10 ? notes.length - 10 : 0;
+      i < notes.length;
+      i += 1
+    ) {
       // Get mod name
       let mod = notes[i].modId;
       const modMember = guild.members.cache.get(mod);
@@ -212,7 +244,11 @@ export class SusCommand extends Subcommand {
 
       // Add sus note to embed
       noteEmbed.addFields({
-        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        name: `Sus ID: ${
+          notes[i].id
+        } | Moderator: ${mod} | Date: <t:${Math.floor(
+          notes[i].time.getTime() / 1000,
+        )}>`,
         value: notes[i].note,
       });
     }
@@ -285,22 +321,23 @@ export class SusCommand extends Subcommand {
       .setTitle(`Sus note for ${userName}`)
       .setThumbnail(member.displayAvatarURL())
       .addFields({
-        name: `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(note.time.getTime() / 1000)}>`,
+        name: `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(
+          note.time.getTime() / 1000,
+        )}>`,
         value: note.note,
       });
 
     // Create buttons to delete or cancel the deletion
-    const buttons = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId(`delete${noteId}`)
-          .setLabel('Delete')
-          .setStyle(ButtonStyle.Danger),
-        new ButtonBuilder()
-          .setCustomId(`cancel${noteId}`)
-          .setLabel('Cancel')
-          .setStyle(ButtonStyle.Secondary),
-      );
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`delete${noteId}`)
+        .setLabel('Delete')
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId(`cancel${noteId}`)
+        .setLabel('Cancel')
+        .setStyle(ButtonStyle.Secondary),
+    );
 
     // Sends the note to verify this note is to be deleted
     const message = await interaction.reply({
@@ -350,7 +387,9 @@ export class SusCommand extends Subcommand {
     });
   }
 
-  public async removeAllNotes(interaction: Subcommand.ChatInputCommandInteraction) {
+  public async removeAllNotes(
+    interaction: Subcommand.ChatInputCommandInteraction,
+  ) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const { guild, channel } = interaction;
@@ -398,7 +437,11 @@ export class SusCommand extends Subcommand {
       .setThumbnail(user.displayAvatarURL());
 
     // Add up to 10 of the latest sus notes to the embed
-    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+    for (
+      let i = notes.length > 10 ? notes.length - 10 : 0;
+      i < notes.length;
+      i += 1
+    ) {
       // Get mod name
       let mod = notes[i].modId;
       const modGuildMember = guild.members.cache.get(mod);
@@ -407,23 +450,26 @@ export class SusCommand extends Subcommand {
       }
       // Add sus note to embed
       noteEmbed.addFields({
-        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        name: `Sus ID: ${
+          notes[i].id
+        } | Moderator: ${mod} | Date: <t:${Math.floor(
+          notes[i].time.getTime() / 1000,
+        )}>`,
         value: notes[i].note,
       });
     }
 
     // Create buttons to delete or cancel the deletion
-    const buttons = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId(`delete${user.id}`)
-          .setLabel('Delete')
-          .setStyle(ButtonStyle.Danger),
-        new ButtonBuilder()
-          .setCustomId(`cancel${user.id}`)
-          .setLabel('Cancel')
-          .setStyle(ButtonStyle.Secondary),
-      );
+    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId(`delete${user.id}`)
+        .setLabel('Delete')
+        .setStyle(ButtonStyle.Danger),
+      new ButtonBuilder()
+        .setCustomId(`cancel${user.id}`)
+        .setLabel('Cancel')
+        .setStyle(ButtonStyle.Secondary),
+    );
 
     // Sends the note to verify this note is to be deleted
     const message = await interaction.reply({
@@ -491,7 +537,9 @@ export class SusCommand extends Subcommand {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply(
+        'Moderator not found! Try again or contact a developer!',
+      );
       return;
     }
 

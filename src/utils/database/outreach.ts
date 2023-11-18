@@ -81,7 +81,11 @@ export async function addStatUser(statId: number, userId: Snowflake) {
   });
 }
 
-export async function createStat(eventId: number, leaderId: Snowflake, roleId: Snowflake) {
+export async function createStat(
+  eventId: number,
+  leaderId: Snowflake,
+  roleId: Snowflake,
+) {
   await container.database.stat.create({
     data: {
       event: {
@@ -115,12 +119,12 @@ export async function createStat(eventId: number, leaderId: Snowflake, roleId: S
 export async function updateStats(
   statId: number,
   stats: {
-    vegan: number,
-    considered: number,
-    antiVegan: number,
-    thanked: number,
-    documentary: number,
-    educated: number,
+    vegan: number;
+    considered: number;
+    antiVegan: number;
+    thanked: number;
+    documentary: number;
+    educated: number;
   },
 ) {
   await container.database.stat.update({
@@ -221,11 +225,9 @@ export async function createTypes() {
 }
 
 export async function setupTypes() {
-  const types = [
-    'Discord Outreach',
-  ];
+  const types = ['Discord Outreach'];
 
-  if (types.length === await countTypes()) {
+  if (types.length === (await countTypes())) {
     return;
   }
 

@@ -37,7 +37,9 @@ export class RestrictedAccessOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkRestrictedAccess(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkRestrictedAccess(interaction.member! as GuildMember);
   }

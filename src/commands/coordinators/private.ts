@@ -53,18 +53,31 @@ export class PrivateCommand extends Subcommand {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addSubcommand((command) => command.setName('create')
-          .setDescription('Create a private channel')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to create a private channel with')
-            .setRequired(true)))
-        .addSubcommand((command) => command.setName('delete')
-          .setDescription('Delete a private channel')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to delete a private channel from'))),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addSubcommand((command) =>
+            command
+              .setName('create')
+              .setDescription('Create a private channel')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to create a private channel with')
+                  .setRequired(true),
+              ),
+          )
+          .addSubcommand((command) =>
+            command
+              .setName('delete')
+              .setDescription('Delete a private channel')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to delete a private channel from'),
+              ),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -122,10 +135,12 @@ export class PrivateCommand extends Subcommand {
         },
         {
           id: coordinator,
-          allow: [PermissionsBitField.Flags.SendMessages,
+          allow: [
+            PermissionsBitField.Flags.SendMessages,
             PermissionsBitField.Flags.ViewChannel,
             PermissionsBitField.Flags.Connect,
-            PermissionsBitField.Flags.MuteMembers],
+            PermissionsBitField.Flags.MuteMembers,
+          ],
         },
       ],
     });
@@ -150,8 +165,10 @@ export class PrivateCommand extends Subcommand {
           },
           {
             id: coordinator,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel],
+            allow: [
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+            ],
           },
         ],
       });
@@ -173,8 +190,10 @@ export class PrivateCommand extends Subcommand {
           },
           {
             id: coordinator,
-            allow: [PermissionsBitField.Flags.SendMessages,
-              PermissionsBitField.Flags.ViewChannel],
+            allow: [
+              PermissionsBitField.Flags.SendMessages,
+              PermissionsBitField.Flags.ViewChannel,
+            ],
           },
         ],
       });
@@ -240,21 +259,23 @@ export class PrivateCommand extends Subcommand {
     if (user === null) {
       if (channel.type !== ChannelType.GuildText) {
         await interaction.editReply({
-          content: 'Please make sure you ran this command in the original private text channel!',
+          content:
+            'Please make sure you ran this command in the original private text channel!',
         });
         return;
       }
 
       if (channel.parentId !== IDs.categories.private) {
         await interaction.editReply({
-          content: 'Please make sure you ran this command in the original private text channel!',
+          content:
+            'Please make sure you ran this command in the original private text channel!',
         });
         return;
       }
 
       if (channel.topic === null) {
         await interaction.editReply({
-          content: 'There was an error with this channel\'s topic!',
+          content: "There was an error with this channel's topic!",
         });
         return;
       }
@@ -265,15 +286,18 @@ export class PrivateCommand extends Subcommand {
       const vcId = topic[topic.indexOf(coordinator) + 1];
       const voiceChannel = guild.channels.cache.get(vcId);
 
-      if (voiceChannel !== undefined
-        && voiceChannel.parentId === IDs.categories.private) {
+      if (
+        voiceChannel !== undefined &&
+        voiceChannel.parentId === IDs.categories.private
+      ) {
         await voiceChannel.delete();
       }
 
       return;
     }
-    const category = guild.channels.cache
-      .get(IDs.categories.private) as CategoryChannel | undefined;
+    const category = guild.channels.cache.get(IDs.categories.private) as
+      | CategoryChannel
+      | undefined;
 
     if (category === undefined) {
       await interaction.editReply({
@@ -282,7 +306,9 @@ export class PrivateCommand extends Subcommand {
       return;
     }
 
-    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
@@ -291,8 +317,10 @@ export class PrivateCommand extends Subcommand {
         const vcId = topic[topic.indexOf(coordinator) + 1];
         const voiceChannel = guild.channels.cache.get(vcId);
 
-        if (voiceChannel !== undefined
-          && voiceChannel.parentId === IDs.categories.private) {
+        if (
+          voiceChannel !== undefined &&
+          voiceChannel.parentId === IDs.categories.private
+        ) {
           voiceChannel.delete();
         }
         textChannel.delete();
@@ -333,19 +361,25 @@ export class PrivateCommand extends Subcommand {
   }
 
   private checkPrivate(user: Snowflake, coordinator: string, guild: Guild) {
-    const category = guild.channels.cache
-      .get(IDs.categories.private) as CategoryChannel | undefined;
+    const category = guild.channels.cache.get(IDs.categories.private) as
+      | CategoryChannel
+      | undefined;
 
     if (category === undefined) {
       return true;
     }
 
-    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     let exists = false;
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
-      if (textChannel.topic?.includes(user) && textChannel.topic?.includes(coordinator)) {
+      if (
+        textChannel.topic?.includes(user) &&
+        textChannel.topic?.includes(coordinator)
+      ) {
         exists = true;
       }
     });

@@ -112,7 +112,11 @@ export async function getSection(userId: Snowflake) {
 }
 
 // This is only for restrictions created with the old bot
-export async function unRestrictLegacy(userId: Snowflake, modId: Snowflake, section: number) {
+export async function unRestrictLegacy(
+  userId: Snowflake,
+  modId: Snowflake,
+  section: number,
+) {
   await container.database.restrict.create({
     data: {
       user: {
@@ -130,7 +134,8 @@ export async function unRestrictLegacy(userId: Snowflake, modId: Snowflake, sect
           id: modId,
         },
       },
-      reason: 'This user was restricted with the old bot. Restrict reason, time and mod unknown, check old bot logs.',
+      reason:
+        'This user was restricted with the old bot. Restrict reason, time and mod unknown, check old bot logs.',
       section,
       endTime: new Date(),
     },

@@ -33,14 +33,18 @@ export class ClearCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addIntegerOption((option) => option.setName('messages')
-          .setDescription('Number of messages to clear')
-          .setRequired(true)
-          .setMinValue(1)
-          .setMaxValue(100)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addIntegerOption((option) =>
+            option
+              .setName('messages')
+              .setDescription('Number of messages to clear')
+              .setRequired(true)
+              .setMinValue(1)
+              .setMaxValue(100),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -53,8 +57,7 @@ export class ClearCommand extends Command {
     const messages = interaction.options.getInteger('messages', true);
     const { channel } = interaction;
 
-    if (channel === null
-      || channel.isDMBased()) {
+    if (channel === null || channel.isDMBased()) {
       await interaction.reply({
         content: 'Could not fetch channel!',
         ephemeral: true,
@@ -89,8 +92,7 @@ export class ClearCommand extends Command {
 
     const { channel } = message;
 
-    if (!channel.isTextBased()
-      || channel.isDMBased()) {
+    if (!channel.isTextBased() || channel.isDMBased()) {
       await message.react('❌');
       await message.reply('Unsupported channel type!');
       return;

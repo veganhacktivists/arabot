@@ -32,8 +32,7 @@ export class BanJoinListener extends Listener {
 
   public async run(user: GuildMember) {
     // Check if the user is banned
-    if (!await checkBan(user.id)
-      && !await checkTempBan(user.id)) {
+    if (!(await checkBan(user.id)) && !(await checkTempBan(user.id))) {
       return;
     }
 
@@ -41,8 +40,11 @@ export class BanJoinListener extends Listener {
     const reason = await getBanReason(user.id);
 
     // Send DM for ban reason
-    await user.send(`You have been banned from ARA for: ${reason}`
-      + '\n\nhttps://vbcamp.org/ARA')
+    await user
+      .send(
+        `You have been banned from ARA for: ${reason}` +
+          '\n\nhttps://vbcamp.org/ARA',
+      )
       .catch(() => {});
 
     // Ban the user

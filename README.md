@@ -14,7 +14,6 @@ Make sure to create the .env file, which you can use the [.env.example](.env.exa
 
 There are 2 options for running this bot, one using docker-compose and the other, less desirable npm.
 
-
 ### Docker
 
 Running the bot Dockerised makes everything easier. To run the bot, run:
@@ -28,11 +27,13 @@ docker-compose up -d
 Make sure to run `npm install` if you just cloned the repo.
 
 Then make sure to compile the TypeScript files using
+
 ```shell
 npm run build
 ```
 
 If you are running the code for the first time with a new database, make sure to run `npm run start:migrate`, otherwise run:
+
 ```shell
 npm start
 ```
@@ -66,4 +67,4 @@ For support, feel free to send an email to anthony@aramovement.org or reach out 
 
 This bot is free and open source. It licensed using [GPL v3](LICENSE).
 
-Well done on making it to the bottom of the README file :) 
+Well done on making it to the bottom of the README file :)

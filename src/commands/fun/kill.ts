@@ -34,12 +34,16 @@ export class KillCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User you want to kill')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User you want to kill')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -66,9 +70,15 @@ export class KillCommand extends Command {
       .setColor('#ff0000')
       .setTitle(`Kill from ${sender.username}`)
       .setImage(randomKill)
-      .setFooter({ text: `Amount of kills from ${sender.username} to you: ${count}` });
+      .setFooter({
+        text: `Amount of kills from ${sender.username} to you: ${count}`,
+      });
 
     // Send the kill
-    await interaction.reply({ content: `${user}`, embeds: [killEmbed], fetchReply: true });
+    await interaction.reply({
+      content: `${user}`,
+      embeds: [killEmbed],
+      fetchReply: true,
+    });
   }
 }

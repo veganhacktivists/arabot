@@ -35,12 +35,16 @@ export class TrialVerifierCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove trial verifier role')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give/remove trial verifier role')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -86,7 +90,9 @@ export class TrialVerifierCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Verifier coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Verifier coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -137,7 +143,8 @@ export class TrialVerifierCommand extends Command {
     await roleAddLog(user.id, mod.id, trialVerifier, true);
     info.message = `Gave ${user} the ${trialVerifier.name} role!`;
 
-    await user.send(`You have been given the ${trialVerifier.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${trialVerifier.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

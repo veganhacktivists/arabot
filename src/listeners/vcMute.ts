@@ -35,7 +35,9 @@ export class VCMuteListener extends Listener {
       const { member } = newState;
 
       if (member === null) {
-        this.container.logger.error('VCMute Listener - GuildMember not found when joining');
+        this.container.logger.error(
+          'VCMute Listener - GuildMember not found when joining',
+        );
         return;
       }
 
@@ -45,7 +47,7 @@ export class VCMuteListener extends Listener {
       }
 
       // Check if user is muted on the database
-      if (!await checkActive(member.id)) {
+      if (!(await checkActive(member.id))) {
         return;
       }
 
@@ -59,12 +61,14 @@ export class VCMuteListener extends Listener {
       const { member } = newState;
 
       if (member === null) {
-        this.container.logger.error('VCMute Listener - GuildMember not found when unmuting');
+        this.container.logger.error(
+          'VCMute Listener - GuildMember not found when unmuting',
+        );
         return;
       }
 
       // Check if user is muted on the database
-      if (!await checkActive(member.id)) {
+      if (!(await checkActive(member.id))) {
         return;
       }
 

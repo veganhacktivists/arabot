@@ -34,11 +34,13 @@ export class RankCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to show rank for')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option.setName('user').setDescription('User to show rank for'),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -109,8 +111,7 @@ export class RankCommand extends Command {
     let member = guild.members.cache.get(user.id);
 
     if (member === undefined) {
-      member = await guild.members.fetch(user.id)
-        .catch(() => undefined);
+      member = await guild.members.fetch(user.id).catch(() => undefined);
       if (member === undefined) {
         info.message = 'The user is not on this server!';
         return info;
@@ -123,10 +124,17 @@ export class RankCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
-      .setAuthor({ name: `${member.displayName}'s Rank`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `${member.displayName}'s Rank`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'Rank', value: `${rank.rank}` },
-        { name: 'Level', value: `${rank.level} (${rank.xpNextLevel}/${xpNextLevel} XP)`, inline: true },
+        {
+          name: 'Level',
+          value: `${rank.level} (${rank.xpNextLevel}/${xpNextLevel} XP)`,
+          inline: true,
+        },
         { name: 'Total XP', value: `${rank.xp}`, inline: true },
         { name: 'Total messages', value: `${rank.messages}` },
       );

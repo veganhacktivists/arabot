@@ -37,7 +37,9 @@ export class DevCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkDevCoordinator(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkDevCoordinator(interaction.member! as GuildMember);
   }

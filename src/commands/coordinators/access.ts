@@ -26,7 +26,8 @@ export class AccessCommand extends Command {
     super(context, {
       ...options,
       name: 'access',
-      description: 'Manages channel permissions for ModMails, Private channels, and restricted channels',
+      description:
+        'Manages channel permissions for ModMails, Private channels, and restricted channels',
       preconditions: ['CoordinatorOnly'],
     });
   }
@@ -34,25 +35,38 @@ export class AccessCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addStringOption((option) => option.setName('permission')
-          .setDescription('Select permissions for the user/role')
-          .setRequired(true)
-          .addChoices(
-            { name: 'Add', value: 'add' },
-            { name: 'Read', value: 'read' },
-            { name: 'Remove', value: 'remove' },
-            { name: 'Reset', value: 'reset' },
-          ))
-        .addChannelOption((option) => option.setName('channel')
-          .setDescription('Channel to change these permissions on')
-          .setRequired(true))
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to set these permissions for'))
-        .addRoleOption((option) => option.setName('role')
-          .setDescription('Role to set these permissions for')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addStringOption((option) =>
+            option
+              .setName('permission')
+              .setDescription('Select permissions for the user/role')
+              .setRequired(true)
+              .addChoices(
+                { name: 'Add', value: 'add' },
+                { name: 'Read', value: 'read' },
+                { name: 'Remove', value: 'remove' },
+                { name: 'Reset', value: 'reset' },
+              ),
+          )
+          .addChannelOption((option) =>
+            option
+              .setName('channel')
+              .setDescription('Channel to change these permissions on')
+              .setRequired(true),
+          )
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to set these permissions for'),
+          )
+          .addRoleOption((option) =>
+            option
+              .setName('role')
+              .setDescription('Role to set these permissions for'),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -88,15 +102,18 @@ export class AccessCommand extends Command {
     // If user and role is provided, the return an error
     if (user !== null && role !== null) {
       await interaction.reply({
-        content: 'You have entered a user and a role at the same time! Please only enter one at a time.',
+        content:
+          'You have entered a user and a role at the same time! Please only enter one at a time.',
         ephemeral: true,
       });
       return;
     }
 
     // Checks that the channel is a GuildText or GuildVoice, otherwise, return error
-    if (channel.type !== ChannelType.GuildText
-      && channel.type !== ChannelType.GuildVoice) {
+    if (
+      channel.type !== ChannelType.GuildText &&
+      channel.type !== ChannelType.GuildVoice
+    ) {
       await interaction.reply({
         content: 'Please only select a text or voice channel!',
         ephemeral: true,
@@ -105,9 +122,11 @@ export class AccessCommand extends Command {
     }
 
     // If the channel is not in the categories ModMail, Private, Restricted, the return error
-    if (channel.parentId !== IDs.categories.modMail
-      && channel.parentId !== IDs.categories.private
-      && channel.parentId !== IDs.categories.restricted) {
+    if (
+      channel.parentId !== IDs.categories.modMail &&
+      channel.parentId !== IDs.categories.private &&
+      channel.parentId !== IDs.categories.restricted
+    ) {
       await interaction.reply({
         content: 'Channel is not in ModMail/Private/Restricted category!',
         ephemeral: true,

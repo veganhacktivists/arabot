@@ -52,7 +52,7 @@ export class ModMailCreateListener extends Listener {
     const userId = topic[2];
 
     // Check if the user is currently restricted on the database
-    if (!await checkActive(userId)) return;
+    if (!(await checkActive(userId))) return;
 
     // Get the restriction logs
     const restrictions = await getRestrictions(userId);
@@ -66,9 +66,11 @@ export class ModMailCreateListener extends Listener {
       .setFooter({ text: `ID: ${userId}` });
 
     // Add up to 10 of the latest restrictions to the embed
-    for (let i = restrictions.length > 10 ? restrictions.length - 10 : 0;
+    for (
+      let i = restrictions.length > 10 ? restrictions.length - 10 : 0;
       i < restrictions.length;
-      i += 1) {
+      i += 1
+    ) {
       // Get mod names
       let restMod = restrictions[i].modId;
       const restModMember = guild.members.cache.get(restMod);
@@ -91,7 +93,9 @@ export class ModMailCreateListener extends Listener {
         restTitle += 'Currently Restricted | ';
       }
 
-      restTitle += `Date: <t:${Math.floor(restrictions[i].startTime.getTime() / 1000)}>`;
+      restTitle += `Date: <t:${Math.floor(
+        restrictions[i].startTime.getTime() / 1000,
+      )}>`;
 
       restrictEmbed.addFields({
         name: restTitle,
@@ -107,7 +111,11 @@ export class ModMailCreateListener extends Listener {
       .setTitle(`${notes.length} sus notes`);
 
     // Add up to 10 of the latest sus notes to the embed
-    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+    for (
+      let i = notes.length > 10 ? notes.length - 10 : 0;
+      i < notes.length;
+      i += 1
+    ) {
       // Get mod name
       const modGuildMember = guild.members.cache.get(notes[i].modId);
       let mod = notes[i].modId;
@@ -116,7 +124,11 @@ export class ModMailCreateListener extends Listener {
       }
       // Add sus note to embed
       susEmbed.addFields({
-        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        name: `Sus ID: ${
+          notes[i].id
+        } | Moderator: ${mod} | Date: <t:${Math.floor(
+          notes[i].time.getTime() / 1000,
+        )}>`,
         value: notes[i].note,
       });
     }

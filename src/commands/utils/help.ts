@@ -29,14 +29,16 @@ export class HelpCommand extends Command {
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
-    registry.registerChatInputCommand((builder) => builder
-      .setName(this.name)
-      .setDescription(this.description));
+    registry.registerChatInputCommand((builder) =>
+      builder.setName(this.name).setDescription(this.description),
+    );
   }
 
   embed = new EmbedBuilder()
-    .setColor(0x0099FF)
-    .setDescription('For a list of all the commands, click [here](https://github.com/veganhacktivists/arabot/blob/main/docs/COMMANDS.md)');
+    .setColor(0x0099ff)
+    .setDescription(
+      'For a list of all the commands, click [here](https://github.com/veganhacktivists/arabot/blob/main/docs/COMMANDS.md)',
+    );
 
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {

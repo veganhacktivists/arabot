@@ -38,12 +38,16 @@ export class MoveAllCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addChannelOption((option) => option.setName('channel')
-          .setDescription('The channel to move everyone to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addChannelOption((option) =>
+            option
+              .setName('channel')
+              .setDescription('The channel to move everyone to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -59,8 +63,10 @@ export class MoveAllCommand extends Command {
 
     await interaction.deferReply({ ephemeral: true });
 
-    if (channel.type !== ChannelType.GuildVoice
-      && channel.type !== ChannelType.GuildStageVoice) {
+    if (
+      channel.type !== ChannelType.GuildVoice &&
+      channel.type !== ChannelType.GuildStageVoice
+    ) {
       await interaction.editReply({
         content: 'The channel you provided is not a voice channel!',
       });
@@ -100,8 +106,7 @@ export class MoveAllCommand extends Command {
 
     const voice = guild.channels.cache.get(mod.voice.channelId);
 
-    if (voice === undefined
-      || !voice.isVoiceBased()) {
+    if (voice === undefined || !voice.isVoiceBased()) {
       await interaction.editReply({
         content: 'Error fetching your current voice channel!',
       });
@@ -138,7 +143,9 @@ export class MoveAllCommand extends Command {
 
     if (mod.voice.channelId === null) {
       await message.react('❌');
-      await message.reply('You need to be in a voice channel to run this command!');
+      await message.reply(
+        'You need to be in a voice channel to run this command!',
+      );
       return;
     }
 
@@ -150,8 +157,7 @@ export class MoveAllCommand extends Command {
 
     const voice = guild.channels.cache.get(mod.voice.channelId);
 
-    if (voice === undefined
-      || !voice.isVoiceBased()) {
+    if (voice === undefined || !voice.isVoiceBased()) {
       await message.react('❌');
       await message.reply('Could not fetch current voice channel!');
       return;
@@ -161,7 +167,9 @@ export class MoveAllCommand extends Command {
       member.voice.setChannel(channel.id);
     });
 
-    await message.reply(`Successfully moved ${voice.members.size} members to <#${channel.id}>!`);
+    await message.reply(
+      `Successfully moved ${voice.members.size} members to <#${channel.id}>!`,
+    );
 
     await message.react('✅');
   }

@@ -69,7 +69,9 @@ export class BanListener extends Listener {
 
     // Check if the bot banned the user
     if (executor.id === this.container.client.user.id) {
-      this.container.logger.error('BanListener: got past the checkActive and bot banned this user.');
+      this.container.logger.error(
+        'BanListener: got past the checkActive and bot banned this user.',
+      );
       return;
     }
 
@@ -81,10 +83,11 @@ export class BanListener extends Listener {
 
     // Checks if GuildMember is null
     if (mod === undefined) {
-      mod = await guild.members.fetch(executor.id)
-        .catch(() => undefined);
+      mod = await guild.members.fetch(executor.id).catch(() => undefined);
       if (mod === undefined) {
-        this.container.logger.error('UnbanListener: Could not fetch moderator.');
+        this.container.logger.error(
+          'UnbanListener: Could not fetch moderator.',
+        );
         return;
       }
     }
@@ -93,7 +96,9 @@ export class BanListener extends Listener {
     await addExistingUser(mod);
 
     if (await checkBan(user.id)) {
-      this.container.logger.error('BanListener: got past the checkActive at the start.');
+      this.container.logger.error(
+        'BanListener: got past the checkActive at the start.',
+      );
       return;
     }
 
@@ -110,12 +115,14 @@ export class BanListener extends Listener {
     await addBan(user.id, mod.id, `${reason}`);
 
     // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('BanListener: Could not fetch log channel');
         return;
@@ -124,7 +131,10 @@ export class BanListener extends Listener {
 
     const log = new EmbedBuilder()
       .setColor('#FF0000')
-      .setAuthor({ name: `Banned ${user.tag} (not done via bot)`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Banned ${user.tag} (not done via bot)`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

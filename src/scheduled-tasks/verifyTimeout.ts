@@ -21,17 +21,22 @@ import type { VoiceChannel } from 'discord.js';
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 
 export class VerifyTimeout extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, options);
   }
 
-  public async run(payload: { channelId: string, userId: string }) {
+  public async run(payload: { channelId: string; userId: string }) {
     // Get the guild where the user is in
-    let channel = this.container.client.channels.cache
-      .get(payload.channelId) as VoiceChannel | undefined;
+    let channel = this.container.client.channels.cache.get(
+      payload.channelId,
+    ) as VoiceChannel | undefined;
     if (channel === undefined) {
-      channel = await this.container.client.channels
-        .fetch(payload.channelId) as VoiceChannel | undefined;
+      channel = (await this.container.client.channels.fetch(
+        payload.channelId,
+      )) as VoiceChannel | undefined;
       if (channel === undefined) {
         this.container.logger.error('verifyTimeout: Channel not found!');
         return;

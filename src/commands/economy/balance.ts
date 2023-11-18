@@ -36,9 +36,7 @@ export class BalanceCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -114,10 +112,11 @@ export class BalanceCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
-      .setAuthor({ name: `${member.displayName}'s Account`, iconURL: `${user.displayAvatarURL()}` })
-      .addFields(
-        { name: 'Balance', value: `${balance.balance} ARA` },
-      );
+      .setAuthor({
+        name: `${member.displayName}'s Account`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields({ name: 'Balance', value: `${balance.balance} ARA` });
 
     info.success = true;
     info.embeds.push(embed);

@@ -36,19 +36,29 @@ export class BalanceCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('The user to give the money to')
-          .setRequired(true))
-        .addIntegerOption((option) => option.setName('amount')
-          .setDescription('The amount to give to the user')
-          .setMinValue(1)
-          .setRequired(true))
-        .addStringOption((option) => option.setName('reason')
-          .setDescription('The reason/reference for the transaction')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('The user to give the money to')
+              .setRequired(true),
+          )
+          .addIntegerOption((option) =>
+            option
+              .setName('amount')
+              .setDescription('The amount to give to the user')
+              .setMinValue(1)
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('reason')
+              .setDescription('The reason/reference for the transaction')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -133,7 +143,13 @@ export class BalanceCommand extends Command {
     }
   }
 
-  private async pay(user: User, recipient: User, amount: number, reason: string, guild: Guild) {
+  private async pay(
+    user: User,
+    recipient: User,
+    amount: number,
+    reason: string,
+    guild: Guild,
+  ) {
     const info = {
       message: '',
       embeds: [] as EmbedBuilder[],
@@ -142,8 +158,9 @@ export class BalanceCommand extends Command {
 
     // Check the amount to be paid is greater than 0
     if (amount < 1) {
-      info.message = 'You need to actually give money, you can\'t send nothing or try to break the '
-          + 'economy 😭';
+      info.message =
+        "You need to actually give money, you can't send nothing or try to break the " +
+        'economy 😭';
       return info;
     }
 
@@ -166,7 +183,7 @@ export class BalanceCommand extends Command {
     const balance = await getBalance(user.id);
 
     if (balance.balance < amount) {
-      info.message = 'You don\'t have enough money to send!';
+      info.message = "You don't have enough money to send!";
       return info;
     }
 
@@ -174,7 +191,10 @@ export class BalanceCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
-      .setAuthor({ name: `Transfer to ${recipientMember.displayName}`, iconURL: `${recipientMember.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Transfer to ${recipientMember.displayName}`,
+        iconURL: `${recipientMember.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'From', value: `${user}`, inline: true },
         { name: 'To', value: `${recipient}`, inline: true },
@@ -186,12 +206,14 @@ export class BalanceCommand extends Command {
     info.embeds.push(embed);
 
     // Log the payment in the server
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.economy) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.economy) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.economy) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(IDs.channels.logs.economy)) as
+        | TextChannel
+        | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('Pay Error: Could not fetch log channel');
         return info;
@@ -199,9 +221,7 @@ export class BalanceCommand extends Command {
     }
 
     const logEmbed = new EmbedBuilder(embed.data);
-    logEmbed
-      .setTimestamp()
-      .setFooter({ text: `ID: ${user.id}` });
+    logEmbed.setTimestamp().setFooter({ text: `ID: ${user.id}` });
     await logChannel.send({ embeds: [logEmbed] });
     return info;
   }

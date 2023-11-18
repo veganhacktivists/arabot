@@ -36,12 +36,16 @@ export class VegCuriousCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give veg curious to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give veg curious to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -121,7 +125,7 @@ export class VegCuriousCommand extends Command {
     }
 
     if (modMember === undefined) {
-      info.message = 'Error fetching the staff\'s guild member!';
+      info.message = "Error fetching the staff's guild member!";
       return info;
     }
 
@@ -134,13 +138,15 @@ export class VegCuriousCommand extends Command {
     if (!modMember.roles.cache.has(IDs.roles.staff.mentorCoordinator)) {
       // Only Mentor Coordinators can remove Veg Curious role
       if (member.roles.cache.has(IDs.roles.nonvegan.vegCurious)) {
-        info.message = 'You need to be a mentor coordinator to remove this role!';
+        info.message =
+          'You need to be a mentor coordinator to remove this role!';
         return info;
       }
 
       // Only Mentor Coordinators can give vegans Veg Curious role
       if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-        info.message = 'You need to be a mentor coordinator to give vegans this role!';
+        info.message =
+          'You need to be a mentor coordinator to give vegans this role!';
         return info;
       }
     }
@@ -160,8 +166,12 @@ export class VegCuriousCommand extends Command {
     await roleAddLog(user.id, mod.id, vegCurious);
     info.message = `Gave ${user} the ${vegCurious.name} role!`;
 
-    await user.send(`You have been given the ${vegCurious.name} role by ${mod} `
-      + 'which gives you access to the diet support section').catch(() => {});
+    await user
+      .send(
+        `You have been given the ${vegCurious.name} role by ${mod} ` +
+          'which gives you access to the diet support section',
+      )
+      .catch(() => {});
     info.success = true;
     return info;
   }

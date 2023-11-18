@@ -17,7 +17,11 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { GuildMember, GuildMemberRoleManager, Snowflake } from 'discord.js';
+import type {
+  GuildMember,
+  GuildMemberRoleManager,
+  Snowflake,
+} from 'discord.js';
 import { container } from '@sapphire/framework';
 import IDs from '#utils/ids';
 

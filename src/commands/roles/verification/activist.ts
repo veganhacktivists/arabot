@@ -29,19 +29,25 @@ export class ActivistCommand extends Command {
       name: 'activist',
       aliases: ['a'],
       description: 'Gives the activist role',
-      preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
+      preconditions: [
+        ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
+      ],
     });
   }
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give activist role to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give activist role to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -121,7 +127,7 @@ export class ActivistCommand extends Command {
     }
 
     if (modMember === undefined) {
-      info.message = 'Error fetching the staff\'s guild member!';
+      info.message = "Error fetching the staff's guild member!";
       return info;
     }
 
@@ -132,11 +138,14 @@ export class ActivistCommand extends Command {
 
     // Checks if the user is Activist and to give them or remove them based on if they have it
     if (member.roles.cache.has(IDs.roles.vegan.activist)) {
-      if (!modMember.roles.cache.hasAny(
-        IDs.roles.staff.verifierCoordinator,
-        IDs.roles.staff.modCoordinator,
-      )) {
-        info.message = 'You need to be a verifier coordinator to remove this role!';
+      if (
+        !modMember.roles.cache.hasAny(
+          IDs.roles.staff.verifierCoordinator,
+          IDs.roles.staff.modCoordinator,
+        )
+      ) {
+        info.message =
+          'You need to be a verifier coordinator to remove this role!';
         return info;
       }
 
@@ -153,15 +162,17 @@ export class ActivistCommand extends Command {
     await roleAddLog(user.id, mod.id, activist);
     info.message = `Gave ${user} the ${activist.name} role!`;
 
-    await user.send(
-      `${user} you have been given the ${activist.name} role by ${mod}! `
-      + `This means that if you'd wish to engage with non-vegans in <#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n`
-      + '1. Try to move conversations with non-vegans towards veganism/animal ethics\n'
-      + '2. Don\'t discuss social topics while activism is happening\n'
-      + '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n'
-      + '4. Don\'t advocate for baby steps towards veganism. Participation in exploitation can stop today\n'
-      + '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans',
-    ).catch(() => {});
+    await user
+      .send(
+        `${user} you have been given the ${activist.name} role by ${mod}! ` +
+          `This means that if you'd wish to engage with non-vegans in <#${IDs.channels.nonVegan.general}>, you should follow these rules:\n\n` +
+          '1. Try to move conversations with non-vegans towards veganism/animal ethics\n' +
+          "2. Don't discuss social topics while activism is happening\n" +
+          '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n' +
+          "4. Don't advocate for baby steps towards veganism. Participation in exploitation can stop today\n" +
+          '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans',
+      )
+      .catch(() => {});
     info.success = true;
     return info;
   }

@@ -26,12 +26,13 @@ import IDs from '#utils/ids';
  * @returns {boolean} true if is in staff channel
  */
 
-// eslint-disable-next-line import/prefer-default-export
 export function checkStaff(channel: TextChannel) {
   if (channel.parent === null) {
     return false;
   }
 
-  return channel.parent.id === IDs.categories.staff
-    || channel.parent.id === IDs.categories.modMail;
+  return (
+    channel.parent.id === IDs.categories.staff ||
+    channel.parent.id === IDs.categories.modMail
+  );
 }

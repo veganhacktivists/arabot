@@ -33,9 +33,7 @@ export class RenameUserCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -70,8 +68,9 @@ export class RenameUserCommand extends Command {
     }
 
     await interaction.reply({
-      content: `${vegan.name}s: \`${vegan.members.size}\``
-        + `\n${notVegan.name}s: \`${notVegan.members.size}\``,
+      content:
+        `${vegan.name}s: \`${vegan.members.size}\`` +
+        `\n${notVegan.name}s: \`${notVegan.members.size}\``,
       fetchReply: true,
     });
   }
@@ -81,7 +80,9 @@ export class RenameUserCommand extends Command {
 
     if (guild === null) {
       await message.react('❌');
-      await message.reply('Guild not found, please try again or contact a developer!');
+      await message.reply(
+        'Guild not found, please try again or contact a developer!',
+      );
       return;
     }
 
@@ -99,8 +100,9 @@ export class RenameUserCommand extends Command {
     }
 
     await message.reply({
-      content: `${vegan.name}s: \`${vegan.members.size}\``
-        + `\n${notVegan.name}s: \`${notVegan.members.size}\``,
+      content:
+        `${vegan.name}s: \`${vegan.members.size}\`` +
+        `\n${notVegan.name}s: \`${notVegan.members.size}\``,
     });
 
     await message.react('✅');

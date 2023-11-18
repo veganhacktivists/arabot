@@ -3,7 +3,7 @@ import { Time } from '@sapphire/time-utilities';
 import type { Snowflake } from 'discord.js';
 
 export function xpToNextLevel(level: number, xp: number) {
-  return 5 * (level * level) + (50 * level) + 100 - xp;
+  return 5 * (level * level) + 50 * level + 100 - xp;
 }
 
 export async function getUser(userId: Snowflake) {

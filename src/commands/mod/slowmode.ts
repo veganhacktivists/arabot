@@ -36,12 +36,16 @@ export class SlowmodeCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addStringOption((option) => option.setName('duration')
-          .setDescription('Set the slowmode time')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addStringOption((option) =>
+            option
+              .setName('duration')
+              .setDescription('Set the slowmode time')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -123,7 +127,9 @@ export class SlowmodeCommand extends Command {
       return info;
     }
 
-    info.message = `${channel} has now been set to a post every ${new DurationFormatter().format(time)}.`;
+    info.message = `${channel} has now been set to a post every ${new DurationFormatter().format(
+      time,
+    )}.`;
     return info;
   }
 }

@@ -37,7 +37,9 @@ export class VerifierCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkVerifierCoordinator(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkVerifierCoordinator(interaction.member! as GuildMember);
   }
@@ -45,7 +47,9 @@ export class VerifierCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   private async checkVerifierCoordinator(user: GuildMember) {
     return user.roles.cache.has(IDs.roles.staff.verifierCoordinator)
       ? this.ok()
-      : this.error({ message: 'Only verifier coordinators can run this command!' });
+      : this.error({
+          message: 'Only verifier coordinators can run this command!',
+        });
   }
 }
 

@@ -45,12 +45,16 @@ export class UnbanCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to unban')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to unban')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -162,13 +166,16 @@ export class UnbanCommand extends Command {
       await addEmptyUser(user.id);
 
       // Add missing ban
-      await addBan(userId, modId, `(Mod who banned is not accurate) - ${reason}`);
+      await addBan(
+        userId,
+        modId,
+        `(Mod who banned is not accurate) - ${reason}`,
+      );
       dbBan = true;
     }
 
     // Unban the user
-    await guild.members.unban(user)
-      .catch(() => {});
+    await guild.members.unban(user).catch(() => {});
 
     if (dbBan) {
       // Add unban to database
@@ -181,12 +188,14 @@ export class UnbanCommand extends Command {
     info.success = true;
 
     // Log unban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
         this.container.logger.error('Ban Error: Could not fetch log channel');
         info.message = `${user} has been banned. This hasn't been logged in a text channel as log channel could not be found`;
@@ -196,7 +205,10 @@ export class UnbanCommand extends Command {
 
     const log = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unbanned ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Unbanned ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

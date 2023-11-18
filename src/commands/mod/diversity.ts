@@ -56,16 +56,28 @@ export class DiversityCommand extends Subcommand {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addSubcommand((command) => command.setName('role')
-          .setDescription('Gives/removes the diversity role')
-          .addUserOption((option) => option.setName('user')
-            .setDescription('User to give/remove diversity to')
-            .setRequired(true)))
-        .addSubcommand((command) => command.setName('toggleopen')
-          .setDescription('Toggles read-only for vegans in diversity section')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addSubcommand((command) =>
+            command
+              .setName('role')
+              .setDescription('Gives/removes the diversity role')
+              .addUserOption((option) =>
+                option
+                  .setName('user')
+                  .setDescription('User to give/remove diversity to')
+                  .setRequired(true),
+              ),
+          )
+          .addSubcommand((command) =>
+            command
+              .setName('toggleopen')
+              .setDescription(
+                'Toggles read-only for vegans in diversity section',
+              ),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -120,11 +132,14 @@ export class DiversityCommand extends Subcommand {
     }
 
     // Checks if the channel is open
-    const open = channel.permissionsFor(IDs.roles.vegan.vegan)!
+    const open = channel
+      .permissionsFor(IDs.roles.vegan.vegan)!
       .has([PermissionsBitField.Flags.SendMessages]);
 
     // Toggle send message in channel
-    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, { SendMessages: !open });
+    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, {
+      SendMessages: !open,
+    });
 
     await interaction.reply({
       content: `${!open ? 'Opened' : 'Closed'} this channel.`,
@@ -132,7 +147,9 @@ export class DiversityCommand extends Subcommand {
     });
   }
 
-  public async roleCommand(interaction: Subcommand.ChatInputCommandInteraction) {
+  public async roleCommand(
+    interaction: Subcommand.ChatInputCommandInteraction,
+  ) {
     // TODO add database updates
     // Get the arguments
     const user = interaction.options.getUser('user');
@@ -181,7 +198,8 @@ export class DiversityCommand extends Subcommand {
       content: `Gave ${user} the ${diversity.name} role!`,
       fetchReply: true,
     });
-    await user.send(`You have been given the ${diversity.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${diversity.name} role by ${mod}!`)
       .catch(() => {});
   }
 
@@ -200,7 +218,9 @@ export class DiversityCommand extends Subcommand {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Diversity coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Diversity coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -235,7 +255,8 @@ export class DiversityCommand extends Subcommand {
       await message.reply({
         content: `Gave ${user} the ${diversity.name} role!`,
       });
-      await user.send(`You have been given the ${diversity.name} role by ${mod}!`)
+      await user
+        .send(`You have been given the ${diversity.name} role by ${mod}!`)
         .catch(() => {});
     }
 
@@ -243,7 +264,9 @@ export class DiversityCommand extends Subcommand {
   }
 
   private async threadManager(member: Snowflake, add: boolean) {
-    const thread = await container.client.channels.fetch(IDs.channels.diversity.diversity);
+    const thread = await container.client.channels.fetch(
+      IDs.channels.diversity.diversity,
+    );
     if (thread === null) {
       return;
     }

@@ -29,15 +29,13 @@ import {
   PermissionsBitField,
   time,
 } from 'discord.js';
-import type {
-  User,
-  Message,
-  TextChannel,
-  Guild,
-  Snowflake,
-} from 'discord.js';
+import type { User, Message, TextChannel, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
-import { addEmptyUser, updateUser, fetchRoles } from '#utils/database/dbExistingUser';
+import {
+  addEmptyUser,
+  updateUser,
+  fetchRoles,
+} from '#utils/database/dbExistingUser';
 import { restrict, checkActive } from '#utils/database/restriction';
 import { randint } from '#utils/maths';
 import { blockedRolesAfterRestricted } from '#utils/blockedRoles';
@@ -85,8 +83,7 @@ export async function restrictRun(
   let member = guild.members.cache.get(userId);
 
   if (member === undefined) {
-    member = await guild.members.fetch(userId)
-      .catch(() => undefined);
+    member = await guild.members.fetch(userId).catch(() => undefined);
   }
 
   const restrictRoles = IDs.roles.restrictions.restricted;
@@ -125,10 +122,12 @@ export async function restrictRun(
           },
           {
             id: IDs.roles.staff.restricted,
-            allow: [PermissionsBitField.Flags.SendMessages,
+            allow: [
+              PermissionsBitField.Flags.SendMessages,
               PermissionsBitField.Flags.ViewChannel,
               PermissionsBitField.Flags.Connect,
-              PermissionsBitField.Flags.MuteMembers],
+              PermissionsBitField.Flags.MuteMembers,
+            ],
           },
         ],
       });
@@ -153,8 +152,10 @@ export async function restrictRun(
             },
             {
               id: IDs.roles.staff.restricted,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
+              allow: [
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel,
+              ],
             },
           ],
         });
@@ -176,8 +177,10 @@ export async function restrictRun(
             },
             {
               id: IDs.roles.staff.restricted,
-              allow: [PermissionsBitField.Flags.SendMessages,
-                PermissionsBitField.Flags.ViewChannel],
+              allow: [
+                PermissionsBitField.Flags.SendMessages,
+                PermissionsBitField.Flags.ViewChannel,
+              ],
             },
           ],
         });
@@ -215,8 +218,7 @@ export async function restrictRun(
     }
   }
 
-  if (member !== undefined
-    && member.voice.channelId !== null) {
+  if (member !== undefined && member.voice.channelId !== null) {
     await member.voice.disconnect();
   }
 
@@ -230,22 +232,24 @@ export async function restrictRun(
 
   const dmEmbed = new EmbedBuilder()
     .setColor('#FF6700')
-    .setAuthor({ name: 'You\'ve been restricted!', iconURL: `${user.displayAvatarURL()}` })
-    .addFields(
-      { name: 'Reason', value: reason },
-    )
+    .setAuthor({
+      name: "You've been restricted!",
+      iconURL: `${user.displayAvatarURL()}`,
+    })
+    .addFields({ name: 'Reason', value: reason })
     .setTimestamp();
 
-  await user.send({ embeds: [dmEmbed] })
-    .catch(() => {});
+  await user.send({ embeds: [dmEmbed] }).catch(() => {});
 
   // Log the ban
-  let logChannel = guild.channels.cache
-    .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+  let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+    | TextChannel
+    | undefined;
 
   if (logChannel === undefined) {
-    logChannel = await guild.channels
-      .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+    logChannel = (await guild.channels.fetch(IDs.channels.logs.restricted)) as
+      | TextChannel
+      | undefined;
     if (logChannel === undefined) {
       container.logger.error('Restrict Error: Could not fetch log channel');
       info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
@@ -255,7 +259,10 @@ export async function restrictRun(
 
   const message = new EmbedBuilder()
     .setColor('#FF6700')
-    .setAuthor({ name: `Restricted ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
+    .setAuthor({
+      name: `Restricted ${user.tag}`,
+      iconURL: `${user.displayAvatarURL()}`,
+    })
     .addFields(
       { name: 'User', value: `${user}`, inline: true },
       { name: 'Moderator', value: `${mod}`, inline: true },
@@ -283,15 +290,22 @@ export class RestrictCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to restrict')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('reason')
-          .setDescription('Reason for restricting the user')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to restrict')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('reason')
+              .setDescription('Reason for restricting the user')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

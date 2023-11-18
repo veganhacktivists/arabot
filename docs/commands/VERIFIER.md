@@ -2,9 +2,10 @@
 
 ## Verification
 
-- `/verify <user> <roles>`/`?ver <user> <roles>` - This is a manual verification to give roles to a user. This should 
-not be used if you are verifying the user in the voice channel. Roles available (you can write multiple in one command
-such as `v a t`):
+- `/verify <user> <roles>`/`?ver <user> <roles>` - This is a manual verification to give roles to a user. This should
+  not be used if you are verifying the user in the voice channel. Roles available (you can write multiple in one command
+  such as `v a t`):
+
   - `v` - Vegan
   - `a` - Activist
   - `t` - Trusted
@@ -13,8 +14,8 @@ such as `v a t`):
   - `conv` - Convinced
   - `veg` - Veg Curious
 
-- `/verifytimeoutremove <user>` - Removes a verification timeout if the user has been timed out as a verifier was not 
-available. This cannot be used for users that have been verified.
+- `/verifytimeoutremove <user>` - Removes a verification timeout if the user has been timed out as a verifier was not
+  available. This cannot be used for users that have been verified.
 
 ## Roles
 

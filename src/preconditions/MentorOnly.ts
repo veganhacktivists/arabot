@@ -37,7 +37,9 @@ export class MentorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkMentor(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkMentor(interaction.member! as GuildMember);
   }

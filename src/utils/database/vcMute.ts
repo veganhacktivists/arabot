@@ -1,7 +1,11 @@
 import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
 
-export async function addMute(userId: Snowflake, modId: Snowflake, reason: string | null) {
+export async function addMute(
+  userId: Snowflake,
+  modId: Snowflake,
+  reason: string | null,
+) {
   // Add the user to the database
   await container.database.vCMute.create({
     data: {
