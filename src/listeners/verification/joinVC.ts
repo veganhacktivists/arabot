@@ -506,7 +506,6 @@ export class VerificationJoinVCListener extends Listener {
         await giveVerificationRoles(user, info.roles);
         // Add timeout if they do not have activist role
         if (!info.roles.activist) {
-          // @ts-ignore
           this.container.tasks.create(
             'verifyUnblock',
             {
