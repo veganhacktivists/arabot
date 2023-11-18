@@ -34,9 +34,7 @@ export class SadCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

@@ -35,12 +35,14 @@ export class Suggestions extends Listener {
       return;
     }
 
-    const mailbox = await this.container.client.channels.cache
-      .get(IDs.channels.staff.mailbox);
+    const mailbox = await this.container.client.channels.cache.get(
+      IDs.channels.staff.mailbox,
+    );
 
-    if (mailbox === undefined
-      || !mailbox.isTextBased()) {
-      this.container.logger.error('Mailbox is not a TextBased channel or is undefined');
+    if (mailbox === undefined || !mailbox.isTextBased()) {
+      this.container.logger.error(
+        'Mailbox is not a TextBased channel or is undefined',
+      );
       return;
     }
 
@@ -54,7 +56,10 @@ export class Suggestions extends Listener {
 
     const suggestion = new EmbedBuilder()
       .setColor('#FFFFFF')
-      .setAuthor({ name: `Suggestion from ${message.author.tag}:`, iconURL: `${message.author.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Suggestion from ${message.author.tag}:`,
+        iconURL: `${message.author.displayAvatarURL()}`,
+      })
       .setTimestamp();
 
     if (message.content.length > 0) {
@@ -66,9 +71,12 @@ export class Suggestions extends Listener {
       suggestion.setFields({ name: 'Attachments', value: attachmentsString });
     } else {
       await message.delete();
-      await message.author.send({
-        content: 'There was an error sending your suggestion, please try again later or contact the devs!',
-      }).catch(() => {});
+      await message.author
+        .send({
+          content:
+            'There was an error sending your suggestion, please try again later or contact the devs!',
+        })
+        .catch(() => {});
       return;
     }
 
@@ -81,13 +89,16 @@ export class Suggestions extends Listener {
 
     await sent.react('👍');
     await sent.react('👎');
-    await sent.react('<:catshrug:917505035196313671>')
-      .catch(() => { sent.react('🤷'); });
+    await sent.react('<:catshrug:917505035196313671>').catch(() => {
+      sent.react('🤷');
+    });
 
-    await message.author.send({
-      content: 'Your suggestion has been sent!',
-      embeds: [suggestion],
-      files: attachments,
-    }).catch(() => {});
+    await message.author
+      .send({
+        content: 'Your suggestion has been sent!',
+        embeds: [suggestion],
+        files: attachments,
+      })
+      .catch(() => {});
   }
 }

@@ -37,7 +37,7 @@ export class XpListener extends Listener {
       return;
     }
 
-    if (!await checkCanAddXp(user.id)) {
+    if (!(await checkCanAddXp(user.id))) {
       return;
     }
 

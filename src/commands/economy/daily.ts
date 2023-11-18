@@ -19,12 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
-import type {
-  User,
-  Guild,
-  GuildMember,
-  Message,
-} from 'discord.js';
+import type { User, Guild, GuildMember, Message } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { daily, getLastDaily } from '#utils/database/economy';
 import { EmbedBuilder } from 'discord.js';
@@ -42,9 +37,7 @@ export class DailyCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -112,9 +105,12 @@ export class DailyCommand extends Command {
 
     const lastDaily = await getLastDaily(user.id);
 
-    if (lastDaily !== null
-      && (new Date().getTime() - lastDaily.time.getTime()) < time) {
-      info.message = 'You have already claimed your daily, come back later to claim it!';
+    if (
+      lastDaily !== null &&
+      new Date().getTime() - lastDaily.time.getTime() < time
+    ) {
+      info.message =
+        'You have already claimed your daily, come back later to claim it!';
       return info;
     }
 
@@ -136,8 +132,15 @@ export class DailyCommand extends Command {
 
     const embed = new EmbedBuilder()
       .setColor('#00ff7d')
-      .setAuthor({ name: 'Daily Reward', iconURL: `${user.displayAvatarURL()}` })
-      .addFields({ name: 'Collected', value: `${amount} ARA`, inline: bonus > 0 });
+      .setAuthor({
+        name: 'Daily Reward',
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields({
+        name: 'Collected',
+        value: `${amount} ARA`,
+        inline: bonus > 0,
+      });
 
     if (bonus > 0) {
       embed.addFields(

@@ -18,12 +18,7 @@
 */
 
 import { Args, Command } from '@sapphire/framework';
-import type {
-  User,
-  Message,
-  Snowflake,
-  Guild,
-} from 'discord.js';
+import type { User, Message, Snowflake, Guild } from 'discord.js';
 import { addExistingUser, updateUser } from '#utils/database/dbExistingUser';
 import { addWarn } from '#utils/database/warnings';
 
@@ -63,7 +58,9 @@ export class WarnCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply(
+        'Moderator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -84,7 +81,12 @@ export class WarnCommand extends Command {
     // await message.react('✅');
   }
 
-  private async warn(userId: Snowflake, modId: Snowflake, reason: string, guild: Guild) {
+  private async warn(
+    userId: Snowflake,
+    modId: Snowflake,
+    reason: string,
+    guild: Guild,
+  ) {
     const info = {
       message: '',
       success: false,
@@ -106,8 +108,7 @@ export class WarnCommand extends Command {
     let member = guild.members.cache.get(userId);
 
     if (member === undefined) {
-      member = await guild.members.fetch(userId)
-        .catch(() => undefined);
+      member = await guild.members.fetch(userId).catch(() => undefined);
     }
 
     if (member === undefined) {

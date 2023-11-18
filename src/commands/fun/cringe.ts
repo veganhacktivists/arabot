@@ -37,7 +37,7 @@ export class CringeCommand extends Command {
       (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
-      }
+      },
     );
   }
 

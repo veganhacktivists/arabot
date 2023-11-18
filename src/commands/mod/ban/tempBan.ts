@@ -19,12 +19,7 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Duration, DurationFormatter } from '@sapphire/time-utilities';
-import type {
-  User,
-  Snowflake,
-  TextChannel,
-  Guild,
-} from 'discord.js';
+import type { User, Snowflake, TextChannel, Guild } from 'discord.js';
 import { EmbedBuilder, Message } from 'discord.js';
 import IDs from '#utils/ids';
 import { addTempBan, checkTempBan } from '#utils/database/tempBan';
@@ -43,18 +38,28 @@ export class TempBanCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to ban')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('duration')
-          .setDescription('How long to ban the user for')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('reason')
-          .setDescription('Note about the user')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to ban')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('duration')
+              .setDescription('How long to ban the user for')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('reason')
+              .setDescription('Note about the user')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -140,8 +145,10 @@ export class TempBanCommand extends Command {
 
     if (message.channel.id !== IDs.channels.restricted.moderators) {
       await message.react('❌');
-      await message.reply(`You can only run this command in <#${IDs.channels.restricted.moderators}> `
-        + 'or alternatively use the slash command!');
+      await message.reply(
+        `You can only run this command in <#${IDs.channels.restricted.moderators}> ` +
+          'or alternatively use the slash command!',
+      );
       return;
     }
 
@@ -197,7 +204,7 @@ export class TempBanCommand extends Command {
     let user = guild.client.users.cache.get(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId) as User;
+      user = (await guild.client.users.fetch(userId)) as User;
     }
 
     // Gets mod's GuildMember
@@ -221,8 +228,7 @@ export class TempBanCommand extends Command {
     let member = guild.members.cache.get(userId);
 
     if (member === undefined) {
-      member = await guild.members.fetch(userId)
-        .catch(() => undefined);
+      member = await guild.members.fetch(userId).catch(() => undefined);
     }
 
     if (member !== undefined) {
@@ -235,8 +241,11 @@ export class TempBanCommand extends Command {
       await updateUser(member);
 
       // Send DM for reason of ban
-      await member.send(`You have been temporarily banned from ARA for ${banLength}. Reason: ${reason}`
-        + '\n\nhttps://vbcamp.org/ARA')
+      await member
+        .send(
+          `You have been temporarily banned from ARA for ${banLength}. Reason: ${reason}` +
+            '\n\nhttps://vbcamp.org/ARA',
+        )
         .catch(() => {});
 
       // Ban the user
@@ -249,32 +258,44 @@ export class TempBanCommand extends Command {
     await addTempBan(userId, modId, time.fromNow, reason);
 
     // Create scheduled task to unban
-    this.container.tasks.create('tempBan', {
-      userId: user.id,
-      guildId: guild.id,
-    }, time.offset);
+    this.container.tasks.create(
+      'tempBan',
+      {
+        userId: user.id,
+        guildId: guild.id,
+      },
+      time.offset,
+    );
 
     info.message = `${user} has been temporarily banned for ${banLength}.`;
     info.success = true;
 
     // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
-        this.container.logger.error('Temp Ban Error: Could not fetch log channel');
-        info.message = `${user} has been temporarily banned for ${banLength}. `
-        + 'This hasn\'t been logged in a text channel as log channel could not be found';
+        this.container.logger.error(
+          'Temp Ban Error: Could not fetch log channel',
+        );
+        info.message =
+          `${user} has been temporarily banned for ${banLength}. ` +
+          "This hasn't been logged in a text channel as log channel could not be found";
         return info;
       }
     }
 
     const log = new EmbedBuilder()
       .setColor('#FF0000')
-      .setAuthor({ name: `Temp Banned ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Temp Banned ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

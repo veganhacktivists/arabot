@@ -37,13 +37,16 @@ export class PatreonOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkPatreon(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkPatreon(interaction.member! as GuildMember);
   }
 
   private async checkPatreon(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.patron) || user.roles.cache.has(IDs.roles.patreon)
+    return user.roles.cache.has(IDs.roles.patron) ||
+      user.roles.cache.has(IDs.roles.patreon)
       ? this.ok()
       : this.error({ message: 'Only Patreon members can run this command!' });
   }

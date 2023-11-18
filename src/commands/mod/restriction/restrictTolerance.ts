@@ -35,15 +35,22 @@ export class RestrictToleranceCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to restrict')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('reason')
-          .setDescription('Reason for restricting the user')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to restrict')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('reason')
+              .setDescription('Reason for restricting the user')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

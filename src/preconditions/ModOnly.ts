@@ -37,14 +37,16 @@ export class ModOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkMod(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkMod(interaction.member! as GuildMember);
   }
 
   private async checkMod(user: GuildMember) {
-    return user.roles.cache.has(IDs.roles.staff.moderator)
-    || user.roles.cache.has(IDs.roles.staff.trialModerator)
+    return user.roles.cache.has(IDs.roles.staff.moderator) ||
+      user.roles.cache.has(IDs.roles.staff.trialModerator)
       ? this.ok()
       : this.error({ message: 'Only moderators can run this command!' });
   }

@@ -36,12 +36,16 @@ export class PlusCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove plus to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give/remove plus to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -86,7 +90,9 @@ export class PlusCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -137,7 +143,8 @@ export class PlusCommand extends Command {
     await roleAddLog(user.id, mod.id, plus);
     info.message = `Gave ${user} the ${plus.name} role!`;
 
-    await user.send(`You have been given the ${plus.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${plus.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

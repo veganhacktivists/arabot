@@ -20,10 +20,7 @@
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import type { TextChannel } from 'discord.js';
-import {
-  CategoryChannel,
-  ChannelType,
-} from 'discord.js';
+import { CategoryChannel, ChannelType } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RestrictToolsCommand extends Subcommand {
@@ -35,9 +32,7 @@ export class RestrictToolsCommand extends Subcommand {
         {
           name: 'channel',
           type: 'group',
-          entries: [
-            { name: 'delete', chatInputRun: 'deleteChannel' },
-          ],
+          entries: [{ name: 'delete', chatInputRun: 'deleteChannel' }],
         },
       ],
       description: 'Tools for managing restrictions',
@@ -48,22 +43,34 @@ export class RestrictToolsCommand extends Subcommand {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Subcommand.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addSubcommandGroup((group) => group.setName('channel')
-          .setDescription('Manages restricted channels')
-          .addSubcommand((command) => command.setName('delete')
-            .setDescription('Deletes a restricted channel')
-            .addUserOption((option) => option.setName('user')
-              .setDescription('The user\'s channel to delete')))),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addSubcommandGroup((group) =>
+            group
+              .setName('channel')
+              .setDescription('Manages restricted channels')
+              .addSubcommand((command) =>
+                command
+                  .setName('delete')
+                  .setDescription('Deletes a restricted channel')
+                  .addUserOption((option) =>
+                    option
+                      .setName('user')
+                      .setDescription("The user's channel to delete"),
+                  ),
+              ),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
     );
   }
 
-  public async deleteChannel(interaction: Subcommand.ChatInputCommandInteraction) {
+  public async deleteChannel(
+    interaction: Subcommand.ChatInputCommandInteraction,
+  ) {
     // Get the arguments
     const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
@@ -83,33 +90,35 @@ export class RestrictToolsCommand extends Subcommand {
     if (user === null) {
       if (channel.type !== ChannelType.GuildText) {
         await interaction.editReply({
-          content: 'Please make sure you ran this command in the original restricted text channel!',
+          content:
+            'Please make sure you ran this command in the original restricted text channel!',
         });
         return;
       }
 
       if (channel.parentId !== IDs.categories.restricted) {
         await interaction.editReply({
-          content: 'Please make sure you ran this command in the original restricted text channel!',
+          content:
+            'Please make sure you ran this command in the original restricted text channel!',
         });
         return;
       }
 
       if (
-        channel.id === IDs.channels.restricted.welcome
-        || channel.id === IDs.channels.restricted.moderators
-        || channel.id === IDs.channels.restricted.restricted
-        || channel.id === IDs.channels.restricted.tolerance
+        channel.id === IDs.channels.restricted.welcome ||
+        channel.id === IDs.channels.restricted.moderators ||
+        channel.id === IDs.channels.restricted.restricted ||
+        channel.id === IDs.channels.restricted.tolerance
       ) {
         await interaction.editReply({
-          content: 'You can\'t run this command these channels!',
+          content: "You can't run this command these channels!",
         });
         return;
       }
 
       if (channel.topic === null) {
         await interaction.editReply({
-          content: 'There was an error with this channel\'s topic!',
+          content: "There was an error with this channel's topic!",
         });
         return;
       }
@@ -120,16 +129,19 @@ export class RestrictToolsCommand extends Subcommand {
       const vcId = topic[3];
       const voiceChannel = guild.channels.cache.get(vcId);
 
-      if (voiceChannel !== undefined
-        && voiceChannel.parentId === IDs.categories.restricted) {
+      if (
+        voiceChannel !== undefined &&
+        voiceChannel.parentId === IDs.categories.restricted
+      ) {
         await voiceChannel.delete();
       }
 
       return;
     }
 
-    const category = guild.channels.cache
-      .get(IDs.categories.restricted) as CategoryChannel | undefined;
+    const category = guild.channels.cache.get(IDs.categories.restricted) as
+      | CategoryChannel
+      | undefined;
 
     if (category === undefined) {
       await interaction.editReply({
@@ -138,7 +150,9 @@ export class RestrictToolsCommand extends Subcommand {
       return;
     }
 
-    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
@@ -147,8 +161,10 @@ export class RestrictToolsCommand extends Subcommand {
         const vcId = topic[topic.indexOf(user?.id) + 1];
         const voiceChannel = guild.channels.cache.get(vcId);
 
-        if (voiceChannel !== undefined
-          && voiceChannel.parentId === IDs.categories.restricted) {
+        if (
+          voiceChannel !== undefined &&
+          voiceChannel.parentId === IDs.categories.restricted
+        ) {
           voiceChannel.delete();
         }
         textChannel.delete();

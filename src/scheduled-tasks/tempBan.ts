@@ -19,19 +19,19 @@
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import IDs from '#utils/ids';
-import {
-  TextChannel,
-  EmbedBuilder,
-} from 'discord.js';
+import { TextChannel, EmbedBuilder } from 'discord.js';
 import { checkBan } from '#utils/database/ban';
 import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
 export class TempBan extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, options);
   }
 
-  public async run(payload: { userId: string, guildId: string }) {
+  public async run(payload: { userId: string; guildId: string }) {
     this.container.logger.debug('Temp Unban Task: Currently running unban');
     // Get the guild where the user is in
     let guild = this.container.client.guilds.cache.get(payload.guildId);
@@ -50,42 +50,49 @@ export class TempBan extends ScheduledTask {
     if (user === undefined) {
       user = await guild.client.users.fetch(userId);
       if (user === undefined) {
-        this.container.logger.error('Temp Unban Task: Could not fetch banned user!');
+        this.container.logger.error(
+          'Temp Unban Task: Could not fetch banned user!',
+        );
         return;
       }
     }
 
-    if (await checkBan(userId)
-      || !await checkTempBan(userId)) {
-      this.container.logger.debug('Temp Unban Task: User is either permanently banned or no longer temporarily banned.');
+    if ((await checkBan(userId)) || !(await checkTempBan(userId))) {
+      this.container.logger.debug(
+        'Temp Unban Task: User is either permanently banned or no longer temporarily banned.',
+      );
       return;
     }
 
     // Unban the user
-    await guild.members.unban(user)
-      .catch(() => {});
+    await guild.members.unban(user).catch(() => {});
 
     await removeTempBan(userId);
 
     // Log unban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
-        this.container.logger.error(`Temp Ban Listener: Could not fetch log channel. User Snowflake: ${userId}`);
+        this.container.logger.error(
+          `Temp Ban Listener: Could not fetch log channel. User Snowflake: ${userId}`,
+        );
         return;
       }
     }
 
     const log = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unbanned ${user.tag} (tempban)`, iconURL: `${user.displayAvatarURL()}` })
-      .addFields(
-        { name: 'User', value: `${user}`, inline: true },
-      )
+      .setAuthor({
+        name: `Unbanned ${user.tag} (tempban)`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields({ name: 'User', value: `${user}`, inline: true })
       .setTimestamp()
       .setFooter({ text: `ID: ${user.id}` });
 

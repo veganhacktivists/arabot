@@ -27,8 +27,9 @@ export class SoftMuteCommand extends Command {
       ...options,
       name: 'softmute',
       aliases: ['sm'],
-      description: 'Prevent a user from reacting to a message by giving '
-        + 'the soft mute role',
+      description:
+        'Prevent a user from reacting to a message by giving ' +
+        'the soft mute role',
       preconditions: ['ModOnly'],
     });
   }
@@ -36,12 +37,16 @@ export class SoftMuteCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to soft mute')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to soft mute')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

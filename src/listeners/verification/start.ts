@@ -39,11 +39,13 @@ export class VerificationReady extends Listener {
 
   public async run(client: Client) {
     // Get verification category
-    let category = client.channels.cache
-      .get(IDs.categories.verification) as CategoryChannel | undefined;
+    let category = client.channels.cache.get(IDs.categories.verification) as
+      | CategoryChannel
+      | undefined;
     if (category === undefined) {
-      category = await client.channels
-        .fetch(IDs.categories.verification) as CategoryChannel | undefined;
+      category = (await client.channels.fetch(IDs.categories.verification)) as
+        | CategoryChannel
+        | undefined;
       if (category === undefined) {
         this.container.logger.error('verifyStart: Channel not found');
         return;
@@ -51,7 +53,9 @@ export class VerificationReady extends Listener {
     }
 
     // Check how many voice channels there are
-    const voiceChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildVoice);
+    const voiceChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildVoice,
+    );
     const currentVCs: VoiceChannel[] = [];
     const emptyVC: string[] = [];
     // Delete voice channels
@@ -66,7 +70,9 @@ export class VerificationReady extends Listener {
     });
 
     // Delete text channels
-    const textChannels = category.children.cache.filter((c) => c.type === ChannelType.GuildText);
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake

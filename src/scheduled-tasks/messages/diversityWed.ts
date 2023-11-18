@@ -23,7 +23,10 @@ import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class DiversityWedMessageTask extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, {
       ...options,
       pattern: '0 15 * * 3',
@@ -33,19 +36,23 @@ export class DiversityWedMessageTask extends ScheduledTask {
   public async run() {
     const { client } = container;
 
-    const message = '**📌 Diversity Section Code of Conduct**\n\n'
-      + '❤️  Be *Kind*\n'
-      + '🧡  Make sure your communication invites others for discourse, not debate.\n'
-      + '💛  Avoid slurs which otherize individuals or groups - safe space vibes please! <:blobheart:820513749893906543>\n'
-      + '💚  When engaging in discourse, acknowledge others participating and actively ask questions in a charitable manner and avoid assumptions about what someone is saying about the topic.\n'
-      + '💙  Avoid spreading misinformation.\n'
-      + '💜  Be sincere when interacting with others, socially and in serious discourse.\n'
-      + '❤️  Respect the creativity of others.\n'
-      + '🧡  Actively seek to include others, especially moderators, in heated discourse for the purpose of de-escalation.';
+    const message =
+      '**📌 Diversity Section Code of Conduct**\n\n' +
+      '❤️  Be *Kind*\n' +
+      '🧡  Make sure your communication invites others for discourse, not debate.\n' +
+      '💛  Avoid slurs which otherize individuals or groups - safe space vibes please! <:blobheart:820513749893906543>\n' +
+      '💚  When engaging in discourse, acknowledge others participating and actively ask questions in a charitable manner and avoid assumptions about what someone is saying about the topic.\n' +
+      '💙  Avoid spreading misinformation.\n' +
+      '💜  Be sincere when interacting with others, socially and in serious discourse.\n' +
+      '❤️  Respect the creativity of others.\n' +
+      '🧡  Actively seek to include others, especially moderators, in heated discourse for the purpose of de-escalation.';
 
-    const women = client.channels.cache.get(IDs.channels.diversity.women) as TextChannel;
-    const disabilities = client.channels.cache
-      .get(IDs.channels.diversity.disabilities) as TextChannel;
+    const women = client.channels.cache.get(
+      IDs.channels.diversity.women,
+    ) as TextChannel;
+    const disabilities = client.channels.cache.get(
+      IDs.channels.diversity.disabilities,
+    ) as TextChannel;
 
     await women.send(message);
     await disabilities.send(message);

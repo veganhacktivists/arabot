@@ -36,12 +36,16 @@ export class MentorCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove mentor role')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give/remove mentor role')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -87,7 +91,9 @@ export class MentorCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Mentor coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Mentor coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -138,7 +144,8 @@ export class MentorCommand extends Command {
     await roleAddLog(user.id, mod.id, mentor, true);
     info.message = `Gave ${user} the ${mentor.name} role!`;
 
-    await user.send(`You have been given the ${mentor.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${mentor.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

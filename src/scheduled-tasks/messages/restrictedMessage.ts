@@ -23,7 +23,10 @@ import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RestrictedMessageTask extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, {
       ...options,
       pattern: '0 17 * * *',
@@ -33,17 +36,23 @@ export class RestrictedMessageTask extends ScheduledTask {
   public async run() {
     const { client } = container;
 
-    const restricted = client.channels.cache.get(IDs.channels.restricted.restricted) as TextChannel;
-    const tolerance = client.channels.cache.get(IDs.channels.restricted.tolerance) as TextChannel;
+    const restricted = client.channels.cache.get(
+      IDs.channels.restricted.restricted,
+    ) as TextChannel;
+    const tolerance = client.channels.cache.get(
+      IDs.channels.restricted.tolerance,
+    ) as TextChannel;
 
     await restricted.send(this.message(IDs.roles.restrictions.restricted1));
     await tolerance.send(this.message(IDs.roles.restrictions.restricted3));
   }
 
   private message(id: string) {
-    return `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264> `
-      + 'to attempt to clear up the issue that lead to your restriction and rejoin the server.'
-      + '\n\nJust let us know what got you restricted and why you’d like to avoid repeating that behaviour and we’ll try to sort it out.';
+    return (
+      `Hi <@&${id}>, just a friendly reminder that you can reach out to <@575252669443211264> ` +
+      'to attempt to clear up the issue that lead to your restriction and rejoin the server.' +
+      '\n\nJust let us know what got you restricted and why you’d like to avoid repeating that behaviour and we’ll try to sort it out.'
+    );
   }
 }
 

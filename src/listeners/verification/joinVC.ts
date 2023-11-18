@@ -45,7 +45,11 @@ import {
   finishVerifyMessages,
 } from '#utils/verification';
 import { maxVCs, questionInfo, serverFind } from '#utils/verificationConfig';
-import { joinVerification, startVerification, finishVerification } from '#utils/database/verification';
+import {
+  joinVerification,
+  startVerification,
+  finishVerification,
+} from '#utils/database/verification';
 import { findNotes } from '#utils/database/sus';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 import { rolesToString } from '#utils/formatter';
@@ -61,8 +65,9 @@ export class VerificationJoinVCListener extends Listener {
 
   public async run(oldState: VoiceState, newState: VoiceState) {
     // If the event was not a user joining the channel
-    if (oldState.channel?.parent?.id === IDs.categories.verification
-      || newState.channel?.parent?.id !== IDs.categories.verification
+    if (
+      oldState.channel?.parent?.id === IDs.categories.verification ||
+      newState.channel?.parent?.id !== IDs.categories.verification
     ) {
       return;
     }
@@ -116,19 +121,22 @@ export class VerificationJoinVCListener extends Listener {
     }
 
     // Checks if there is more than one person who has joined or if the channel has members
-    if (channel.members.size !== 1
-      || !channel.members.has(member.id)) {
+    if (channel.members.size !== 1 || !channel.members.has(member.id)) {
       return;
     }
 
     // Check if the user has the verifiers role
-    if (member.roles.cache.has(IDs.roles.staff.verifier)
-      || member.roles.cache.has(IDs.roles.staff.trialVerifier)) {
+    if (
+      member.roles.cache.has(IDs.roles.staff.verifier) ||
+      member.roles.cache.has(IDs.roles.staff.trialVerifier)
+    ) {
       await channel.setName('Verifier Meeting');
       verifier = true;
     } else {
-      await currentChannel.send(`Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\n`
-      + 'If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you\'d like to verify as a vegan again, you\'d have to contact a Mod, which could be done via ModMail.');
+      await currentChannel.send(
+        `Hiya ${member.user}, please be patient as a verifier has been called out to verify you.\n\n` +
+          "If you leave this voice channel, you will automatically be given the non-vegan role where you gain access to this server and if you'd like to verify as a vegan again, you'd have to contact a Mod, which could be done via ModMail.",
+      );
       // Adds to the database that the user joined verification
       await joinVerification(channel.id, member);
 
@@ -143,22 +151,31 @@ export class VerificationJoinVCListener extends Listener {
       ]);
 
       // Start 15-minute timer if verifier does not join
-      this.container.tasks.create('verifyTimeout', {
-        channelId: channel.id,
-        userId: member.id,
-      }, 900_000); // 15 minutes
+      this.container.tasks.create(
+        'verifyTimeout',
+        {
+          channelId: channel.id,
+          userId: member.id,
+        },
+        900_000,
+      ); // 15 minutes
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.cache
-      .filter((c) => c.type === ChannelType.GuildVoice);
+    const listVoiceChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildVoice,
+    );
 
     // Create a text channel for verifiers only
     if (!verifier) {
       let verificationText: TextChannel;
       let bannedName = false;
       try {
-        verificationText = await createVerificationText(member, channel, category);
+        verificationText = await createVerificationText(
+          member,
+          channel,
+          category,
+        );
       } catch {
         bannedName = true;
         verificationText = await createVerificationText(
@@ -184,7 +201,12 @@ export class VerificationJoinVCListener extends Listener {
         embeds: [userInfoEmbed, susNotes],
       });
 
-      await this.verificationProcess(verificationText, channel.id, member, guild);
+      await this.verificationProcess(
+        verificationText,
+        channel.id,
+        member,
+        guild,
+      );
     }
 
     // Create a new channel for others to join
@@ -200,29 +222,37 @@ export class VerificationJoinVCListener extends Listener {
     await currentChannel.permissionOverwrites.set([
       {
         id: guild.roles.everyone,
-        deny: [PermissionsBitField.Flags.SendMessages,
+        deny: [
+          PermissionsBitField.Flags.SendMessages,
           PermissionsBitField.Flags.ViewChannel,
-          PermissionsBitField.Flags.Stream],
+          PermissionsBitField.Flags.Stream,
+        ],
       },
       {
         id: IDs.roles.verifyBlock,
-        deny: [PermissionsBitField.Flags.ViewChannel,
+        deny: [
+          PermissionsBitField.Flags.ViewChannel,
           PermissionsBitField.Flags.Connect,
-          PermissionsBitField.Flags.SendMessages],
+          PermissionsBitField.Flags.SendMessages,
+        ],
       },
       {
         id: IDs.roles.staff.verifier,
-        allow: [PermissionsBitField.Flags.SendMessages,
+        allow: [
+          PermissionsBitField.Flags.SendMessages,
           PermissionsBitField.Flags.ViewChannel,
           PermissionsBitField.Flags.Connect,
-          PermissionsBitField.Flags.MuteMembers],
+          PermissionsBitField.Flags.MuteMembers,
+        ],
       },
       {
         id: IDs.roles.staff.trialVerifier,
-        allow: [PermissionsBitField.Flags.SendMessages,
+        allow: [
+          PermissionsBitField.Flags.SendMessages,
           PermissionsBitField.Flags.ViewChannel,
           PermissionsBitField.Flags.Connect,
-          PermissionsBitField.Flags.MuteMembers],
+          PermissionsBitField.Flags.MuteMembers,
+        ],
       },
       {
         id: member.id,
@@ -259,7 +289,11 @@ export class VerificationJoinVCListener extends Listener {
       .setTitle(`${notes.length} sus notes for ${user.user.username}`);
 
     // Add up to 10 of the latest sus notes to the embed
-    for (let i = notes.length > 10 ? notes.length - 10 : 0; i < notes.length; i += 1) {
+    for (
+      let i = notes.length > 10 ? notes.length - 10 : 0;
+      i < notes.length;
+      i += 1
+    ) {
       // Get mod name
       const modGuildMember = guild.members.cache.get(notes[i].modId);
       let mod = notes[i].modId;
@@ -268,7 +302,11 @@ export class VerificationJoinVCListener extends Listener {
       }
       // Add sus note to embed
       embed.addFields({
-        name: `Sus ID: ${notes[i].id} | Moderator: ${mod} | Date: <t:${Math.floor(notes[i].time.getTime() / 1000)}>`,
+        name: `Sus ID: ${
+          notes[i].id
+        } | Moderator: ${mod} | Date: <t:${Math.floor(
+          notes[i].time.getTime() / 1000,
+        )}>`,
         value: notes[i].note,
       });
     }
@@ -335,7 +373,10 @@ export class VerificationJoinVCListener extends Listener {
           case 0: {
             info.find.reason = buttonChoice;
             if (buttonChoice !== 0 && info.find.reason === 0) {
-              embed = await this.createEmbed(serverFind[info.page].question, embedColor);
+              embed = await this.createEmbed(
+                serverFind[info.page].question,
+                embedColor,
+              );
               buttons = await this.createButtons(serverFind[info.page].buttons);
               await message.edit({
                 embeds: [embed],
@@ -405,7 +446,10 @@ export class VerificationJoinVCListener extends Listener {
         info.page += 1;
         // Checks if finished all the questions
         if (info.page < questionLength) {
-          embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
+          embed = await this.createEmbed(
+            questionInfo[info.page].question,
+            embedColor,
+          );
           buttons = await this.createButtons(questionInfo[info.page].buttons);
           await message.edit({
             embeds: [embed],
@@ -419,13 +463,14 @@ export class VerificationJoinVCListener extends Listener {
             .setColor(embedColor)
             .setTitle(`Give these roles to ${user.displayName}?`)
             .setThumbnail(user.avatarURL()!)
-            .addFields(
-              { name: 'Roles:', value: this.getTextRoles(info.roles) },
-            );
+            .addFields({
+              name: 'Roles:',
+              value: this.getTextRoles(info.roles),
+            });
 
           // Create buttons for input
-          buttons = [new ActionRowBuilder<ButtonBuilder>()
-            .addComponents(
+          buttons = [
+            new ActionRowBuilder<ButtonBuilder>().addComponents(
               new ButtonBuilder()
                 .setCustomId('confirm')
                 .setLabel('Yes')
@@ -434,7 +479,8 @@ export class VerificationJoinVCListener extends Listener {
                 .setCustomId('cancel')
                 .setLabel('No')
                 .setStyle(ButtonStyle.Danger),
-            )];
+            ),
+          ];
           await message.edit({
             embeds: [embed],
             components: buttons,
@@ -444,7 +490,9 @@ export class VerificationJoinVCListener extends Listener {
       // Confirming and finishing the verification
       if (button.customId === 'confirm' && info.page >= questionLength) {
         // Check verifier is on the database
-        const verifierGuildMember = await guild.members.cache.get(button.user.id);
+        const verifierGuildMember = await guild.members.cache.get(
+          button.user.id,
+        );
         if (verifierGuildMember === undefined) {
           await message.edit({ content: 'Verifier not found!' });
           return;
@@ -459,19 +507,21 @@ export class VerificationJoinVCListener extends Listener {
         // Add timeout if they do not have activist role
         if (!info.roles.activist) {
           // @ts-ignore
-          this.container.tasks.create('verifyUnblock', {
-            userId: user.id,
-            guildId: guild.id,
-          }, (info.roles.vegan || info.roles.convinced) ? 604800000 : 1814400000);
+          this.container.tasks.create(
+            'verifyUnblock',
+            {
+              userId: user.id,
+              guildId: guild.id,
+            },
+            info.roles.vegan || info.roles.convinced ? 604800000 : 1814400000,
+          );
         }
         // Add embed saying verification completed
         embed = new EmbedBuilder()
           .setColor('#34c000')
           .setTitle(`Successfully verified ${user.displayName}!`)
           .setThumbnail(user.user.displayAvatarURL())
-          .addFields(
-            { name: 'Roles:', value: this.getTextRoles(info.roles) },
-          );
+          .addFields({ name: 'Roles:', value: this.getTextRoles(info.roles) });
         await message.edit({
           embeds: [embed],
           components: [],
@@ -486,7 +536,10 @@ export class VerificationJoinVCListener extends Listener {
         info.roles.trusted = false;
         info.roles.vegCurious = false;
         info.roles.convinced = false;
-        embed = await this.createEmbed(questionInfo[info.page].question, embedColor);
+        embed = await this.createEmbed(
+          questionInfo[info.page].question,
+          embedColor,
+        );
         buttons = await this.createButtons(questionInfo[info.page].buttons);
         await message.edit({
           embeds: [embed],
@@ -498,9 +551,7 @@ export class VerificationJoinVCListener extends Listener {
   }
 
   private async createEmbed(title: string, color: ColorResolvable) {
-    return new EmbedBuilder()
-      .setColor(color)
-      .setTitle(title);
+    return new EmbedBuilder().setColor(color).setTitle(title);
   }
 
   private async createButtons(buttons: string[]) {
@@ -511,13 +562,12 @@ export class VerificationJoinVCListener extends Listener {
       if (i % 5 === 0) {
         buttonActions.push(new ActionRowBuilder<ButtonBuilder>());
       }
-      buttonActions[Math.floor(i / 5)]
-        .addComponents(
-          new ButtonBuilder()
-            .setCustomId(`button${i}`)
-            .setLabel(buttons[i])
-            .setStyle(ButtonStyle.Secondary),
-        );
+      buttonActions[Math.floor(i / 5)].addComponents(
+        new ButtonBuilder()
+          .setCustomId(`button${i}`)
+          .setLabel(buttons[i])
+          .setStyle(ButtonStyle.Secondary),
+      );
     }
 
     return buttonActions;
@@ -532,15 +582,13 @@ export class VerificationJoinVCListener extends Listener {
     return parseInt(buttonChoice, 10);
   }
 
-  private getTextRoles(
-    roles: {
-      vegan: boolean,
-      activist: boolean,
-      trusted: boolean,
-      vegCurious: boolean,
-      convinced: boolean
-    },
-  ) {
+  private getTextRoles(roles: {
+    vegan: boolean;
+    activist: boolean;
+    trusted: boolean;
+    vegCurious: boolean;
+    convinced: boolean;
+  }) {
     let rolesText = '';
     if (roles.convinced) {
       rolesText += `<@&${IDs.roles.nonvegan.convinced}>`;

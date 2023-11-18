@@ -37,7 +37,9 @@ export class EventCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkEventCoordinator(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkEventCoordinator(interaction.member! as GuildMember);
   }
@@ -45,7 +47,9 @@ export class EventCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   private async checkEventCoordinator(user: GuildMember) {
     return user.roles.cache.has(IDs.roles.staff.eventCoordinator)
       ? this.ok()
-      : this.error({ message: 'Only event coordinators can run this command!' });
+      : this.error({
+          message: 'Only event coordinators can run this command!',
+        });
   }
 }
 

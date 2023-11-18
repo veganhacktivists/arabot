@@ -46,7 +46,9 @@ export class XpListener extends Listener {
     // If no counts exist on the database, then create the first count from the bot
     if (lastCount === null) {
       if (this.container.client.id === null) {
-        message.channel.send('An unexpected error occurred trying to set up the counting channel, please contact a developer!');
+        message.channel.send(
+          'An unexpected error occurred trying to set up the counting channel, please contact a developer!',
+        );
         return;
       }
 
@@ -58,7 +60,9 @@ export class XpListener extends Listener {
 
       lastCount = await getLastCount();
       if (lastCount === null) {
-        message.channel.send('An unexpected error occurred, please contact a developer!');
+        message.channel.send(
+          'An unexpected error occurred, please contact a developer!',
+        );
         return;
       }
     }
@@ -80,7 +84,9 @@ export class XpListener extends Listener {
     // If the count was not correct, restart it
     await addCount(message.author.id, 0);
     await message.react('❌');
-    await message.reply(`${message.author} counted incorrectly! The count got up to ${lastCount.number}! `
-    + 'The count has been reset and the next number is 1');
+    await message.reply(
+      `${message.author} counted incorrectly! The count got up to ${lastCount.number}! ` +
+        'The count has been reset and the next number is 1',
+    );
   }
 }

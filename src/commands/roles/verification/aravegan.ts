@@ -28,19 +28,25 @@ export class ARAVeganCommand extends Command {
       ...options,
       name: 'aravegan',
       description: 'Gives the ara vegan role',
-      preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
+      preconditions: [
+        ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
+      ],
     });
   }
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give vegan role to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give vegan role to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -120,7 +126,7 @@ export class ARAVeganCommand extends Command {
     }
 
     if (modMember === undefined) {
-      info.message = 'Error fetching the staff\'s guild member!';
+      info.message = "Error fetching the staff's guild member!";
       return info;
     }
 
@@ -131,11 +137,14 @@ export class ARAVeganCommand extends Command {
 
     // Checks if the user is an ARA Vegan and to give them or remove them based on if they have it
     if (member.roles.cache.has(IDs.roles.vegan.araVegan)) {
-      if (!modMember.roles.cache.hasAny(
-        IDs.roles.staff.verifierCoordinator,
-        IDs.roles.staff.modCoordinator,
-      )) {
-        info.message = 'You need to be a verifier coordinator to remove these roles!';
+      if (
+        !modMember.roles.cache.hasAny(
+          IDs.roles.staff.verifierCoordinator,
+          IDs.roles.staff.modCoordinator,
+        )
+      ) {
+        info.message =
+          'You need to be a verifier coordinator to remove these roles!';
         return info;
       }
 
@@ -158,7 +167,8 @@ export class ARAVeganCommand extends Command {
     await roleAddLog(user.id, mod.id, vegan);
     info.message = `Gave ${user} the ${vegan.name} role!`;
 
-    await user.send(`You have been given the ${vegan.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${vegan.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

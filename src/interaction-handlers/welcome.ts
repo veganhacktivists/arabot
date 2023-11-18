@@ -17,7 +17,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
+import {
+  InteractionHandler,
+  InteractionHandlerTypes,
+} from '@sapphire/framework';
 import type { PieceContext } from '@sapphire/framework';
 import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
@@ -38,15 +41,17 @@ export class WelcomeButtonHandler extends InteractionHandler {
 
   public async run(interaction: ButtonInteraction) {
     let { member } = interaction;
-    const general = this.container.client.channels.cache
-      .get(IDs.channels.nonVegan.general) as TextChannel | undefined;
+    const general = this.container.client.channels.cache.get(
+      IDs.channels.nonVegan.general,
+    ) as TextChannel | undefined;
     if (general === undefined) {
       return;
     }
 
     if (member === null) {
       await interaction.reply({
-        content: 'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
+        content:
+          'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
         ephemeral: true,
       });
       return;
@@ -59,19 +64,23 @@ export class WelcomeButtonHandler extends InteractionHandler {
       if (!member.voice.channel) {
         await member.roles.add(IDs.roles.nonvegan.nonvegan);
 
-        await general.send(`${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> `
-        + `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`
-        + '\n\nIf you would like to be verified as a vegan, join the \'Verification\' voice channel.');
+        await general.send(
+          `${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> ` +
+            `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.` +
+            "\n\nIf you would like to be verified as a vegan, join the 'Verification' voice channel.",
+        );
         return;
       }
 
       await interaction.reply({
-        content: 'You\'re currently in a verification, you\'ll have to leave the verification or get verified before being able to access the server again.',
+        content:
+          "You're currently in a verification, you'll have to leave the verification or get verified before being able to access the server again.",
         ephemeral: true,
       });
     } catch (error) {
       await interaction.reply({
-        content: 'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
+        content:
+          'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
         ephemeral: true,
       });
     }

@@ -23,7 +23,10 @@ import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class VerifyReminder extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, {
       ...options,
       pattern: '0 */1 * * *',
@@ -42,11 +45,15 @@ export class VerifyReminder extends ScheduledTask {
     if (!messageCount || +messageCount < 100) return;
 
     // Send verification reminder to non-vegan general
-    const channel = client.channels.cache.get(IDs.channels.nonVegan.general) as TextChannel;
+    const channel = client.channels.cache.get(
+      IDs.channels.nonVegan.general,
+    ) as TextChannel;
 
-    await channel.send('If you want to have the vegan or activist role, you\'ll need to do a voice verification. '
-      + 'To do this, hop into the \'Verification\' voice channel.'
-      + '\n\nIf there aren\'t any verifiers available, you\'ll be disconnected, and you can rejoin later.');
+    await channel.send(
+      "If you want to have the vegan or activist role, you'll need to do a voice verification. " +
+        "To do this, hop into the 'Verification' voice channel." +
+        "\n\nIf there aren't any verifiers available, you'll be disconnected, and you can rejoin later.",
+    );
 
     // Reset the total message counter to 0
     await this.container.redis.set(redisKey, 0);

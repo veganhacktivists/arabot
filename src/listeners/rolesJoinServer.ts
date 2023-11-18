@@ -71,9 +71,13 @@ export class RolesJoinServerListener extends Listener {
 
       // Add user to the restricted vegan channel
       if (section === 5) {
-        const restrictedCategory = member.guild.channels.cache.get(IDs.categories.restricted);
-        if (restrictedCategory !== undefined
-          && restrictedCategory.type === ChannelType.GuildCategory) {
+        const restrictedCategory = member.guild.channels.cache.get(
+          IDs.categories.restricted,
+        );
+        if (
+          restrictedCategory !== undefined &&
+          restrictedCategory.type === ChannelType.GuildCategory
+        ) {
           await this.restrictRun(member.id, restrictedCategory, member.guild);
         }
       }
@@ -93,19 +97,28 @@ export class RolesJoinServerListener extends Listener {
       await member.roles.add(roles);
     }
 
-    const privateCategory = member.guild.channels.cache.get(IDs.categories.private);
+    const privateCategory = member.guild.channels.cache.get(
+      IDs.categories.private,
+    );
 
-    if (privateCategory !== undefined
-      && privateCategory.type === ChannelType.GuildCategory) {
+    if (
+      privateCategory !== undefined &&
+      privateCategory.type === ChannelType.GuildCategory
+    ) {
       await this.privateRun(member.id, privateCategory, member.guild);
     }
 
     // TODO add access back to diversity team
   }
 
-  private async restrictRun(userId: Snowflake, category: CategoryChannel, guild: Guild) {
-    const textChannels = category.children.cache
-      .filter((c) => c.type === ChannelType.GuildText);
+  private async restrictRun(
+    userId: Snowflake,
+    category: CategoryChannel,
+    guild: Guild,
+  ) {
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
@@ -114,9 +127,11 @@ export class RolesJoinServerListener extends Listener {
         const vcId = topic[topic.indexOf(userId) + 1];
         const voiceChannel = guild.channels.cache.get(vcId);
 
-        if (voiceChannel !== undefined
-          && voiceChannel.parentId === IDs.categories.restricted
-          && voiceChannel.isVoiceBased()) {
+        if (
+          voiceChannel !== undefined &&
+          voiceChannel.parentId === IDs.categories.restricted &&
+          voiceChannel.isVoiceBased()
+        ) {
           voiceChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
         }
         textChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
@@ -124,9 +139,14 @@ export class RolesJoinServerListener extends Listener {
     });
   }
 
-  private async privateRun(userId: Snowflake, category: CategoryChannel, guild: Guild) {
-    const textChannels = category.children.cache
-      .filter((c) => c.type === ChannelType.GuildText);
+  private async privateRun(
+    userId: Snowflake,
+    category: CategoryChannel,
+    guild: Guild,
+  ) {
+    const textChannels = category.children.cache.filter(
+      (c) => c.type === ChannelType.GuildText,
+    );
     textChannels.forEach((c) => {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
@@ -135,9 +155,11 @@ export class RolesJoinServerListener extends Listener {
         const vcId = topic[topic.indexOf(userId) + 2];
         const voiceChannel = guild.channels.cache.get(vcId);
 
-        if (voiceChannel !== undefined
-          && voiceChannel.parentId === IDs.categories.private
-          && voiceChannel.isVoiceBased()) {
+        if (
+          voiceChannel !== undefined &&
+          voiceChannel.parentId === IDs.categories.private &&
+          voiceChannel.isVoiceBased()
+        ) {
           voiceChannel.permissionOverwrites.edit(userId, { ViewChannel: true });
         }
         textChannel.permissionOverwrites.edit(userId, { ViewChannel: true });

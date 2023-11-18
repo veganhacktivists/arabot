@@ -19,16 +19,14 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { CategoryChannel, ChannelType, EmbedBuilder } from 'discord.js';
-import type {
-  User,
-  Message,
-  TextChannel,
-  Guild,
-  Snowflake,
-} from 'discord.js';
+import type { User, Message, TextChannel, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchRoles, addExistingUser } from '#utils/database/dbExistingUser';
-import { unRestrict, checkActive, unRestrictLegacy } from '#utils/database/restriction';
+import {
+  unRestrict,
+  checkActive,
+  unRestrictLegacy,
+} from '#utils/database/restriction';
 
 export class UnRestrictCommand extends Command {
   public constructor(context: Command.Context, options: Command.Options) {
@@ -44,12 +42,16 @@ export class UnRestrictCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to unrestrict')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to unrestrict')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -105,7 +107,12 @@ export class UnRestrictCommand extends Command {
 
     const channelRun = message.channel;
 
-    const info = await this.unRestrictRun(user?.id, mod.id, guild, channelRun.id);
+    const info = await this.unRestrictRun(
+      user?.id,
+      mod.id,
+      guild,
+      channelRun.id,
+    );
 
     if (!info.runInVeganRestrict) {
       await message.reply(info.message);
@@ -151,12 +158,11 @@ export class UnRestrictCommand extends Command {
     let member = guild.members.cache.get(userId);
 
     if (member === undefined) {
-      member = await guild.members.fetch(userId)
-        .catch(() => undefined);
+      member = await guild.members.fetch(userId).catch(() => undefined);
     }
 
     if (member === undefined) {
-      info.message = 'Can\'t unrestrict the user as they are not on this server';
+      info.message = "Can't unrestrict the user as they are not on this server";
       return info;
     }
 
@@ -192,14 +198,16 @@ export class UnRestrictCommand extends Command {
 
     // Remove vegan restrict channels
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      const category = guild.channels.cache
-        .get(IDs.categories.restricted) as CategoryChannel | undefined;
+      const category = guild.channels.cache.get(IDs.categories.restricted) as
+        | CategoryChannel
+        | undefined;
 
       let topic: string[];
 
       if (category !== undefined) {
-        const textChannels = category.children.cache
-          .filter((c) => c.type === ChannelType.GuildText);
+        const textChannels = category.children.cache.filter(
+          (c) => c.type === ChannelType.GuildText,
+        );
         textChannels.forEach((c) => {
           const textChannel = c as TextChannel;
           // Checks if the channel topic has the user's snowflake
@@ -211,8 +219,10 @@ export class UnRestrictCommand extends Command {
             const vcId = topic[topic.indexOf(userId) + 1];
             const voiceChannel = guild.channels.cache.get(vcId);
 
-            if (voiceChannel !== undefined
-              && voiceChannel.parentId === IDs.categories.restricted) {
+            if (
+              voiceChannel !== undefined &&
+              voiceChannel.parentId === IDs.categories.restricted
+            ) {
               voiceChannel.delete();
             }
             textChannel.delete();
@@ -224,14 +234,18 @@ export class UnRestrictCommand extends Command {
     info.success = true;
 
     // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
-        this.container.logger.error('Restrict Error: Could not fetch log channel');
+        this.container.logger.error(
+          'Restrict Error: Could not fetch log channel',
+        );
         info.message = `Unrestricted ${user} but could not find the log channel. This has been logged to the database.`;
         return info;
       }
@@ -239,7 +253,10 @@ export class UnRestrictCommand extends Command {
 
     const message = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unrestricted ${user.tag}`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Unrestricted ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

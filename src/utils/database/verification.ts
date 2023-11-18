@@ -28,12 +28,12 @@ export async function manualVerification(
   member: GuildMember,
   verifier: GuildMember,
   roles: {
-    vegan: boolean,
-    activist: boolean,
-    araVegan: boolean,
-    trusted: boolean,
-    vegCurious: boolean,
-    convinced: boolean
+    vegan: boolean;
+    activist: boolean;
+    araVegan: boolean;
+    trusted: boolean;
+    vegCurious: boolean;
+    convinced: boolean;
   },
 ) {
   await updateUser(member);
@@ -64,7 +64,10 @@ export async function manualVerification(
   });
 }
 
-export async function joinVerification(channelId: Snowflake, member: GuildMember) {
+export async function joinVerification(
+  channelId: Snowflake,
+  member: GuildMember,
+) {
   // Update the user on the database with the current roles they have
   await updateUser(member);
 
@@ -115,23 +118,24 @@ export async function finishVerification(
   channelId: Snowflake,
   verifierId: Snowflake,
   info: {
-    page: number,
+    page: number;
     find: {
-      reason: number,
-      where: number
-    },
-    length: number,
-    reasoning: number,
-    life: number,
-    food: number,
+      reason: number;
+      where: number;
+    };
+    length: number;
+    reasoning: number;
+    life: number;
+    food: number;
     roles: {
-      vegan: boolean,
-      activist: boolean,
-      araVegan: boolean,
-      trusted: boolean,
-      vegCurious: boolean,
-      convinced: boolean
-    } },
+      vegan: boolean;
+      activist: boolean;
+      araVegan: boolean;
+      trusted: boolean;
+      vegCurious: boolean;
+      convinced: boolean;
+    };
+  },
 ) {
   // TODO potentially add an incomplete tracker?
   await container.database.verify.update({
@@ -220,14 +224,17 @@ export async function blockTime(userId: Snowflake) {
       return 0;
     }
     const timeOff = new Date().getTime() - verification.finishTime.getTime();
-    return ((verification.vegan || verification.convinced) ? 604800000 : 1814400000) - timeOff;
+    return (
+      (verification.vegan || verification.convinced ? 604800000 : 1814400000) -
+      timeOff
+    );
   }
 
   // Timeouts
-  const count = await countIncomplete(verification.userId) % (leaveBan + 1);
+  const count = (await countIncomplete(verification.userId)) % (leaveBan + 1);
   const timeOff = new Date().getTime() - verification.joinTime.getTime();
   // Creates the length of the time for the ban
-  return (fibonacci(count) * 3600_000) - timeOff;
+  return fibonacci(count) * 3600_000 - timeOff;
 }
 
 // Checks if the last verification was completed

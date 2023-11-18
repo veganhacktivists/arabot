@@ -30,10 +30,12 @@ export class BotAppreciationListener extends Listener {
 
   public async run(message: Message) {
     const content = message.content.toLowerCase();
-    if (!content.includes('thanks arabot')
-      && !content.includes('thanks ara bot')
-      && !content.includes('thank you arabot')
-      && !content.includes('thank you ara bot')) {
+    if (
+      !content.includes('thanks arabot') &&
+      !content.includes('thanks ara bot') &&
+      !content.includes('thank you arabot') &&
+      !content.includes('thank you ara bot')
+    ) {
       return;
     }
 

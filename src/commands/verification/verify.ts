@@ -18,14 +18,12 @@
  */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type {
-  Message,
-  User,
-  Guild,
-  Snowflake,
-} from 'discord.js';
+import type { Message, User, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
-import { finishVerifyMessages, giveVerificationRoles } from '#utils/verification';
+import {
+  finishVerifyMessages,
+  giveVerificationRoles,
+} from '#utils/verification';
 import { manualVerification } from '#utils/database/verification';
 
 export class VerifyCommand extends Command {
@@ -35,22 +33,31 @@ export class VerifyCommand extends Command {
       name: 'verify',
       aliases: ['ver'],
       description: 'Gives roles to the user',
-      preconditions: [['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly']],
+      preconditions: [
+        ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
+      ],
     });
   }
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give the roles to')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('roles')
-          .setDescription('Roles to give to the user')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give the roles to')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('roles')
+              .setDescription('Roles to give to the user')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -76,7 +83,13 @@ export class VerifyCommand extends Command {
       return;
     }
 
-    const verify = await this.verify(user, verifier.id, roles, messageId, guild);
+    const verify = await this.verify(
+      user,
+      verifier.id,
+      roles,
+      messageId,
+      guild,
+    );
 
     await interaction.reply({
       content: verify.message,
@@ -113,7 +126,13 @@ export class VerifyCommand extends Command {
       return;
     }
 
-    const verify = await this.verify(user, verifier.id, roles, message.id, guild);
+    const verify = await this.verify(
+      user,
+      verifier.id,
+      roles,
+      message.id,
+      guild,
+    );
 
     await message.reply(verify.message);
     await message.react(verify.success ? '✅' : '❌');
@@ -144,8 +163,7 @@ export class VerifyCommand extends Command {
 
     // Checks if member is null
     if (member === undefined) {
-      member = await guild.members.fetch(user.id)
-        .catch(() => undefined);
+      member = await guild.members.fetch(user.id).catch(() => undefined);
       if (member === undefined) {
         info.message = 'Failed to fetch member';
         return info;
@@ -153,7 +171,7 @@ export class VerifyCommand extends Command {
     }
 
     if (member.roles.cache.hasAny(...IDs.roles.restrictions.restricted)) {
-      info.message = 'Can\'t verify a restricted user!';
+      info.message = "Can't verify a restricted user!";
       return info;
     }
 
@@ -161,8 +179,7 @@ export class VerifyCommand extends Command {
 
     // Checks if verifier is null
     if (verifier === undefined) {
-      verifier = await guild.members.fetch(user.id)
-        .catch(() => undefined);
+      verifier = await guild.members.fetch(user.id).catch(() => undefined);
       if (verifier === undefined) {
         info.message = 'Failed to fetch verifier';
         return info;
@@ -203,15 +220,19 @@ export class VerifyCommand extends Command {
       return info;
     }
 
-    if ((roles.vegan || member.roles.cache.has(IDs.roles.vegan.vegan))
-      && (roleArgs.includes('nv') || roles.vegCurious || roles.convinced)) {
-      info.message = 'Can\'t give non-vegan roles to a vegan';
+    if (
+      (roles.vegan || member.roles.cache.has(IDs.roles.vegan.vegan)) &&
+      (roleArgs.includes('nv') || roles.vegCurious || roles.convinced)
+    ) {
+      info.message = "Can't give non-vegan roles to a vegan";
       return info;
     }
 
-    if (roleArgs.includes('nv')
-      && (roles.vegan || roles.activist || roles.araVegan)) {
-      info.message = 'Can\'t give vegan roles to a non-vegan';
+    if (
+      roleArgs.includes('nv') &&
+      (roles.vegan || roles.activist || roles.araVegan)
+    ) {
+      info.message = "Can't give vegan roles to a non-vegan";
       return info;
     }
 
@@ -221,8 +242,10 @@ export class VerifyCommand extends Command {
 
     await manualVerification(messageId, member, verifier, roles);
 
-    if (member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
-      && (roles.vegan || roles.activist || roles.araVegan)) {
+    if (
+      member.roles.cache.has(IDs.roles.nonvegan.nonvegan) &&
+      (roles.vegan || roles.activist || roles.araVegan)
+    ) {
       await member.roles.remove([
         IDs.roles.nonvegan.nonvegan,
         IDs.roles.nonvegan.vegCurious,

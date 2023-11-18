@@ -19,12 +19,7 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { ChannelType, EmbedBuilder } from 'discord.js';
-import type {
-  Message,
-  TextChannel,
-  Guild,
-  Snowflake,
-} from 'discord.js';
+import type { Message, TextChannel, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 import { getRestrictions } from '#utils/database/restriction';
 import { checkStaff } from '#utils/checker';
@@ -42,11 +37,15 @@ export class RestrictLogsCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to check restriction logs for')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to check restriction logs for'),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -72,8 +71,7 @@ export class RestrictLogsCommand extends Command {
 
     let userId: Snowflake | null = null;
 
-    if (user !== undefined
-      && user !== null) {
+    if (user !== undefined && user !== null) {
       userId = user.id;
     }
 
@@ -201,9 +199,11 @@ export class RestrictLogsCommand extends Command {
       .setFooter({ text: `ID: ${userId}` });
 
     // Add up to 10 of the latest restrictions to the embed
-    for (let i = restrictions.length > 10 ? restrictions.length - 10 : 0;
+    for (
+      let i = restrictions.length > 10 ? restrictions.length - 10 : 0;
       i < restrictions.length;
-      i += 1) {
+      i += 1
+    ) {
       // Get mod names
       let restMod = restrictions[i].modId;
       const restModMember = guild.members.cache.get(restMod);
@@ -226,7 +226,9 @@ export class RestrictLogsCommand extends Command {
         restTitle += 'Currently Restricted | ';
       }
 
-      restTitle += `Date: <t:${Math.floor(restrictions[i].startTime.getTime() / 1000)}>`;
+      restTitle += `Date: <t:${Math.floor(
+        restrictions[i].startTime.getTime() / 1000,
+      )}>`;
 
       embed.addFields({
         name: restTitle,

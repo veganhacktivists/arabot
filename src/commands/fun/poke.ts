@@ -34,12 +34,16 @@ export class PokeCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User you want to poke')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User you want to poke')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -61,9 +65,15 @@ export class PokeCommand extends Command {
       .setColor('#0099ff')
       .setTitle(`Poke from ${sender.username}`)
       .setImage(randomPoke)
-      .setFooter({ text: `Amount of pokes from ${sender.username} to you: ${count}` });
+      .setFooter({
+        text: `Amount of pokes from ${sender.username} to you: ${count}`,
+      });
 
     // Send the poke
-    await interaction.reply({ content: `${user}`, embeds: [pokeEmbed], fetchReply: true });
+    await interaction.reply({
+      content: `${user}`,
+      embeds: [pokeEmbed],
+      fetchReply: true,
+    });
   }
 }

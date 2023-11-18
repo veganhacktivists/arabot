@@ -5,7 +5,7 @@ export async function roleLog(
   userId: Snowflake,
   modId: Snowflake,
   role: Role,
-  staffRole : boolean,
+  staffRole: boolean,
   add: boolean,
 ) {
   await container.database.roleLog.create({

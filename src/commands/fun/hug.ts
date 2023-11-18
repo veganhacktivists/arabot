@@ -34,12 +34,16 @@ export class HugCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User you want to hug')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User you want to hug')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -61,9 +65,15 @@ export class HugCommand extends Command {
       .setColor('#0099ff')
       .setTitle(`Hug from ${hugger.username}`)
       .setImage(randomHug)
-      .setFooter({ text: `Amount of hugs given from ${hugger.username} to you: ${count}` });
+      .setFooter({
+        text: `Amount of hugs given from ${hugger.username} to you: ${count}`,
+      });
 
     // Send the hug
-    await interaction.reply({ content: `${user}`, embeds: [hugEmbed], fetchReply: true });
+    await interaction.reply({
+      content: `${user}`,
+      embeds: [hugEmbed],
+      fetchReply: true,
+    });
   }
 }

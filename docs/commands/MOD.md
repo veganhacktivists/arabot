@@ -4,12 +4,12 @@
 
 - `/rename <user> <optional: nickname>`/`?ru <user> <optional: nickname>` - Renames that user to the specified nickname,
   if nickname is left blank it will reset the nickname to their original username.
-- `/slowmode <duration>`/`?slowmode <duration>` - changes the slowmode for a chat. Duration uses a time which can be set by providing a number 
-followed by s/d/m/y or just writing `off`. These can be combined. 
-For example to set the slowmode for 1 minute and 30 seconds, you would write: `1m 30s`.
+- `/slowmode <duration>`/`?slowmode <duration>` - changes the slowmode for a chat. Duration uses a time which can be set by providing a number
+  followed by s/d/m/y or just writing `off`. These can be combined.
+  For example to set the slowmode for 1 minute and 30 seconds, you would write: `1m 30s`.
 - `/softmute <user>`/`?sm/softmute <user>` - Prevents the user from reacting to messages.
-- `/vcmute <user>`/`?vcmute <user>` - Adds a persistent VC mute if the user has left the VC or leaves the server to 
-circumvent VC mutes.
+- `/vcmute <user>`/`?vcmute <user>` - Adds a persistent VC mute if the user has left the VC or leaves the server to
+  circumvent VC mutes.
 - `?warn <user> <reason>` - Gives a warning to the user.
 
 ## Roles
@@ -36,15 +36,15 @@ These are used for users that have broken rules severe enough that takes away th
 
 - `/restrict <user> <reason>`/`?r/restrict <user> <reason>` - Restricts the user to the restricted section
 - `/unrestrict <user>`/`?ur <user>` - Unrestricts the user
-- `/restrictlogs <optional: user>` - Shows the logs of when the user has been restricted. The need to provide the user 
-is optional depending on if the command is run in the ModMail category.
+- `/restrictlogs <optional: user>` - Shows the logs of when the user has been restricted. The need to provide the user
+  is optional depending on if the command is run in the ModMail category.
 - `/restricttools channel delete <optional: user>` - Deletes the vegan restricted channel for the user. Providing a user
-is only optional if the command is run in the channel that is to be deleted.
+  is only optional if the command is run in the channel that is to be deleted.
 
 ## Bans
 
 - `/tempban <user> <duration> <reason>`/`?tempban <user> <duration <reason>` - Bans the user for a specific amount of
-time. Duration uses a time which can be set by providing a number followed by s/d/m/y. These can be combined.
-For example to ban someone for 1 week and 3 days, you would write: `1w 3d`.
+  time. Duration uses a time which can be set by providing a number followed by s/d/m/y. These can be combined.
+  For example to ban someone for 1 week and 3 days, you would write: `1w 3d`.
 - `/ban <user> <reason>`/`?ban <user> <reason>` - Permanently bans that user.
 - `/unban <user>`/`?unban <user>` - Unbans that user.

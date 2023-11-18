@@ -34,15 +34,22 @@ export class RenameUserCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to change nickname')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('nickname')
-          .setDescription('The nickname to give the user')
-          .setMaxLength(32)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to change nickname')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('nickname')
+              .setDescription('The nickname to give the user')
+              .setMaxLength(32),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -85,7 +92,7 @@ export class RenameUserCommand extends Command {
       await member.setNickname(nickname);
     } catch {
       await interaction.reply({
-        content: 'Bot doesn\'t have permission to change the user\'s name!',
+        content: "Bot doesn't have permission to change the user's name!",
         ephemeral: true,
         fetchReply: true,
       });
@@ -111,7 +118,7 @@ export class RenameUserCommand extends Command {
 
     const nickname = args.finished ? null : await args.rest('string');
 
-    if ((nickname != null) && nickname.length > 32) {
+    if (nickname != null && nickname.length > 32) {
       await message.react('❌');
       await message.reply('Nickname is too long!');
       return;
@@ -121,7 +128,9 @@ export class RenameUserCommand extends Command {
       await member.setNickname(nickname);
     } catch {
       await message.react('❌');
-      await message.reply('Bot doesn\'t have permission to change the user\'s name!');
+      await message.reply(
+        "Bot doesn't have permission to change the user's name!",
+      );
       return;
     }
 

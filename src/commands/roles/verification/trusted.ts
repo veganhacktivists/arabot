@@ -36,12 +36,16 @@ export class TrustedCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove trusted to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give/remove trusted to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -138,10 +142,13 @@ export class TrustedCommand extends Command {
     await roleAddLog(user.id, mod.id, trusted);
     info.message = `Gave ${user} the ${trusted.name} role!`;
 
-    await user.send(`You have been given the ${trusted.name} role by ${mod}!`
-      + '\n\nThis role allows you to post attachments to the server and stream in VCs.'
-      + '\nMake sure that you follow the rules, and don\'t post anything NSFW, anything objectifying animals and follow Discord\'s ToS.'
-      + `\nNot following these rules can result in the removal of the ${trusted.name} role.`)
+    await user
+      .send(
+        `You have been given the ${trusted.name} role by ${mod}!` +
+          '\n\nThis role allows you to post attachments to the server and stream in VCs.' +
+          "\nMake sure that you follow the rules, and don't post anything NSFW, anything objectifying animals and follow Discord's ToS." +
+          `\nNot following these rules can result in the removal of the ${trusted.name} role.`,
+      )
       .catch(() => {});
     info.success = true;
     return info;

@@ -35,14 +35,21 @@ export class AnonymousCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addStringOption((option) => option.setName('message')
-          .setDescription('The message the bot will send')
-          .setRequired(true))
-        .addChannelOption((option) => option.setName('channel')
-          .setDescription('The channel the bot will send the message')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addStringOption((option) =>
+            option
+              .setName('message')
+              .setDescription('The message the bot will send')
+              .setRequired(true),
+          )
+          .addChannelOption((option) =>
+            option
+              .setName('channel')
+              .setDescription('The channel the bot will send the message'),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

@@ -36,14 +36,21 @@ export class VCMuteCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to persistently mute')
-          .setRequired(true))
-        .addStringOption((option) => option.setName('reason')
-          .setDescription('Reason for persistently muting the user')),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to persistently mute')
+              .setRequired(true),
+          )
+          .addStringOption((option) =>
+            option
+              .setName('reason')
+              .setDescription('Reason for persistently muting the user'),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -128,7 +135,9 @@ export class VCMuteCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Moderator not found! Try again or contact a developer!');
+      await message.reply(
+        'Moderator not found! Try again or contact a developer!',
+      );
       return;
     }
 

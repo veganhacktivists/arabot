@@ -17,7 +17,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import { InteractionHandler, InteractionHandlerTypes } from '@sapphire/framework';
+import {
+  InteractionHandler,
+  InteractionHandlerTypes,
+} from '@sapphire/framework';
 import type { PieceContext } from '@sapphire/framework';
 import type { ButtonInteraction, GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
@@ -39,8 +42,9 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
   public async run(interaction: ButtonInteraction) {
     let { member } = interaction;
 
-    const errorMessage = 'There was an error giving you the role, please try again later or contact ModMail/the developer '
-      + 'to sort out this problem.';
+    const errorMessage =
+      'There was an error giving you the role, please try again later or contact ModMail/the developer ' +
+      'to sort out this problem.';
 
     if (member === null) {
       await interaction.reply({
@@ -64,8 +68,9 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
       if (member.roles.cache.has(IDs.roles.vegan.nvAccess)) {
         await member.roles.remove(IDs.roles.vegan.nvAccess);
         await interaction.reply({
-          content: 'Your access from the non vegan section has been removed. '
-            + 'If you want to gain access again, click this button again.',
+          content:
+            'Your access from the non vegan section has been removed. ' +
+            'If you want to gain access again, click this button again.',
           ephemeral: true,
         });
         return;
@@ -73,8 +78,9 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
 
       await member.roles.add(IDs.roles.vegan.nvAccess);
       await interaction.reply({
-        content: 'Your access to the non vegan section has been given back. '
-          + 'If you want to remove access again, click this button again.',
+        content:
+          'Your access to the non vegan section has been given back. ' +
+          'If you want to remove access again, click this button again.',
         ephemeral: true,
       });
     } catch (error) {

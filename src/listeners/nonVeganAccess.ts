@@ -20,10 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import { ButtonStyle, ActionRowBuilder, ButtonBuilder } from 'discord.js';
 
-import type {
-  Client,
-  TextChannel,
-} from 'discord.js';
+import type { Client, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class NonVeganAccessReady extends Listener {
@@ -36,11 +33,13 @@ export class NonVeganAccessReady extends Listener {
   }
 
   public async run(client: Client) {
-    let roles = client.channels.cache
-      .get(IDs.channels.information.roles) as TextChannel | undefined;
+    let roles = client.channels.cache.get(IDs.channels.information.roles) as
+      | TextChannel
+      | undefined;
     if (roles === undefined) {
-      roles = await client.channels
-        .fetch(IDs.channels.information.roles) as TextChannel | undefined;
+      roles = (await client.channels.fetch(IDs.channels.information.roles)) as
+        | TextChannel
+        | undefined;
       if (roles === undefined) {
         this.container.logger.error('nonVeganAccess: Roles not found');
         return;
@@ -51,17 +50,17 @@ export class NonVeganAccessReady extends Listener {
     const messages = await roles.messages.fetch();
     const message = messages.first();
 
-    const content = '**Change access to non-vegan section of the server:**\n\n'
-      + 'If you\'re vegan and want your access removed/added back to the non vegan sections, '
-      + 'press the button bellow to remove/gain access to the non vegan sections.';
+    const content =
+      '**Change access to non-vegan section of the server:**\n\n' +
+      "If you're vegan and want your access removed/added back to the non vegan sections, " +
+      'press the button bellow to remove/gain access to the non vegan sections.';
 
-    const button = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(
-        new ButtonBuilder()
-          .setCustomId('nvAccess')
-          .setLabel('Non Vegan Access')
-          .setStyle(ButtonStyle.Primary),
-      );
+    const button = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder()
+        .setCustomId('nvAccess')
+        .setLabel('Non Vegan Access')
+        .setStyle(ButtonStyle.Primary),
+    );
 
     if (message?.author.id !== botId) {
       await roles.send({

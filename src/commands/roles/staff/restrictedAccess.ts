@@ -36,12 +36,16 @@ export class RestrictedAccessCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give/remove restricted access role')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give/remove restricted access role')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -87,7 +91,9 @@ export class RestrictedAccessCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Mod coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Mod coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -138,7 +144,8 @@ export class RestrictedAccessCommand extends Command {
     await roleAddLog(user.id, mod.id, restricted, true);
     info.message = `Gave ${user} the ${restricted.name} role!`;
 
-    await user.send(`You have been given the ${restricted.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${restricted.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

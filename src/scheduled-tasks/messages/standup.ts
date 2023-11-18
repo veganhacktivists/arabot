@@ -23,7 +23,10 @@ import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class StandupTask extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, {
       ...options,
       pattern: '0 12 * * 1',
@@ -33,7 +36,9 @@ export class StandupTask extends ScheduledTask {
   public async run() {
     const { client } = container;
 
-    const channel = client.channels.cache.get(IDs.channels.staff.coordinators) as TextChannel;
+    const channel = client.channels.cache.get(
+      IDs.channels.staff.coordinators,
+    ) as TextChannel;
 
     await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
                             \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);

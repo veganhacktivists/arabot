@@ -34,12 +34,16 @@ export class VerifyTimeoutRemoveCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to remove timeout from')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to remove timeout from')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -67,8 +71,7 @@ export class VerifyTimeoutRemoveCommand extends Command {
     let member = guild.members.cache.get(user.id);
 
     if (member === undefined) {
-      member = await guild.members.fetch(user.id)
-        .catch(undefined);
+      member = await guild.members.fetch(user.id).catch(undefined);
       if (member === undefined) {
         await interaction.editReply(`${user} is not on this server!`);
         return;
@@ -81,7 +84,9 @@ export class VerifyTimeoutRemoveCommand extends Command {
     }
 
     if (await checkVerificationFinish(user.id)) {
-      await interaction.editReply(`Can't remove ${user}'s role as they failed their last verification`);
+      await interaction.editReply(
+        `Can't remove ${user}'s role as they failed their last verification`,
+      );
       return;
     }
 

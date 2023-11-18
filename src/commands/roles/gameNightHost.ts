@@ -35,12 +35,16 @@ export class GameNightHostCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description)
-        .addUserOption((option) => option.setName('user')
-          .setDescription('User to give Game Night Host role to')
-          .setRequired(true)),
+      (builder) =>
+        builder
+          .setName(this.name)
+          .setDescription(this.description)
+          .addUserOption((option) =>
+            option
+              .setName('user')
+              .setDescription('User to give Game Night Host role to')
+              .setRequired(true),
+          ),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -86,7 +90,9 @@ export class GameNightHostCommand extends Command {
 
     if (mod === null) {
       await message.react('❌');
-      await message.reply('Event coordinator not found! Try again or contact a developer!');
+      await message.reply(
+        'Event coordinator not found! Try again or contact a developer!',
+      );
       return;
     }
 
@@ -137,7 +143,8 @@ export class GameNightHostCommand extends Command {
     await roleAddLog(user.id, mod.id, gameNightHost);
     info.message = `Gave ${user} the ${gameNightHost.name} role!`;
 
-    await user.send(`You have been given the ${gameNightHost.name} role by ${mod}!`)
+    await user
+      .send(`You have been given the ${gameNightHost.name} role by ${mod}!`)
       .catch(() => {});
     info.success = true;
     return info;

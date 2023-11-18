@@ -1,6 +1,10 @@
 import { container } from '@sapphire/framework';
 
-export async function addToDatabase(userId: string, modId: string, message: string) {
+export async function addToDatabase(
+  userId: string,
+  modId: string,
+  message: string,
+) {
   // Add the user to the database
   await container.database.sus.create({
     data: {
@@ -27,10 +31,9 @@ export async function findNotes(userId: string, active: boolean) {
       userId,
       active,
     },
-    orderBy:
-      {
-        id: 'asc',
-      },
+    orderBy: {
+      id: 'asc',
+    },
   });
 
   return note;

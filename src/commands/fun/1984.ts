@@ -35,9 +35,7 @@ export class N1984Command extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -54,8 +52,10 @@ export class N1984Command extends Command {
 
     // Creates the embed for the 1984 reaction
     // Add a 1 in 1000 chance of Dantas literally making ARA 1984
-    const random1984 = Math.random() < 0.001 ? 'https://c.tenor.com/0BwU0BjWYX4AAAAC/arthuria-dantas.gif'
-      : N1984[Math.floor(Math.random() * N1984.length)];
+    const random1984 =
+      Math.random() < 0.001
+        ? 'https://c.tenor.com/0BwU0BjWYX4AAAAC/arthuria-dantas.gif'
+        : N1984[Math.floor(Math.random() * N1984.length)];
     const n1984Embed = new EmbedBuilder()
       .setColor('#ffffff')
       .setTitle(`${user.username} is happy!`)

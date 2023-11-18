@@ -72,10 +72,11 @@ export class UnbanListener extends Listener {
 
     // Checks if GuildMember is null
     if (mod === undefined) {
-      mod = await guild.members.fetch(executor.id)
-        .catch(() => undefined);
+      mod = await guild.members.fetch(executor.id).catch(() => undefined);
       if (mod === undefined) {
-        this.container.logger.error('UnbanListener: Could not fetch moderator.');
+        this.container.logger.error(
+          'UnbanListener: Could not fetch moderator.',
+        );
         return;
       }
     }
@@ -84,7 +85,7 @@ export class UnbanListener extends Listener {
     await addExistingUser(mod);
 
     // Check for missing ban on database
-    if (!await checkBan(user.id)) {
+    if (!(await checkBan(user.id))) {
       // Check if user and mod are on the database
       await addEmptyUser(user.id);
 
@@ -96,21 +97,28 @@ export class UnbanListener extends Listener {
     await removeBan(user.id, mod.id);
 
     // Log the ban
-    let logChannel = guild.channels.cache
-      .get(IDs.channels.logs.restricted) as TextChannel | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
+      | TextChannel
+      | undefined;
 
     if (logChannel === undefined) {
-      logChannel = await guild.channels
-        .fetch(IDs.channels.logs.restricted) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(
+        IDs.channels.logs.restricted,
+      )) as TextChannel | undefined;
       if (logChannel === undefined) {
-        this.container.logger.error('UnbanListener: Could not fetch log channel');
+        this.container.logger.error(
+          'UnbanListener: Could not fetch log channel',
+        );
         return;
       }
     }
 
     const log = new EmbedBuilder()
       .setColor('#28A745')
-      .setAuthor({ name: `Unbanned ${user.tag} (not done via bot)`, iconURL: `${user.displayAvatarURL()}` })
+      .setAuthor({
+        name: `Unbanned ${user.tag} (not done via bot)`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
       .addFields(
         { name: 'User', value: `${user}`, inline: true },
         { name: 'Moderator', value: `${mod}`, inline: true },

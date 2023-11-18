@@ -21,11 +21,14 @@ import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import IDs from '#utils/ids';
 
 export class VerifyUnblock extends ScheduledTask {
-  public constructor(context: ScheduledTask.Context, options: ScheduledTask.Options) {
+  public constructor(
+    context: ScheduledTask.Context,
+    options: ScheduledTask.Options,
+  ) {
     super(context, options);
   }
 
-  public async run(payload: { userId: string, guildId: string }) {
+  public async run(payload: { userId: string; guildId: string }) {
     // Get the guild where the user is in
     let guild = this.container.client.guilds.cache.get(payload.guildId);
     if (guild === undefined) {
@@ -39,8 +42,7 @@ export class VerifyUnblock extends ScheduledTask {
     // Find GuildMember for the user
     let user = guild.members.cache.get(payload.userId);
     if (user === undefined) {
-      user = await guild.members.fetch(payload.userId)
-        .catch(undefined);
+      user = await guild.members.fetch(payload.userId).catch(undefined);
       if (user === undefined) {
         this.container.logger.error('verifyUnblock: GuildMember not found!');
         return;

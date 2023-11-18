@@ -29,15 +29,14 @@ export class ApplyCommand extends Command {
     });
   }
 
-  message = 'If you want to help out in ARA and support animals at the same time, '
-    + 'apply here: https://forms.gle/kgBHbB7LHFUJXhui6 and we\'ll try to get back as soon as possible!';
+  message =
+    'If you want to help out in ARA and support animals at the same time, ' +
+    "apply here: https://forms.gle/kgBHbB7LHFUJXhui6 and we'll try to get back as soon as possible!";
 
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },

@@ -37,7 +37,9 @@ export class DiversityCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
     return this.checkDiversityCoordinator(interaction.member! as GuildMember);
   }
 
-  public override async contextMenuRun(interaction: ContextMenuCommandInteraction) {
+  public override async contextMenuRun(
+    interaction: ContextMenuCommandInteraction,
+  ) {
     // for context menu command
     return this.checkDiversityCoordinator(interaction.member! as GuildMember);
   }
@@ -45,7 +47,9 @@ export class DiversityCoordinatorOnlyPrecondition extends AllFlowsPrecondition {
   private async checkDiversityCoordinator(user: GuildMember) {
     return user.roles.cache.has(IDs.roles.staff.diversityCoordinator)
       ? this.ok()
-      : this.error({ message: 'Only diversity coordinators can run this command!' });
+      : this.error({
+          message: 'Only diversity coordinators can run this command!',
+        });
   }
 }
 
