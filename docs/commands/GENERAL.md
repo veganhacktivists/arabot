@@ -16,7 +16,6 @@
 - `/balance`/`?balance` - Checks how many ARAs you have
 - `/topbalances`/`?topbalances` - Displays the richest server members
 
-
 ## XP
 
 - `/rank <optional: user>`/`?rank <optional: user>` - Shows your rank based on the amount of XP you have. If you provide

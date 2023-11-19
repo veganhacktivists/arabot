@@ -34,9 +34,7 @@ export class TopBalancesCommand extends Command {
   // Registers that this is a slash command
   public override registerApplicationCommands(registry: Command.Registry) {
     registry.registerChatInputCommand(
-      (builder) => builder
-        .setName(this.name)
-        .setDescription(this.description),
+      (builder) => builder.setName(this.name).setDescription(this.description),
       {
         behaviorWhenNotIdentical: RegisterBehavior.Overwrite,
       },
@@ -95,13 +93,19 @@ export class TopBalancesCommand extends Command {
     const embed = new EmbedBuilder()
       .setColor('#cc802c')
       .setTitle('Top Balances on the Server')
-      .setAuthor({ name: 'ARA', iconURL: 'https://github.com/veganhacktivists/arabot/blob/main/docs/images/logo.png?raw=true' });
+      .setAuthor({
+        name: 'ARA',
+        iconURL:
+          'https://github.com/veganhacktivists/arabot/blob/main/docs/images/logo.png?raw=true',
+      });
 
     const leaders = await getTopBalances(5);
     const fetchMemberPromises: Promise<GuildMember | null>[] = [];
 
     for (const leader of leaders) {
-      fetchMemberPromises.push(guild.members.fetch(leader.userId).catch(() => null));
+      fetchMemberPromises.push(
+        guild.members.fetch(leader.userId).catch(() => null),
+      );
     }
 
     const members = await Promise.all(fetchMemberPromises);
@@ -114,13 +118,18 @@ export class TopBalancesCommand extends Command {
       if (member) {
         embed.addFields(
           {
-            name: (i + 1) + '.',
-            value: '[' + member.displayName + '](<https://discord.com/users/' + leader.userId + '>)',
+            name: i + 1 + '.',
+            value:
+              '[' +
+              member.displayName +
+              '](<https://discord.com/users/' +
+              leader.userId +
+              '>)',
             inline: true,
           },
           {
             name: 'Balance',
-            value: leader.balance + ' ARA\'s',
+            value: leader.balance + " ARA's",
             inline: true,
           },
           {
