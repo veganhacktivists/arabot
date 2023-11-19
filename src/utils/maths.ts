@@ -19,10 +19,10 @@
 
 /**
  * Checks if any parsed value is a number.
- * @param number check if variable is a number
+ * @param number check if a string is a number
  * @returns {boolean} true if it is a number
  */
-export function isNumber(number: any) {
+export function isNumber(number: string) {
   return !Number.isNaN(+number);
 }
 
