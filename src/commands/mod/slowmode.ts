@@ -104,7 +104,6 @@ export class SlowmodeCommand extends Command {
     if (isNumber(durationCheck)) {
       durationCheck += 's';
     }
-    this.container.logger.debug(durationCheck);
 
     const durationParsed = new Duration(durationCheck);
     let time = 0;
