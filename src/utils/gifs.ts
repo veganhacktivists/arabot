@@ -23,6 +23,24 @@ export const Kill = [
   'https://c.tenor.com/N1eC5_O9KiAAAAAd/justketh-goose-attack.gif',
   'https://c.tenor.com/lSGhAaUU2iQAAAAC/honk-honk-am-goose-cute.gif',
   'https://c.tenor.com/aM6ovLN3dtwAAAAC/cat-attack.gif',
+  // Thanks to Lithium (259318132936671233) <3
+  'https://c.tenor.com/rqwsMxkcw5AAAAAC/dog-bang.gif',
+  'https://c.tenor.com/i9j5kg7dUV4AAAAC/toy-story-toy-story2.gif',
+  'https://c.tenor.com/UGXBWgRuqlgAAAAC/penguin-chase.gif',
+  'https://c.tenor.com/yOn0J1JGLMwAAAAd/blanket-attack.gif',
+  'https://c.tenor.com/aZwgcwO6yvEAAAAd/dd.gif',
+  'https://c.tenor.com/n51pqoBDBp4AAAAd/kill-you-chuckie.gif',
+  'https://c.tenor.com/7XGED-yj1TwAAAAd/chonker-cat.gif',
+  'https://c.tenor.com/coB4-k0N610AAAAd/cat-bite.gif',
+  'https://c.tenor.com/MNt4by6XWVYAAAAd/flip-anime.gif',
+  'https://c.tenor.com/Lyqfq7_vJnsAAAAC/kick-funny.gif',
+  'https://c.tenor.com/5n9kC7DGb4oAAAAC/swadloon.gif',
+  'https://c.tenor.com/NLcX8H3CzfkAAAAC/funny-epic.gif',
+  'https://c.tenor.com/ZpKJzYJ-RhoAAAAd/jerk-penguins.gif',
+  'https://c.tenor.com/g_kGVqKmxGoAAAAC/ffvii-ff7.gif',
+  'https://c.tenor.com/GN48fNKNKGUAAAAC/tic-elder-sister-plastic-neesan.gif',
+  'https://c.tenor.com/ulRnUvqttDEAAAAd/cat-tail-wagging.gif',
+  'https://c.tenor.com/bB0ysXaYer8AAAAC/klee-genshin-impact.gif',
 ];
 
 export const Poke = [
