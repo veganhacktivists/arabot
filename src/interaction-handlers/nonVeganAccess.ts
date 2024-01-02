@@ -21,12 +21,11 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from '@sapphire/framework';
-import type { PieceContext } from '@sapphire/framework';
 import type { ButtonInteraction, GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class NonVeganAccessButtonHandler extends InteractionHandler {
-  public constructor(ctx: PieceContext, options: InteractionHandler.Options) {
+  public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
     super(ctx, {
       ...options,
       interactionHandlerType: InteractionHandlerTypes.Button,
