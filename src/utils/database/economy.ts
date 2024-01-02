@@ -128,3 +128,18 @@ export async function getLastDaily(userId: Snowflake) {
 
   return time;
 }
+
+export async function getTopBalances(count: number) {
+  const topBalances = await container.database.balance.findMany({
+    select: {
+      userId: true,
+      balance: true,
+    },
+    orderBy: {
+      balance: 'desc',
+    },
+    take: count,
+  });
+
+  return topBalances;
+}

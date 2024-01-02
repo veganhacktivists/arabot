@@ -14,6 +14,7 @@
 - `/daily`/`?daily` - Gives you a daily reward of ARAs
 - `/pay <user> <amount> <reason>`/`?pay <user> <amount> <reason>` - Give a user an amount of ARAs
 - `/balance`/`?balance` - Checks how many ARAs you have
+- `/topbalances`/`?topbalances` - Displays the richest server members
 
 ## XP
 
