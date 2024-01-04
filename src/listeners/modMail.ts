@@ -18,15 +18,24 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import { ChannelType, EmbedBuilder } from 'discord.js';
-import type { GuildChannel } from 'discord.js';
+import { ChannelType } from 'discord.js';
+import type { GuildChannel, EmbedBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
 import { checkActive, getRestrictions } from '#utils/database/restriction';
 import { findNotes } from '#utils/database/sus';
+import {
+  createRestrictLogEmbed,
+  createSusLogEmbed,
+  createWarningsEmbed,
+} from '#utils/embeds';
+import { fetchWarnings } from '#utils/database/warnings';
 
 export class ModMailCreateListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'channelCreate',
@@ -51,6 +60,16 @@ export class ModMailCreateListener extends Listener {
     // Get the user's ID
     const userId = topic[2];
 
+    // Gets user who created ModMail
+    let user = guild.client.users.cache.get(userId);
+
+    if (user === undefined) {
+      user = await guild.client.users.fetch(userId);
+      if (user === undefined) {
+        return;
+      }
+    }
+
     // Check if the user is currently restricted on the database
     if (!(await checkActive(userId))) return;
 
@@ -60,81 +79,21 @@ export class ModMailCreateListener extends Listener {
 
     // Creation of embeds
     // Restriction Logs
-    const restrictEmbed = new EmbedBuilder()
-      .setColor('#FF6700')
-      .setTitle(`${restrictions.length} restrictions`)
-      .setFooter({ text: `ID: ${userId}` });
+    const embeds: EmbedBuilder[] = [];
+    embeds.push(createRestrictLogEmbed(restrictions, user, guild));
 
-    // Add up to 10 of the latest restrictions to the embed
-    for (
-      let i = restrictions.length > 10 ? restrictions.length - 10 : 0;
-      i < restrictions.length;
-      i += 1
-    ) {
-      // Get mod names
-      let restMod = restrictions[i].modId;
-      const restModMember = guild.members.cache.get(restMod);
-      if (restModMember !== undefined) {
-        restMod = restModMember.displayName;
-      }
-      let endRestMod = restrictions[i].endModId;
-      if (endRestMod !== null) {
-        const endRestModMember = guild.members.cache.get(endRestMod);
-        if (endRestModMember !== undefined) {
-          endRestMod = endRestModMember.displayName;
-        }
-      }
+    // Warnings
+    const warnings = await fetchWarnings(userId);
 
-      let restTitle = `Restriction: ${i + 1} | Restricted by: ${restMod} |  `;
-
-      if (endRestMod !== null) {
-        restTitle += `Unrestricted by: ${endRestMod} | `;
-      } else {
-        restTitle += 'Currently Restricted | ';
-      }
-
-      restTitle += `Date: <t:${Math.floor(
-        restrictions[i].startTime.getTime() / 1000,
-      )}>`;
-
-      restrictEmbed.addFields({
-        name: restTitle,
-        value: restrictions[i].reason,
-      });
-    }
+    embeds.push(createWarningsEmbed(warnings, user, guild));
 
     // Sus Notes
     const notes = await findNotes(userId, true);
 
-    const susEmbed = new EmbedBuilder()
-      .setColor('#0099ff')
-      .setTitle(`${notes.length} sus notes`);
-
-    // Add up to 10 of the latest sus notes to the embed
-    for (
-      let i = notes.length > 10 ? notes.length - 10 : 0;
-      i < notes.length;
-      i += 1
-    ) {
-      // Get mod name
-      const modGuildMember = guild.members.cache.get(notes[i].modId);
-      let mod = notes[i].modId;
-      if (modGuildMember !== undefined) {
-        mod = modGuildMember.displayName;
-      }
-      // Add sus note to embed
-      susEmbed.addFields({
-        name: `Sus ID: ${
-          notes[i].id
-        } | Moderator: ${mod} | Date: <t:${Math.floor(
-          notes[i].time.getTime() / 1000,
-        )}>`,
-        value: notes[i].note,
-      });
-    }
+    embeds.push(createSusLogEmbed(notes, user, guild));
 
     // Set a timeout for 1 second and then send the 2 embeds
     await setTimeout(1000);
-    await channel.send({ embeds: [restrictEmbed, susEmbed] });
+    await channel.send({ embeds: embeds });
   }
 }

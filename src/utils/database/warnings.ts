@@ -1,5 +1,6 @@
 import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
+import { Prisma } from '@prisma/client';
 
 export async function addWarn(
   userId: Snowflake,
@@ -50,6 +51,8 @@ export async function fetchWarnings(userId: Snowflake) {
 
   return warnings;
 }
+
+export type Warnings = Prisma.PromiseReturnType<typeof fetchWarnings>;
 
 export async function deleteWarning(warningId: number) {
   await container.database.warning.delete({

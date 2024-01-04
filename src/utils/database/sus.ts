@@ -1,4 +1,5 @@
 import { container } from '@sapphire/framework';
+import { Prisma } from '@prisma/client';
 
 export async function addToDatabase(
   userId: string,
@@ -38,6 +39,8 @@ export async function findNotes(userId: string, active: boolean) {
 
   return note;
 }
+
+export type SusNotes = Prisma.PromiseReturnType<typeof findNotes>;
 
 // Get one note from the id
 export async function getNote(noteId: number) {

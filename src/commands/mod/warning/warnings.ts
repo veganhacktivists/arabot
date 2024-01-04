@@ -23,6 +23,7 @@ import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchWarnings } from '#utils/database/warnings';
 import { checkStaff } from '#utils/checker';
+import { createWarningsEmbed } from '#utils/embeds';
 
 export class WarningsCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -152,34 +153,7 @@ export class WarningsCommand extends Command {
     }
 
     // Creates an embed to display the warnings
-    const embed = new EmbedBuilder()
-      .setColor('#FF6700')
-      .setTitle(`${warnings.length} restrictions for ${user.tag}`)
-      .setThumbnail(user.displayAvatarURL())
-      .setFooter({ text: `ID: ${user.id}` });
-
-    // Add up to 10 of the latest warnings to the embed
-    for (
-      let i = warnings.length > 10 ? warnings.length - 10 : 0;
-      i < warnings.length;
-      i += 1
-    ) {
-      // Get mod names
-      let mod = warnings[i].modId;
-      const modMember = guild.members.cache.get(mod);
-      if (modMember !== undefined) {
-        mod = modMember.displayName;
-      }
-
-      let warnTitle = `ID: ${warnings[i].id} | Moderator: ${mod} |  `;
-
-      warnTitle += `Date: <t:${Math.floor(warnings[i].time.getTime() / 1000)}>`;
-
-      embed.addFields({
-        name: warnTitle,
-        value: warnings[i].note,
-      });
-    }
+    const embed = createWarningsEmbed(warnings, user, guild);
 
     info.embeds.push(embed);
     return info;

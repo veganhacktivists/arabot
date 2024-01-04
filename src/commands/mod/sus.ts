@@ -38,6 +38,7 @@ import {
 } from '#utils/database/sus';
 import { checkStaff } from '#utils/checker';
 import IDs from '#utils/ids';
+import { createSusLogEmbed } from '#utils/embeds';
 
 // TODO add a check when they join the server to give the user the sus role again
 
@@ -219,34 +220,7 @@ export class SusCommand extends Subcommand {
     }
 
     // Creates the embed to display the sus note
-    const noteEmbed = new EmbedBuilder()
-      .setColor('#0099ff')
-      .setTitle(`${notes.length} sus notes for ${user.username}`)
-      .setThumbnail(user.displayAvatarURL());
-
-    // Add up to 10 of the latest sus notes to the embed
-    for (
-      let i = notes.length > 10 ? notes.length - 10 : 0;
-      i < notes.length;
-      i += 1
-    ) {
-      // Get mod name
-      let mod = notes[i].modId;
-      const modMember = guild.members.cache.get(mod);
-      if (modMember !== undefined) {
-        mod = modMember.displayName;
-      }
-
-      // Add sus note to embed
-      noteEmbed.addFields({
-        name: `Sus ID: ${
-          notes[i].id
-        } | Moderator: ${mod} | Date: <t:${Math.floor(
-          notes[i].time.getTime() / 1000,
-        )}>`,
-        value: notes[i].note,
-      });
-    }
+    const noteEmbed = createSusLogEmbed(notes, user, guild);
 
     // Sends the notes to the user
     await interaction.reply({
@@ -547,11 +521,6 @@ export class SusCommand extends Subcommand {
     // Give the user the sus role they don't already have the sus note
     if (!user.roles.cache.has(IDs.roles.restrictions.sus)) {
       await user.roles.add(IDs.roles.restrictions.sus);
-    }
-
-    // Checks if the user is xlevra to send a very kind message
-    if (mod.id === '259624904746467329') {
-      await message.reply('Fuck you for making me add this feature 🤬');
     }
 
     await message.react('✅');
