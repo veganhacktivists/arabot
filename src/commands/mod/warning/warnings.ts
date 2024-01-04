@@ -22,6 +22,7 @@ import { ChannelType, EmbedBuilder } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchWarnings } from '#utils/database/warnings';
+import { checkStaff } from '#utils/checker';
 
 export class WarningsCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -69,7 +70,9 @@ export class WarningsCommand extends Command {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    const staffChannel = checkStaff(interaction.channel);
+
+    await interaction.deferReply({ ephemeral: !staffChannel });
 
     const info = await this.warnings(user, guild);
 

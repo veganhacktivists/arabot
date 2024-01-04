@@ -82,7 +82,7 @@ export class WarnCommand extends Command {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply();
 
     const info = await this.warn(user.id, mod.id, reason, guild);
 
