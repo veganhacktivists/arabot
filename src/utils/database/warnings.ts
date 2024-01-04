@@ -27,3 +27,17 @@ export async function addWarn(
     },
   });
 }
+
+export async function fetchWarnings(userId: Snowflake) {
+  const warnings = await container.database.warning.findMany({
+    where: {
+      userId,
+      active: true,
+    },
+    orderBy: {
+      id: 'asc',
+    },
+  });
+
+  return warnings;
+}
