@@ -28,7 +28,7 @@ import { addWarn } from '#utils/database/warnings';
   mean we would have a lot of the warns already in the database.
 */
 export class WarnCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'warn',

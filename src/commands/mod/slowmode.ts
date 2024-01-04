@@ -24,7 +24,7 @@ import { Duration, DurationFormatter } from '@sapphire/time-utilities';
 import { isNumber } from '#utils/maths';
 
 export class SlowmodeCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'slowmode',

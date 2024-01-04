@@ -23,7 +23,7 @@ import { Kill } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class KillCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'kill',

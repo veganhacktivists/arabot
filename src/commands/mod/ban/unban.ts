@@ -33,7 +33,7 @@ import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class UnbanCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'unban',

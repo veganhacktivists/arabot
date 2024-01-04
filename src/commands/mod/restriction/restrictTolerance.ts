@@ -22,7 +22,7 @@ import type { User, Message } from 'discord.js';
 import { restrictRun } from './restrict';
 
 export class RestrictToleranceCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'restricttolerance',

@@ -23,7 +23,7 @@ import { EmbedBuilder } from 'discord.js';
 import { getRank, xpToNextLevel } from '#utils/database/xp';
 
 export class RankCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'rank',

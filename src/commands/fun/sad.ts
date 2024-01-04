@@ -22,7 +22,7 @@ import { EmbedBuilder } from 'discord.js';
 import { Sad } from '#utils/gifs';
 
 export class SadCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'sad',

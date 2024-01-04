@@ -27,7 +27,7 @@ import {
 import { manualVerification } from '#utils/database/verification';
 
 export class VerifyCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'verify',

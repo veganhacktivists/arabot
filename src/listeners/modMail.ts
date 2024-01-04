@@ -26,7 +26,7 @@ import { checkActive, getRestrictions } from '#utils/database/restriction';
 import { findNotes } from '#utils/database/sus';
 
 export class ModMailCreateListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       event: 'channelCreate',

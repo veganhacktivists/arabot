@@ -25,7 +25,7 @@ import type { Message } from 'discord.js';
 import { ChannelType } from 'discord.js';
 
 export class MoveAllCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'moveall',

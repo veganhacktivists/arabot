@@ -22,7 +22,7 @@ import type { Message } from 'discord.js';
 import { ChannelType, TextChannel } from 'discord.js';
 
 export class AnonymousCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'anonymous',

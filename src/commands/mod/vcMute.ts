@@ -23,7 +23,7 @@ import { addMute, removeMute, checkActive } from '#utils/database/vcMute';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 
 export class VCMuteCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'vcmute',

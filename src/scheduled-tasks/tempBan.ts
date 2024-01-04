@@ -25,7 +25,7 @@ import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
 export class TempBan extends ScheduledTask {
   public constructor(
-    context: ScheduledTask.Context,
+    context: ScheduledTask.LoaderContext,
     options: ScheduledTask.Options,
   ) {
     super(context, options);
@@ -102,6 +102,6 @@ export class TempBan extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    tempBan: never;
+    tempBan: { userId: string; guildId: string }
   }
 }

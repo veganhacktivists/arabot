@@ -26,7 +26,7 @@ import { addTempBan, checkTempBan } from '#utils/database/tempBan';
 import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
 
 export class TempBanCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'tempban',
@@ -258,14 +258,14 @@ export class TempBanCommand extends Command {
     await addTempBan(userId, modId, time.fromNow, reason);
 
     // Create scheduled task to unban
-    this.container.tasks.create(
-      'tempBan',
-      {
+    this.container.tasks.create({
+      name: 'tempBan',
+      payload: {
         userId: user.id,
         guildId: guild.id,
       },
-      time.offset,
-    );
+      delay: time.offset,
+    });
 
     info.message = `${user} has been temporarily banned for ${banLength}.`;
     info.success = true;

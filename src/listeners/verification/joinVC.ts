@@ -56,7 +56,7 @@ import { rolesToString } from '#utils/formatter';
 import IDs from '#utils/ids';
 
 export class VerificationJoinVCListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       event: 'voiceStateUpdate',
@@ -151,14 +151,15 @@ export class VerificationJoinVCListener extends Listener {
       ]);
 
       // Start 15-minute timer if verifier does not join
-      this.container.tasks.create(
-        'verifyTimeout',
-        {
+      this.container.tasks.create({
+        name: 'verifyTimeout',
+        payload: {
           channelId: channel.id,
           userId: member.id,
         },
-        900_000,
-      ); // 15 minutes
+      },
+        900_000 // 15 minutes
+      );
     }
 
     // Check how many voice channels there are
@@ -506,12 +507,13 @@ export class VerificationJoinVCListener extends Listener {
         await giveVerificationRoles(user, info.roles);
         // Add timeout if they do not have activist role
         if (!info.roles.activist) {
-          this.container.tasks.create(
-            'verifyUnblock',
-            {
+          this.container.tasks.create({
+            name: 'verifyUnblock',
+            payload: {
               userId: user.id,
               guildId: guild.id,
             },
+          },
             info.roles.vegan || info.roles.convinced ? 604800000 : 1814400000,
           );
         }

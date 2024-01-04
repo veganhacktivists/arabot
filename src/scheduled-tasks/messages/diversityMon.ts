@@ -24,7 +24,7 @@ import IDs from '#utils/ids';
 
 export class DiversityMonMessageTask extends ScheduledTask {
   public constructor(
-    context: ScheduledTask.Context,
+    context: ScheduledTask.LoaderContext,
     options: ScheduledTask.Options,
   ) {
     super(context, {

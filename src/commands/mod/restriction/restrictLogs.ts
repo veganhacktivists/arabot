@@ -25,7 +25,7 @@ import { getRestrictions } from '#utils/database/restriction';
 import { checkStaff } from '#utils/checker';
 
 export class RestrictLogsCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'restrictlogs',

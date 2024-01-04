@@ -43,7 +43,7 @@ import IDs from '#utils/ids';
 // TODO add a check when they join the server to give the user the sus role again
 
 export class SusCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'sus',

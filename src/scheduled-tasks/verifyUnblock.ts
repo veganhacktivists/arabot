@@ -22,7 +22,7 @@ import IDs from '#utils/ids';
 
 export class VerifyUnblock extends ScheduledTask {
   public constructor(
-    context: ScheduledTask.Context,
+    context: ScheduledTask.LoaderContext,
     options: ScheduledTask.Options,
   ) {
     super(context, options);
@@ -56,6 +56,6 @@ export class VerifyUnblock extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    verifyUnblock: never;
+    verifyUnblock: { userId: string; guildId: string };
   }
 }

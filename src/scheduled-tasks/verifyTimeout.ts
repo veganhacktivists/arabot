@@ -22,7 +22,7 @@ import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 
 export class VerifyTimeout extends ScheduledTask {
   public constructor(
-    context: ScheduledTask.Context,
+    context: ScheduledTask.LoaderContext,
     options: ScheduledTask.Options,
   ) {
     super(context, options);
@@ -56,6 +56,6 @@ export class VerifyTimeout extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    verifyTimeout: never;
+    verifyTimeout: { channelId: string; userId: string };
   }
 }

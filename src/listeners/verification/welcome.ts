@@ -24,7 +24,7 @@ import type { Client, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class VerificationReady extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: true,

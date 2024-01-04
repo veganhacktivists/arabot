@@ -26,7 +26,7 @@ import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
 import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
 export class BanCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'ban',

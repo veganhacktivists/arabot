@@ -23,7 +23,7 @@ import { N1984 } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
 export class N1984Command extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: '1984',

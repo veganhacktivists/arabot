@@ -24,7 +24,7 @@ import { Listener } from '@sapphire/framework';
 import { setupTypes } from '#utils/database/outreach';
 
 export class EventTypesReadyListener extends Listener {
-  public constructor(context: Listener.Context, options: Listener.Options) {
+  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
     super(context, {
       ...options,
       once: true,

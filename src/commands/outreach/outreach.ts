@@ -38,7 +38,7 @@ import IDs from '#utils/ids';
 import { EmbedBuilder } from 'discord.js';
 
 export class OutreachCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'outreach',

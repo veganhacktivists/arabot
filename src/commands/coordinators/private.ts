@@ -31,7 +31,7 @@ import {
 import IDs from '#utils/ids';
 
 export class PrivateCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'private',

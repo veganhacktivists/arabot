@@ -31,7 +31,7 @@ import type { TextChannel, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class DiversityCommand extends Subcommand {
-  public constructor(context: Subcommand.Context, options: Subcommand.Options) {
+  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
     super(context, {
       ...options,
       name: 'diversity',

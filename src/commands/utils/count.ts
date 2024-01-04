@@ -22,7 +22,7 @@ import type { Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RenameUserCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'count',

@@ -277,7 +277,7 @@ export async function restrictRun(
 }
 
 export class RestrictCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'restrict',

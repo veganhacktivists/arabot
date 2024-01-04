@@ -24,7 +24,7 @@ import { getBalance } from '#utils/database/economy';
 import { EmbedBuilder } from 'discord.js';
 
 export class BalanceCommand extends Command {
-  public constructor(context: Command.Context, options: Command.Options) {
+  public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
       name: 'balance',
