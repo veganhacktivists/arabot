@@ -9,8 +9,13 @@ export async function addWarn(
   await container.database.warning.create({
     data: {
       user: {
-        connect: {
-          id: userId,
+        connectOrCreate: {
+          where: {
+            id: userId,
+          },
+          create: {
+            id: userId,
+          },
         },
       },
       mod: {

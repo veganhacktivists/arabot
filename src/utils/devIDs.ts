@@ -122,6 +122,7 @@ const devIDs = {
     logs: {
       restricted: '999431681217937513',
       economy: '999431681599623198',
+      sus: '999431681599623199',
     },
   },
   categories: {
