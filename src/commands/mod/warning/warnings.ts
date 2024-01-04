@@ -79,7 +79,7 @@ export class WarningsCommand extends Command {
     });
   }
 
-  // Non Application Command method of banning a user
+  // Non Application Command method for fetching warnings
   public async messageRun(message: Message, args: Args) {
     // Get arguments
     let user: User | undefined;
@@ -148,14 +148,14 @@ export class WarningsCommand extends Command {
       return info;
     }
 
-    // Creates the embed to display the restrictions
+    // Creates an embed to display the warnings
     const embed = new EmbedBuilder()
       .setColor('#FF6700')
       .setTitle(`${warnings.length} restrictions for ${user.tag}`)
       .setThumbnail(user.displayAvatarURL())
       .setFooter({ text: `ID: ${user.id}` });
 
-    // Add up to 10 of the latest restrictions to the embed
+    // Add up to 10 of the latest warnings to the embed
     for (
       let i = warnings.length > 10 ? warnings.length - 10 : 0;
       i < warnings.length;
