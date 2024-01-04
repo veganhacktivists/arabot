@@ -28,11 +28,20 @@ export async function addWarn(
   });
 }
 
+export async function fetchWarning(warningId: number) {
+  const warning = await container.database.warning.findUnique({
+    where: {
+      id: warningId,
+    },
+  });
+
+  return warning;
+}
+
 export async function fetchWarnings(userId: Snowflake) {
   const warnings = await container.database.warning.findMany({
     where: {
       userId,
-      active: true,
     },
     orderBy: {
       id: 'asc',
@@ -40,4 +49,12 @@ export async function fetchWarnings(userId: Snowflake) {
   });
 
   return warnings;
+}
+
+export async function deleteWarning(warningId: number) {
+  await container.database.warning.delete({
+    where: {
+      id: warningId,
+    },
+  });
 }
