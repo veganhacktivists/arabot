@@ -20,14 +20,13 @@
 import { RegisterBehavior, Args } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import {
-  ChannelType,
   EmbedBuilder,
   ActionRowBuilder,
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
 } from 'discord.js';
-import type { Message, GuildMember, TextChannel } from 'discord.js';
+import type { Message, GuildMember } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 import {
@@ -43,7 +42,10 @@ import IDs from '#utils/ids';
 // TODO add a check when they join the server to give the user the sus role again
 
 export class SusCommand extends Subcommand {
-  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
+  public constructor(
+    context: Subcommand.LoaderContext,
+    options: Subcommand.Options,
+  ) {
     super(context, {
       ...options,
       name: 'sus',
@@ -201,14 +203,7 @@ export class SusCommand extends Subcommand {
       return;
     }
 
-    let staffChannel = false;
-    let { channel } = interaction;
-    if (channel !== null) {
-      if (channel.type === ChannelType.GuildText) {
-        channel = channel as TextChannel;
-        staffChannel = checkStaff(channel);
-      }
-    }
+    const staffChannel = checkStaff(interaction.channel);
 
     // Gets the sus notes from the database
     const notes = await findNotes(user.id, true);

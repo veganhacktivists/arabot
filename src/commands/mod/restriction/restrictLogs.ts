@@ -75,10 +75,9 @@ export class RestrictLogsCommand extends Command {
       userId = user.id;
     }
 
-    let staffChannel = false;
-    if (channel.type === ChannelType.GuildText) {
+    const staffChannel = checkStaff(channel);
+    if (staffChannel) {
       channel = channel as TextChannel;
-      staffChannel = checkStaff(channel);
 
       if (userId === null) {
         let topic: string[];
