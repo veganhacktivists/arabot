@@ -195,9 +195,9 @@ export class WarnCommand extends Command {
       | undefined;
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
-        IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
+      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
+        | TextChannel
+        | undefined;
       if (logChannel === undefined) {
         container.logger.error('Warn Error: Could not fetch log channel');
         info.message = `Warned ${user} but could not find the log channel. This has been logged to the database.`;
