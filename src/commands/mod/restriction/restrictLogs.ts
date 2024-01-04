@@ -29,7 +29,7 @@ export class RestrictLogsCommand extends Command {
     super(context, {
       ...options,
       name: 'restrictlogs',
-      description: 'Unrestricts a user',
+      description: 'Shows restriction history for a user',
       preconditions: ['ModOnly'],
     });
   }
