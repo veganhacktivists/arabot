@@ -23,7 +23,7 @@ import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchWarnings } from '#utils/database/warnings';
 
-export class RestrictLogsCommand extends Command {
+export class WarningsCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
