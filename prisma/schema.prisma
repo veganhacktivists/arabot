@@ -256,7 +256,6 @@ model Warning {
   mod    User     @relation("warnMod", fields: [modId], references: [id])
   modId  String
   time   DateTime @default(now())
-  active Boolean  @default(true)
   note   String
 }
 

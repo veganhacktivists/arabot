@@ -17,8 +17,9 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type { TextChannel } from 'discord.js';
+import type { TextBasedChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { ChannelType } from 'discord.js';
 
 /**
  * Checks if the channel is in the staff category.
@@ -26,7 +27,15 @@ import IDs from '#utils/ids';
  * @returns {boolean} true if is in staff channel
  */
 
-export function checkStaff(channel: TextChannel) {
+export function checkStaff(channel: TextBasedChannel | null) {
+  if (channel === null) {
+    return false;
+  }
+
+  if (channel.type !== ChannelType.GuildText) {
+    return false;
+  }
+
   if (channel.parent === null) {
     return false;
   }

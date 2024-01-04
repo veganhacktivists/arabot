@@ -1,5 +1,6 @@
 import { container } from '@sapphire/framework';
 import type { Snowflake } from 'discord.js';
+import { Prisma } from '@prisma/client';
 
 export async function restrict(
   userId: Snowflake,
@@ -70,6 +71,8 @@ export async function getRestrictions(userId: Snowflake) {
 
   return restrictions;
 }
+
+export type RestrictionLogs = Prisma.PromiseReturnType<typeof getRestrictions>;
 
 export async function checkActive(userId: Snowflake) {
   const restriction = await container.database.restrict.findFirst({
