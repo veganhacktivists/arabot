@@ -258,14 +258,16 @@ export class TempBanCommand extends Command {
     await addTempBan(userId, modId, time.fromNow, reason);
 
     // Create scheduled task to unban
-    this.container.tasks.create({
-      name: 'tempBan',
-      payload: {
-        userId: user.id,
-        guildId: guild.id,
+    await this.container.tasks.create(
+      {
+        name: 'tempBan',
+        payload: {
+          userId: user.id,
+          guildId: guild.id,
+        },
       },
-      delay: time.offset,
-    });
+      time.offset,
+    );
 
     info.message = `${user} has been temporarily banned for ${banLength}.`;
     info.success = true;
