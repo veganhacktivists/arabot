@@ -37,7 +37,10 @@ import { fibonacci } from '#utils/maths';
 import IDs from '#utils/ids';
 
 export class VerificationLeaveVCListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'voiceStateUpdate',
@@ -103,14 +106,15 @@ export class VerificationLeaveVCListener extends Listener {
         // Creates the length of the time for the ban
         const banLength = fibonacci(incompleteCount) * 3600_000;
 
-        this.container.tasks.create({
-          name: 'verifyUnblock',
-          payload: {
-            userId: user.id,
-            guildId: guild.id,
+        await this.container.tasks.create(
+          {
+            name: 'verifyUnblock',
+            payload: {
+              userId: user.id,
+              guildId: guild.id,
+            },
           },
-        },
-        banLength,
+          banLength,
         );
 
         await user.user
