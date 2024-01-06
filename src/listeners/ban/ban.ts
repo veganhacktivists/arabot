@@ -25,7 +25,10 @@ import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class BanListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'guildBanAdd',

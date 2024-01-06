@@ -33,7 +33,10 @@ import { blockedRoles, blockedRolesAfterRestricted } from '#utils/blockedRoles';
 import IDs from '#utils/ids';
 
 export class RolesJoinServerListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'guildMemberAdd',

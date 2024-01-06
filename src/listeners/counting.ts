@@ -25,7 +25,10 @@ import { getLastCount, addCount } from '#utils/database/counting';
 import IDs from '#utils/ids';
 
 export class XpListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'messageCreate',

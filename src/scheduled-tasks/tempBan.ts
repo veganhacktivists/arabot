@@ -102,6 +102,6 @@ export class TempBan extends ScheduledTask {
 
 declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
-    tempBan: { userId: string; guildId: string }
+    tempBan: { userId: string; guildId: string };
   }
 }

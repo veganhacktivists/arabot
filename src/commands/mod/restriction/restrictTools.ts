@@ -24,7 +24,10 @@ import { CategoryChannel, ChannelType } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RestrictToolsCommand extends Subcommand {
-  public constructor(context: Subcommand.LoaderContext, options: Subcommand.Options) {
+  public constructor(
+    context: Subcommand.LoaderContext,
+    options: Subcommand.Options,
+  ) {
     super(context, {
       ...options,
       name: 'restricttools',

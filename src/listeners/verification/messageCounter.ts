@@ -22,7 +22,10 @@ import type { Message } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class VerificationMessageCounter extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'messageCreate',

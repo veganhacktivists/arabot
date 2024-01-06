@@ -25,7 +25,10 @@ import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class WelcomeButtonHandler extends InteractionHandler {
-  public constructor(ctx: InteractionHandler.LoaderContext, options: InteractionHandler.Options) {
+  public constructor(
+    ctx: InteractionHandler.LoaderContext,
+    options: InteractionHandler.Options,
+  ) {
     super(ctx, {
       ...options,
       interactionHandlerType: InteractionHandlerTypes.Button,

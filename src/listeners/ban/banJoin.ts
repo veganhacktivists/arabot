@@ -23,7 +23,10 @@ import { checkBan, getBanReason } from '#utils/database/ban';
 import { checkTempBan } from '#utils/database/tempBan';
 
 export class BanJoinListener extends Listener {
-  public constructor(context: Listener.LoaderContext, options: Listener.Options) {
+  public constructor(
+    context: Listener.LoaderContext,
+    options: Listener.Options,
+  ) {
     super(context, {
       ...options,
       event: 'guildMemberAdd',
