@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Cringe } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
@@ -44,19 +44,34 @@ export class CringeCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
-    // TODO exception handling
-    const { user } = interaction;
+    const { member } = interaction;
 
-    await addFunLog(user.id, 'cringe');
-    const count = await countTotal(user.id, 'cringe');
+    // Type check
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
+
+    await addFunLog(member.id, 'cringe');
+    const count = await countTotal(member.id, 'cringe');
+
+    let embedFooter: string;
+    if (count === 1) {
+      embedFooter = `${member.displayName} cringed for the first time!`;
+    } else {
+      embedFooter = `${member.displayName} cringed ${count} times!`;
+    }
 
     // Creates the embed for the cringe reaction
     const randomCringe = Cringe[Math.floor(Math.random() * Cringe.length)];
     const cringeEmbed = new EmbedBuilder()
       .setColor('#001148')
-      .setTitle(`${user.username} feels immense cringe...`)
+      .setTitle(`${member.displayName} feels immense cringe...`)
       .setImage(randomCringe)
-      .setFooter({ text: `${user.username}'s cringe count: ${count}` });
+      .setFooter({ text: embedFooter });
 
     // Send the embed
     await interaction.reply({ embeds: [cringeEmbed], fetchReply: true });

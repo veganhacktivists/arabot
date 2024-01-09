@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Hugs } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
@@ -54,20 +54,43 @@ export class HugCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     const user = interaction.options.getUser('user', true);
-    const hugger = interaction.user;
+    const hugger = interaction.member;
+
+    // Type Checks
+
+    if (!(hugger instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
 
     await addFunLog(hugger.id, 'hug', user.id);
     const count = await countTotal(hugger.id, 'hug', user.id);
+
+    let embedFooter: string;
+    if (hugger.id === user.id) {
+      if (count === 1) {
+        embedFooter = `You hugged yourself for the first time!`;
+      } else {
+        embedFooter = `You hugged yourself ${count} times!`;
+      }
+    } else {
+      if (count === 1) {
+        embedFooter = `${hugger.displayName} hugged you for the first time!`;
+      } else {
+        embedFooter = `${hugger.displayName} hugged you ${count} times!`;
+      }
+    }
 
     // Creates the embed for the hug
     const randomHug = Hugs[Math.floor(Math.random() * Hugs.length)];
     const hugEmbed = new EmbedBuilder()
       .setColor('#0099ff')
-      .setTitle(`Hug from ${hugger.username}`)
+      .setTitle(`Hug from ${hugger.displayName}`)
       .setImage(randomHug)
-      .setFooter({
-        text: `Amount of hugs given from ${hugger.username} to you: ${count}`,
-      });
+      .setFooter({ text: embedFooter });
 
     // Send the hug
     await interaction.reply({

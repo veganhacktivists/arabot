@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Kill } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
@@ -54,7 +54,16 @@ export class KillCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     const user = interaction.options.getUser('user', true)!;
-    const sender = interaction.user;
+    const sender = interaction.member;
+
+    // Type checks
+    if (!(sender instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
 
     if (user.id === sender.id) {
       await interaction.reply('You changed your mind');
@@ -64,15 +73,20 @@ export class KillCommand extends Command {
     await addFunLog(sender.id, 'kill', user.id);
     const count = await countTotal(sender.id, 'kill', user.id);
 
+    let embedFooter: string;
+    if (count === 1) {
+      embedFooter = `${sender.displayName} killed you for the first time!`;
+    } else {
+      embedFooter = `${sender.displayName} killed you ${count} times!`;
+    }
+
     // Creates the embed for the kill
     const randomKill = Kill[Math.floor(Math.random() * Kill.length)];
     const killEmbed = new EmbedBuilder()
       .setColor('#ff0000')
-      .setTitle(`Kill from ${sender.username}`)
+      .setTitle(`Kill from ${sender.displayName}`)
       .setImage(randomKill)
-      .setFooter({
-        text: `Amount of kills from ${sender.username} to you: ${count}`,
-      });
+      .setFooter({ text: embedFooter });
 
     // Send the kill
     await interaction.reply({

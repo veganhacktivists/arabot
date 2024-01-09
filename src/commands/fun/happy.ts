@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Happy } from '#utils/gifs';
 
 export class HappyCommand extends Command {
@@ -44,15 +44,22 @@ export class HappyCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
-    // TODO exception handling
-    const member = interaction.member!.user;
-    const memberGuildMember = interaction.guild!.members.cache.get(member.id)!;
+    const { member } = interaction;
+
+    // Type checks
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
 
     // Creates the embed for the happy reaction
     const randomHappy = Happy[Math.floor(Math.random() * Happy.length)];
     const happyEmbed = new EmbedBuilder()
       .setColor('#40ff00')
-      .setTitle(`${memberGuildMember.displayName} is happy!`)
+      .setTitle(`${member.displayName} is happy!`)
       .setImage(randomHappy);
 
     // Send the embed

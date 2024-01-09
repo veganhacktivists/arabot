@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Poke } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
@@ -54,20 +54,42 @@ export class PokeCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the users
     const user = interaction.options.getUser('user', true)!;
-    const sender = interaction.user;
+    const sender = interaction.member;
+
+    // Type checks
+    if (!(sender instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
 
     await addFunLog(sender.id, 'poke', user.id);
     const count = await countTotal(sender.id, 'poke', user.id);
+
+    let embedFooter: string;
+    if (sender.id === user.id) {
+      if (count === 1) {
+        embedFooter = `You poked yourself for the first time!`;
+      } else {
+        embedFooter = `You poked yourself ${count} times!`;
+      }
+    } else {
+      if (count === 1) {
+        embedFooter = `${sender.displayName} poked you for the first time!`;
+      } else {
+        embedFooter = `${sender.displayName} poked you ${count} times!`;
+      }
+    }
 
     // Creates the embed for the poke
     const randomPoke = Poke[Math.floor(Math.random() * Poke.length)];
     const pokeEmbed = new EmbedBuilder()
       .setColor('#0099ff')
-      .setTitle(`Poke from ${sender.username}`)
+      .setTitle(`Poke from ${sender.displayName}`)
       .setImage(randomPoke)
-      .setFooter({
-        text: `Amount of pokes from ${sender.username} to you: ${count}`,
-      });
+      .setFooter({ text: embedFooter });
 
     // Send the poke
     await interaction.reply({

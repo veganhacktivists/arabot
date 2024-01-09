@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { Shrug } from '#utils/gifs';
 
 export class ShrugCommand extends Command {
@@ -44,15 +44,22 @@ export class ShrugCommand extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
-    // TODO exception handling
-    const member = interaction.member!.user;
-    const memberGuildMember = interaction.guild!.members.cache.get(member.id)!;
+    const { member } = interaction;
+
+    // Type checks
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
 
     // Creates the embed for the shrug reaction
     const randomShrug = Shrug[Math.floor(Math.random() * Shrug.length)];
     const shrugEmbed = new EmbedBuilder()
       .setColor('#001980')
-      .setTitle(`${memberGuildMember.displayName} shrugs`)
+      .setTitle(`${member.displayName} shrugs`)
       .setImage(randomShrug);
 
     // Send the embed

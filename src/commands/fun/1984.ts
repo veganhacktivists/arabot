@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder } from 'discord.js';
+import { EmbedBuilder, GuildMember } from 'discord.js';
 import { N1984 } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun';
 
@@ -45,10 +45,26 @@ export class N1984Command extends Command {
   // Command run
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the user
-    const { user } = interaction;
+    const { member } = interaction;
 
-    await addFunLog(user.id, '1984');
-    const count = await countTotal(user.id, '1984');
+    // Type checks
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        ephemeral: true,
+        content: 'Failed to fetch your user on the bot!',
+      });
+      return;
+    }
+
+    await addFunLog(member.id, '1984');
+    const count = await countTotal(member.id, '1984');
+
+    let embedFooter: string;
+    if (count === 1) {
+      embedFooter = `${member.displayName} 1984'd the server for the first time!`;
+    } else {
+      embedFooter = `${member.displayName} 1984'd the server ${count} times!`;
+    }
 
     // Creates the embed for the 1984 reaction
     // Add a 1 in 1000 chance of Dantas literally making ARA 1984
@@ -58,9 +74,9 @@ export class N1984Command extends Command {
         : N1984[Math.floor(Math.random() * N1984.length)];
     const n1984Embed = new EmbedBuilder()
       .setColor('#ffffff')
-      .setTitle(`${user.username} is happy!`)
+      .setTitle(`${member.displayName} is happy!`)
       .setImage(random1984)
-      .setFooter({ text: `${user.username}'s 1984 count: ${count}` });
+      .setFooter({ text: embedFooter });
 
     // Send the embed
     await interaction.reply({ embeds: [n1984Embed], fetchReply: true });
