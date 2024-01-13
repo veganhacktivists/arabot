@@ -29,6 +29,7 @@ export const blockedRoles = [
   IDs.roles.staff.trialVerifier,
   IDs.roles.staff.mentor,
   IDs.roles.stageHost,
+  IDs.roles.booster,
 ];
 
 export const blockedRolesAfterRestricted = [

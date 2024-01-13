@@ -20,6 +20,7 @@
 const devIDs = {
   roles: {
     trusted: '999431675081666599',
+    booster: '',
     nonvegan: {
       nonvegan: '999431675081666598',
       vegCurious: '999431675098447932',
