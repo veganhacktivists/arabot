@@ -507,6 +507,7 @@ export class SusCommand extends Subcommand {
   ) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
+    const mod = interaction.user;
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
@@ -616,6 +617,8 @@ export class SusCommand extends Subcommand {
           embeds: [],
         });
       }
+
+      await this.deleteAllNotesLogger(user, mod, guild);
     });
 
     // Remove the buttons after they have been clicked
@@ -627,5 +630,38 @@ export class SusCommand extends Subcommand {
 
     // Remove sus role from the user
     await member.roles.remove(IDs.roles.restrictions.sus);
+  }
+
+  // Logs removal of 1 sus note
+  private async deleteAllNotesLogger(user: User, mod: User, guild: Guild) {
+    // Log the sus note
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
+      | TextChannel
+      | undefined;
+
+    if (logChannel === undefined) {
+      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
+        | TextChannel
+        | undefined;
+      if (logChannel === undefined) {
+        this.container.logger.error('Sus Error: Could not fetch log channel');
+        return;
+      }
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor('#28A745')
+      .setAuthor({
+        name: `Purged all sus notes for ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields(
+        { name: 'User', value: `${user}`, inline: true },
+        { name: 'Moderator', value: `${mod}`, inline: true },
+      )
+      .setTimestamp()
+      .setFooter({ text: `ID: ${user.id}` });
+
+    await logChannel.send({ embeds: [embed] });
   }
 }
