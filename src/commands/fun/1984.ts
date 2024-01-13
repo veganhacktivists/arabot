@@ -28,7 +28,7 @@ export class N1984Command extends Command {
       ...options,
       name: '1984',
       description: 'this is literally 1984',
-      preconditions: ['CoordinatorOnly', 'ModOnly'],
+      preconditions: [['CoordinatorOnly', 'ModOnly']],
     });
   }
 
