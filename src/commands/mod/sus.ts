@@ -29,6 +29,7 @@ import {
   Guild,
   TextChannel,
   GuildMember,
+  Snowflake,
 } from 'discord.js';
 import type { Message } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
@@ -320,6 +321,7 @@ export class SusCommand extends Subcommand {
   public async removeNote(interaction: Subcommand.ChatInputCommandInteraction) {
     // Get the arguments
     const noteId = interaction.options.getInteger('id', true);
+    const mod = interaction.user;
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
@@ -349,26 +351,36 @@ export class SusCommand extends Subcommand {
     const modId = note.modId;
 
     // Get user GuildMembers for user and mod and person who ran command
-    const user = this.container.client.users.cache.get(note.userId);
-    const mod = this.container.client.users.cache.get(note.modId);
-
-    let userDisplay = userId;
-    if (user instanceof User) {
-      userDisplay = user.tag;
+    let user = guild.client.users.cache.get(userId);
+    if (!(user instanceof User)) {
+      user = await guild.client.users.fetch(userId).catch(() => undefined);
+    }
+    if (user === undefined) {
+      await interaction.reply({
+        content: 'Error fetching user!',
+        ephemeral: true,
+        fetchReply: true,
+      });
+      return;
     }
 
-    let modDisplay = modId;
-    if (mod instanceof User) {
-      modDisplay = mod.displayName;
+    let modCreator = guild.client.users.cache.get(modId);
+    if (!(modCreator instanceof User)) {
+      modCreator = await guild.client.users.fetch(modId).catch(() => undefined);
+    }
+
+    let modCreatorDisplay = modId;
+    if (modCreator instanceof User) {
+      modCreatorDisplay = modCreator.displayName;
     }
 
     // Create an embed for the note
     const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
-      .setTitle(`Sus note for ${userDisplay}`)
-      .setThumbnail(user!.displayAvatarURL())
+      .setTitle(`Sus note for ${user.tag}`)
+      .setThumbnail(user.displayAvatarURL())
       .addFields({
-        name: `ID: ${noteId} | Moderator: ${modDisplay} | Date: <t:${Math.floor(
+        name: `ID: ${noteId} | Moderator: ${modCreatorDisplay} | Date: <t:${Math.floor(
           note.time.getTime() / 1000,
         )}>`,
         value: note.note,
@@ -411,9 +423,7 @@ export class SusCommand extends Subcommand {
       if (button.customId === `delete${noteId}`) {
         await deactivateNote(noteId);
         await interaction.editReply({
-          content: `${
-            user instanceof User ? user : userDisplay
-          }'s sus note (ID: ${noteId}) has been successfully removed`,
+          content: `${user}'s sus note (ID: ${noteId}) has been successfully removed`,
           embeds: [],
         });
 
@@ -432,6 +442,9 @@ export class SusCommand extends Subcommand {
             await member.roles.remove(IDs.roles.restrictions.sus);
           }
         }
+
+        // Logs the removal of the sus note
+        await this.deleteNoteLogger(userId, mod, noteId, guild);
       }
     });
 
@@ -441,6 +454,52 @@ export class SusCommand extends Subcommand {
         components: [],
       });
     });
+  }
+
+  // Logs removal of 1 sus note
+  private async deleteNoteLogger(
+    userId: Snowflake,
+    mod: User,
+    noteId: number,
+    guild: Guild,
+  ) {
+    // Find user
+    let user = guild.client.users.cache.get(userId);
+    if (!(user instanceof User)) {
+      user = await guild.client.users.fetch(userId).catch(() => undefined);
+    }
+    if (!(user instanceof User)) return;
+
+    // Log the sus note
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
+      | TextChannel
+      | undefined;
+
+    if (logChannel === undefined) {
+      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
+        | TextChannel
+        | undefined;
+      if (logChannel === undefined) {
+        this.container.logger.error('Sus Error: Could not fetch log channel');
+        return;
+      }
+    }
+
+    const embed = new EmbedBuilder()
+      .setColor('#28A745')
+      .setAuthor({
+        name: `Removed sus note for ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields(
+        { name: 'User', value: `${user}`, inline: true },
+        { name: 'Moderator', value: `${mod}`, inline: true },
+        { name: 'Note ID', value: `${noteId}`, inline: true },
+      )
+      .setTimestamp()
+      .setFooter({ text: `ID: ${user.id}` });
+
+    await logChannel.send({ embeds: [embed] });
   }
 
   public async removeAllNotes(
