@@ -28,6 +28,7 @@ import {
   User,
   Guild,
   TextChannel,
+  GuildMember,
 } from 'discord.js';
 import type { Message } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
@@ -344,39 +345,30 @@ export class SusCommand extends Subcommand {
       return;
     }
 
+    const userId = note.userId;
+    const modId = note.modId;
+
     // Get user GuildMembers for user and mod and person who ran command
-    const member = await guild.members.cache.get(note.userId);
-    const mod = await guild.members.cache.get(note.modId);
+    const user = this.container.client.users.cache.get(note.userId);
+    const mod = this.container.client.users.cache.get(note.modId);
 
-    // TODO fix if user left the server
-    if (member === undefined || mod === undefined) {
-      await interaction.reply({
-        content: 'Error fetching users from Discord!',
-        ephemeral: true,
-        fetchReply: true,
-      });
-      return;
+    let userDisplay = userId;
+    if (user instanceof User) {
+      userDisplay = user.tag;
     }
 
-    // Get user's name
-    let userName = note.userId;
-    if (member !== undefined) {
-      userName = member.displayName;
-    }
-
-    // Get mod name
-    let modName = note.modId;
-    if (mod !== undefined) {
-      modName = mod.displayName;
+    let modDisplay = modId;
+    if (mod instanceof User) {
+      modDisplay = mod.displayName;
     }
 
     // Create an embed for the note
     const noteEmbed = new EmbedBuilder()
       .setColor('#ff0000')
-      .setTitle(`Sus note for ${userName}`)
-      .setThumbnail(member.displayAvatarURL())
+      .setTitle(`Sus note for ${userDisplay}`)
+      .setThumbnail(user!.displayAvatarURL())
       .addFields({
-        name: `ID: ${noteId} | Moderator: ${modName} | Date: <t:${Math.floor(
+        name: `ID: ${noteId} | Moderator: ${modDisplay} | Date: <t:${Math.floor(
           note.time.getTime() / 1000,
         )}>`,
         value: note.note,
@@ -419,17 +411,26 @@ export class SusCommand extends Subcommand {
       if (button.customId === `delete${noteId}`) {
         await deactivateNote(noteId);
         await interaction.editReply({
-          content: `${member}'s sus note (ID: ${noteId}) has been successfully removed`,
+          content: `${
+            user instanceof User ? user : userDisplay
+          }'s sus note (ID: ${noteId}) has been successfully removed`,
           embeds: [],
         });
 
         // TODO create a new Prisma function to only count and not to get a whole list of sus notes
         // Check how many notes the user has and if 0, then remove sus note
-        const notes = await findNotes(member.id, true);
+        const notes = await findNotes(userId, true);
 
         // Checks if there are no notes on the user and if there's none, remove the sus role
         if (notes.length === 0) {
-          await member.roles.remove(IDs.roles.restrictions.sus);
+          let member = guild.members.cache.get(userId);
+          if (!(member instanceof GuildMember)) {
+            member = await guild.members.fetch(userId).catch(() => undefined);
+          }
+
+          if (member instanceof GuildMember) {
+            await member.roles.remove(IDs.roles.restrictions.sus);
+          }
         }
       }
     });
