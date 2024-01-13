@@ -1,7 +1,7 @@
 import { container } from '@sapphire/framework';
 import { Prisma } from '@prisma/client';
 
-export async function addToDatabase(
+export async function addSusNoteDB(
   userId: string,
   modId: string,
   message: string,
@@ -10,13 +10,23 @@ export async function addToDatabase(
   await container.database.sus.create({
     data: {
       user: {
-        connect: {
-          id: userId,
+        connectOrCreate: {
+          where: {
+            id: userId,
+          },
+          create: {
+            id: userId,
+          },
         },
       },
       mod: {
-        connect: {
-          id: modId,
+        connectOrCreate: {
+          where: {
+            id: modId,
+          },
+          create: {
+            id: modId,
+          },
         },
       },
       note: message,

@@ -25,12 +25,14 @@ import {
   ButtonBuilder,
   ButtonInteraction,
   ButtonStyle,
+  User,
+  Guild,
+  TextChannel,
 } from 'discord.js';
-import type { Message, GuildMember } from 'discord.js';
+import type { Message } from 'discord.js';
 import { isMessageInstance } from '@sapphire/discord.js-utilities';
-import { addExistingUser } from '#utils/database/dbExistingUser';
 import {
-  addToDatabase,
+  addSusNoteDB,
   findNotes,
   getNote,
   deactivateNote,
@@ -54,8 +56,8 @@ export class SusCommand extends Subcommand {
         {
           name: 'add',
           default: true,
-          chatInputRun: 'addNote',
-          messageRun: 'addMessage',
+          chatInputRun: 'addNoteChatInput',
+          messageRun: 'addNoteMessage',
         },
         {
           name: 'view',
@@ -143,7 +145,9 @@ export class SusCommand extends Subcommand {
   }
 
   // Subcommand to add sus note
-  public async addNote(interaction: Subcommand.ChatInputCommandInteraction) {
+  public async addNoteChatInput(
+    interaction: Subcommand.ChatInputCommandInteraction,
+  ) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const note = interaction.options.getString('note', true);
@@ -151,7 +155,7 @@ export class SusCommand extends Subcommand {
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null) {
+    if (!(guild instanceof Guild)) {
       await interaction.reply({
         content: 'Error fetching guild!',
         ephemeral: true,
@@ -159,35 +163,117 @@ export class SusCommand extends Subcommand {
       return;
     }
 
-    // Add the data to the database
+    const info = await this.addNote(user, mod, note, guild);
 
-    // Check if the user exists on the database
-    const member = guild.members.cache.get(user.id);
-    const modMember = guild.members.cache.get(mod.id);
+    await interaction.reply({
+      content: info.message,
+      ephemeral: true,
+    });
+  }
 
-    if (member === undefined || modMember === undefined) {
-      await interaction.reply({
-        content: 'Error fetching users!',
-        ephemeral: true,
-      });
+  // Non Application Command method of adding a sus note
+  public async addNoteMessage(message: Message, args: Args) {
+    // Get arguments
+    let user: User;
+    try {
+      user = await args.pick('user');
+    } catch {
+      await message.react('❌');
+      await message.reply('User was not provided!');
+      return;
+    }
+    const note = args.finished ? null : await args.rest('string');
+    const mod = message.author;
+
+    if (note === null) {
+      await message.react('❌');
+      await message.reply('No sus note was provided!');
       return;
     }
 
-    // Check if user and mod are on the database
-    await addExistingUser(member);
-    await addExistingUser(modMember);
+    const guild = message.guild;
 
-    await addToDatabase(user.id, mod.id, note);
+    if (!(guild instanceof Guild)) {
+      await message.react('❌');
+      await message.reply(
+        'Could not find guild! Make sure you run this command in a server.',
+      );
+      return;
+    }
+
+    const info = await this.addNote(user, mod, note, guild);
+
+    if (!info.success) {
+      await message.react('❌');
+      return;
+    }
+
+    await message.react('✅');
+  }
+
+  private async addNote(user: User, mod: User, note: string, guild: Guild) {
+    const info = {
+      message: '',
+      success: false,
+    };
+
+    // Get GuildMember for user to add a sus note for
+    let member = guild.members.cache.get(user.id);
+
+    // Checks if Member was not found in cache
+    if (member === undefined) {
+      // Fetches Member from API call to Discord
+      member = await guild.members.fetch(user.id);
+      if (member === undefined) {
+        info.message = 'Error fetching user';
+        return info;
+      }
+    }
+
+    // Add the data to the database
+    await addSusNoteDB(user.id, mod.id, note);
 
     // Give the user the sus role they don't already have the sus note
     if (!member.roles.cache.has(IDs.roles.restrictions.sus)) {
       await member.roles.add(IDs.roles.restrictions.sus);
     }
 
-    await interaction.reply({
-      content: `${user} note: ${note}`,
-      ephemeral: true,
-    });
+    info.message = `Added the sus note for ${user}: ${note}`;
+    info.success = true;
+
+    // Log the sus note
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
+      | TextChannel
+      | undefined;
+
+    if (logChannel === undefined) {
+      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
+        | TextChannel
+        | undefined;
+      if (logChannel === undefined) {
+        this.container.logger.error('Sus Error: Could not fetch log channel');
+        info.message = `Added a sus note for ${user} but could not find the log channel. This has been logged to the database.`;
+        return info;
+      }
+    }
+
+    const message = new EmbedBuilder()
+      .setColor('#0099ff')
+      .setAuthor({
+        name: `Added sus note for ${user.tag}`,
+        iconURL: `${user.displayAvatarURL()}`,
+      })
+      .addFields(
+        { name: 'User', value: `${user}`, inline: true },
+        { name: 'Moderator', value: `${mod}`, inline: true },
+        { name: 'Note', value: note },
+      )
+      .setTimestamp()
+      .setFooter({ text: `ID: ${user.id}` });
+
+    await logChannel.send({ embeds: [message] });
+
+    return info;
   }
 
   public async listNote(interaction: Subcommand.ChatInputCommandInteraction) {
@@ -481,48 +567,5 @@ export class SusCommand extends Subcommand {
 
     // Remove sus role from the user
     await member.roles.remove(IDs.roles.restrictions.sus);
-  }
-
-  // Non Application Command method of adding a sus note
-  // xlevra begged me to add this... so I guess here it is
-  public async addMessage(message: Message, args: Args) {
-    // Get arguments
-    let user: GuildMember;
-    try {
-      user = await args.pick('member');
-    } catch {
-      await message.react('❌');
-      await message.reply('User was not provided!');
-      return;
-    }
-    const note = args.finished ? null : await args.rest('string');
-    const mod = message.member;
-
-    if (note === null) {
-      await message.react('❌');
-      await message.reply('No sus note was provided!');
-      return;
-    }
-
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply(
-        'Moderator not found! Try again or contact a developer!',
-      );
-      return;
-    }
-
-    // Check if user and mod are on the database
-    await addExistingUser(user);
-    await addExistingUser(mod);
-
-    await addToDatabase(user.id, mod.id, note);
-
-    // Give the user the sus role they don't already have the sus note
-    if (!user.roles.cache.has(IDs.roles.restrictions.sus)) {
-      await user.roles.add(IDs.roles.restrictions.sus);
-    }
-
-    await message.react('✅');
   }
 }
