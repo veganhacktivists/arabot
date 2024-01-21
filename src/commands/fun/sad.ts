@@ -27,7 +27,6 @@ export class SadCommand extends Command {
       ...options,
       name: 'sad',
       description: 'Express your sadness',
-      preconditions: [['CoordinatorOnly', 'PatreonOnly']],
     });
   }
 

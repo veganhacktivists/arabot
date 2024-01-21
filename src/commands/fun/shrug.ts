@@ -27,7 +27,6 @@ export class ShrugCommand extends Command {
       ...options,
       name: 'shrug',
       description: 'Ugh... whatever... idk...',
-      preconditions: [['CoordinatorOnly', 'PatreonOnly']],
     });
   }
 
