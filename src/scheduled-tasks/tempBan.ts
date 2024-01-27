@@ -19,7 +19,7 @@
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import IDs from '#utils/ids';
-import { TextChannel, EmbedBuilder } from 'discord.js';
+import { EmbedBuilder } from 'discord.js';
 import { checkBan } from '#utils/database/ban';
 import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
 
@@ -36,7 +36,9 @@ export class TempBan extends ScheduledTask {
     // Get the guild where the user is in
     let guild = this.container.client.guilds.cache.get(payload.guildId);
     if (guild === undefined) {
-      guild = await this.container.client.guilds.fetch(payload.guildId);
+      guild = await this.container.client.guilds
+        .fetch(payload.guildId)
+        .catch(() => undefined);
       if (guild === undefined) {
         this.container.logger.error('Temp Unban Task: Guild not found!');
         return;
@@ -48,7 +50,7 @@ export class TempBan extends ScheduledTask {
     let user = guild.client.users.cache.get(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
+      user = await guild.client.users.fetch(userId).catch(() => undefined);
       if (user === undefined) {
         this.container.logger.error(
           'Temp Unban Task: Could not fetch banned user!',
@@ -70,20 +72,27 @@ export class TempBan extends ScheduledTask {
     await removeTempBan(userId);
 
     // Log unban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
-        IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
-      if (logChannel === undefined) {
+      const logChannelFetch = await guild.channels
+        .fetch(IDs.channels.logs.restricted)
+        .catch(() => null);
+      if (logChannelFetch === null) {
         this.container.logger.error(
           `Temp Ban Listener: Could not fetch log channel. User Snowflake: ${userId}`,
         );
         return;
       }
+
+      logChannel = logChannelFetch;
+    }
+
+    if (!logChannel.isTextBased()) {
+      this.container.logger.error(
+        'Temp Ban Listener: Log channel is not a text based channel!',
+      );
+      return;
     }
 
     const log = new EmbedBuilder()
