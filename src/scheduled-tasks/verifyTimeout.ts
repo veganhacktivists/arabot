@@ -30,13 +30,11 @@ export class VerifyTimeout extends ScheduledTask {
 
   public async run(payload: { channelId: string; userId: string }) {
     // Get the guild where the user is in
-    let channel = this.container.client.channels.cache.get(
-      payload.channelId,
-    );
+    let channel = this.container.client.channels.cache.get(payload.channelId);
     if (channel === undefined) {
-      const channelFetch = await this.container.client.channels.fetch(
-        payload.channelId,
-      ).catch(() => null);
+      const channelFetch = await this.container.client.channels
+        .fetch(payload.channelId)
+        .catch(() => null);
       if (channelFetch === null) {
         this.container.logger.error('verifyTimeout: Channel not found!');
         return;
@@ -46,7 +44,9 @@ export class VerifyTimeout extends ScheduledTask {
     }
 
     if (channel.type !== ChannelType.GuildVoice) {
-      this.container.logger.error('verifyTimeout: Channel is not a voice channel!');
+      this.container.logger.error(
+        'verifyTimeout: Channel is not a voice channel!',
+      );
       return;
     }
 

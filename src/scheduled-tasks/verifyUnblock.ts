@@ -32,7 +32,9 @@ export class VerifyUnblock extends ScheduledTask {
     // Get the guild where the user is in
     let guild = this.container.client.guilds.cache.get(payload.guildId);
     if (guild === undefined) {
-      guild = await this.container.client.guilds.fetch(payload.guildId).catch(() => undefined);
+      guild = await this.container.client.guilds
+        .fetch(payload.guildId)
+        .catch(() => undefined);
       if (guild === undefined) {
         this.container.logger.error('verifyUnblock: Guild not found!');
         return;
