@@ -1,6 +1,6 @@
 .idea
 dist
 node_modules
-tsconfig.tsbuildinfo
 npm-debug.log
 .env
+*.md

@@ -4,10 +4,11 @@
   "description": "A Discord bot for Animal Rights Advocates",
   "main": "dist/index.js",
   "scripts": {
+    "preinstall": "npx only-allow pnpm",
     "build": "tsc",
     "cleanBuild": "rm -rf ./dist && tsc",
     "start": "node dist/index.js",
-    "start:migrate": "prisma migrate deploy && npm run start"
+    "start:migrate": "prisma migrate deploy && pnpm run start"
   },
   "imports": {
     "#utils/*": "./dist/utils/*.js"
@@ -28,6 +29,10 @@
     "url": "https://github.com/veganhacktivists/arabot/issues"
   },
   "homepage": "https://github.com/veganhacktivists/arabot#readme",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=8"
+  },
   "dependencies": {
     "@prisma/client": "^5.7.1",
     "@sapphire/discord.js-utilities": "^7.1.5",
@@ -42,12 +47,12 @@
     "@types/node": "^20.10.6",
     "bullmq": "^5.1.1",
     "discord.js": "^14.14.1",
+    "ioredis": "^5.3.2",
     "redis": "^4.6.12",
     "ts-node": "^10.9.1",
     "typescript": "^5.3.3"
   },
   "devDependencies": {
-    "@types/ioredis": "^5.0.0",
     "@typescript-eslint/eslint-plugin": "^6.17.0",
     "@typescript-eslint/parser": "^6.17.0",
     "eslint": "8.56.0",

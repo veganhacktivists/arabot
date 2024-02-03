@@ -1,24 +1,28 @@
-FROM node:20
+FROM node:20 AS base
+# PNPM
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
 
-WORKDIR /opt/app
+COPY . /app
+WORKDIR /app
 
 ENV NODE_ENV=production
 
-COPY --chown=node:node package.json .
-COPY --chown=node:node package-lock.json .
-COPY --chown=node:node tsconfig.json .
-COPY --chown=node:node prisma ./prisma/
+FROM base AS prod-deps
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
 
-RUN npm install
+FROM base AS build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
+RUN pnpm run build
 
-COPY . .
+FROM base
+COPY --from=prod-deps /app/node_modules /app/node_modules
+COPY --from=build /app/dist /app/dist
 
-RUN npx prisma generate
-
-RUN npm run build
-
-RUN chown node:node /opt/app/
+RUN pnpx prisma generate
+RUN pnpm run build
+RUN chown node:node .
 
 USER node
-
-CMD [ "npm", "run", "start:migrate"]
+CMD [ "pnpm", "run", "start:migrate"]
