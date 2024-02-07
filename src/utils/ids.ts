@@ -60,6 +60,8 @@ let IDs = {
       verifierCoordinator: '940721280376778822',
       eventCoordinator: '944732860554817586',
       outreachCoordinator: '954804769476730890',
+      mediaCoordinator: '1203778509449723914',
+      hrCoordinator: '1203802120180989993',
       restricted: '851624392928264222',
       moderator: '826157475815489598',
       trialModerator: '982074555596152904',

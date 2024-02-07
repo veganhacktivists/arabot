@@ -356,6 +356,12 @@ export class PrivateCommand extends Subcommand {
     } else if (user.roles.cache.has(IDs.roles.staff.eventCoordinator)) {
       name = 'event';
       id = IDs.roles.staff.eventCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.mediaCoordinator)) {
+      name = 'media';
+      id = IDs.roles.staff.mediaCoordinator;
+    }  else if (user.roles.cache.has(IDs.roles.staff.hrCoordinator)) {
+      name = 'hr';
+      id = IDs.roles.staff.hrCoordinator;
     } else {
       name = 'coordinator';
       id = IDs.roles.staff.coordinator;
