@@ -222,9 +222,10 @@ model Stat {
 }
 
 model StatRole {
-  stat   Stat   @relation(fields: [statId], references: [id])
-  statId Int    @id
-  roleId String
+  stat      Stat   @relation(fields: [statId], references: [id])
+  statId    Int    @id
+  roleId    String
+  channelId String
 }
 
 model ParticipantStat {

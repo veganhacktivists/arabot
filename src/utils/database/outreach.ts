@@ -85,6 +85,7 @@ export async function createStat(
   eventId: number,
   leaderId: Snowflake,
   roleId: Snowflake,
+  channelId: Snowflake,
 ) {
   await container.database.stat.create({
     data: {
@@ -110,6 +111,7 @@ export async function createStat(
       role: {
         create: {
           roleId,
+          channelId,
         },
       },
     },

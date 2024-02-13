@@ -19,7 +19,7 @@
 
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { RegisterBehavior } from '@sapphire/framework';
-import type { Snowflake } from 'discord.js';
+import { ChannelType, PermissionsBitField, Snowflake } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import {
   addStatUser,
@@ -207,7 +207,7 @@ export class OutreachCommand extends Subcommand {
 
     if (!mod.roles.cache.has(IDs.roles.staff.outreachLeader)) {
       await interaction.reply({
-        content: 'You need to be an Outreach Coordinator to run this command!',
+        content: 'You need to be an Outreach Leader to run this command!',
         ephemeral: true,
       });
       return;
@@ -274,7 +274,8 @@ export class OutreachCommand extends Subcommand {
 
     stat.forEach(({ role }) => {
       if (role !== null) {
-        guild.roles.delete(role.roleId);
+        guild.roles.delete(role.roleId); // Delete role
+        guild.channels.delete(role.channelId); // Delete VC
       }
     });
 
@@ -387,13 +388,65 @@ export class OutreachCommand extends Subcommand {
 
     await updateUser(leaderMember);
 
+    // Create role for group
     const role = await guild.roles.create({
       name: `Outreach Group ${groupNo}`,
+      mentionable: true,
     });
 
-    await createStat(event.id, leader.id, role.id);
+    // Create a voice channel for group
+    const channel = await guild.channels.create({
+      name: `Outreach Group ${groupNo}`,
+      type: ChannelType.GuildVoice,
+      parent: IDs.categories.activism,
+      permissionOverwrites: [
+        {
+          id: guild.roles.everyone,
+          deny: [
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.Connect,
+            PermissionsBitField.Flags.ViewChannel,
+          ],
+        },
+        {
+          id: IDs.roles.vegan.activist,
+          allow: [PermissionsBitField.Flags.ViewChannel],
+        },
+        {
+          id: role.id, // Permissions for the specific group
+          allow: [
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.Connect,
+          ],
+        },
+        {
+          id: IDs.roles.staff.outreachLeader,
+          allow: [
+            PermissionsBitField.Flags.SendMessages,
+            PermissionsBitField.Flags.Connect,
+          ],
+        },
+      ],
+    });
 
+    // Create stats in database
+    await createStat(event.id, leader.id, role.id, channel.id);
+
+    // Give group leader role
     await leaderMember.roles.add(role);
+
+    // Send message in VC with a welcome and reminder
+    await channel.send(
+      `Welcome ${role}, ${leaderMember} is going to be the leader of your group!\n\n` +
+        'Remember to keep track of stats during activism with `/outreach group update` and' +
+        'to have these questions in mind whilst doing activism:\n' +
+        '- How many said would go vegan?\n' +
+        '- How many seriously considered being vegan?\n' +
+        '- How many people had anti-vegan viewpoints?\n' +
+        '- How many thanked you for the conversation?\n' +
+        '- How many said they would watch a vegan documentary?\n' +
+        '- How many got educated on veganism or the animal industry?',
+    );
 
     await interaction.editReply({
       content: `Created a group with the leader being ${leader}`,
