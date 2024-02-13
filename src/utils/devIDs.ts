@@ -60,6 +60,7 @@ const devIDs = {
       outreachCoordinator: '999431675140382807',
       mediaCoordinator: '1204801056404676618',
       hrCoordinator: '1204795893480431657',
+      outreachLeader: '999431675123597409',
       restricted: '999431675123597407',
       moderator: '999431675123597408',
       trialModerator: '999431675123597404',

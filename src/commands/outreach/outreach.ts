@@ -66,7 +66,6 @@ export class OutreachCommand extends Subcommand {
           ],
         },
       ],
-      preconditions: ['ModOnly'],
     });
   }
 
@@ -200,13 +199,13 @@ export class OutreachCommand extends Subcommand {
 
     if (mod === undefined) {
       await interaction.reply({
-        content: 'Mod was not found!',
+        content: 'Outreach Leader was not found!',
         ephemeral: true,
       });
       return;
     }
 
-    if (!mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+    if (!mod.roles.cache.has(IDs.roles.staff.outreachLeader)) {
       await interaction.reply({
         content: 'You need to be an Outreach Coordinator to run this command!',
         ephemeral: true,
@@ -254,9 +253,9 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    if (!mod.roles.cache.has(IDs.roles.staff.outreachCoordinator)) {
+    if (!mod.roles.cache.has(IDs.roles.staff.outreachLeader)) {
       await interaction.reply({
-        content: 'You need to be an Outreach Coordinator to run this command!',
+        content: 'You need to be an Outreach Leader to run this command!',
         ephemeral: true,
       });
       return;
@@ -442,7 +441,7 @@ export class OutreachCommand extends Subcommand {
 
       if (
         leader.id !== stat.stat.leaderId &&
-        !leaderMember.roles.cache.has(IDs.roles.staff.outreachCoordinator)
+        !leaderMember.roles.cache.has(IDs.roles.staff.outreachLeader)
       ) {
         await interaction.editReply({
           content: `You are not the leader for ${group}`,
