@@ -29,7 +29,7 @@ export class PlusCommand extends Command {
       name: 'plus',
       aliases: ['+'],
       description: 'Give/remove the plus role',
-      preconditions: [['CoordinatorOnly', 'ModOnly']],
+      preconditions: [['CoordinatorOnly', 'VerifierOnly', 'ModOnly']],
     });
   }
 
