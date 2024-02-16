@@ -138,6 +138,14 @@ export class PlusCommand extends Command {
       info.success = true;
       return info;
     }
+
+    // Checks if the user is vegan before giving the plus role
+    // If not, stop from giving the plus role
+    if (!member.roles.cache.has(IDs.roles.vegan.vegan)) {
+      info.message = `Can't give ${user} the vegan role as they are not vegan!`;
+      return info;
+    }
+
     // Add Plus role to the user
     await member.roles.add(plus);
     await roleAddLog(user.id, mod.id, plus);
