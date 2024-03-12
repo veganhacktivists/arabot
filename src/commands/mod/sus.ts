@@ -219,26 +219,11 @@ export class SusCommand extends Subcommand {
       success: false,
     };
 
-    // Get GuildMember for user to add a sus note for
-    let member = guild.members.cache.get(user.id);
-
-    // Checks if Member was not found in cache
-    if (member === undefined) {
-      // Fetches Member from API call to Discord
-      member = await guild.members.fetch(user.id);
-      if (member === undefined) {
-        info.message = 'Error fetching user';
-        return info;
-      }
-    }
-
     // Add the data to the database
     await addSusNoteDB(user.id, mod.id, note);
 
-    // Give the user the sus role they don't already have the sus note
-    if (!member.roles.cache.has(IDs.roles.restrictions.sus)) {
-      await member.roles.add(IDs.roles.restrictions.sus);
-    }
+    // Gives the sus role to the user
+    await this.addSusRole(user, guild);
 
     info.message = `Added the sus note for ${user}: ${note}`;
     info.success = true;
@@ -276,6 +261,26 @@ export class SusCommand extends Subcommand {
     await logChannel.send({ embeds: [message] });
 
     return info;
+  }
+
+  private async addSusRole(user: User, guild: Guild) {
+    // Get GuildMember for user to add a sus note for
+    let member = guild.members.cache.get(user.id);
+
+    // Checks if Member was not found in cache
+    if (member === undefined) {
+      // Fetches Member from API call to Discord
+      member = await guild.members.fetch(user.id).catch(() => undefined);
+    }
+
+    if (member === undefined) {
+      return;
+    }
+
+    // Give the user the sus role they don't already have the sus note
+    if (!member.roles.cache.has(IDs.roles.restrictions.sus)) {
+      await member.roles.add(IDs.roles.restrictions.sus);
+    }
   }
 
   public async listNote(interaction: Subcommand.ChatInputCommandInteraction) {
