@@ -25,8 +25,7 @@ import { LogLevel, SapphireClient, container } from '@sapphire/framework';
 import '@sapphire/plugin-scheduled-tasks/register';
 import '@sapphire/plugin-logger/register';
 import { PrismaClient } from '@prisma/client';
-import { createClient } from 'redis';
-import type { RedisClientType } from 'redis';
+import { Redis } from 'ioredis';
 
 // Setting up the Sapphire client
 const client = new SapphireClient({
@@ -50,7 +49,7 @@ const client = new SapphireClient({
   tasks: {
     bull: {
       connection: {
-        host: process.env.BULLMQ_URL,
+        host: process.env.REDIS_URL,
       },
     },
   },
@@ -64,10 +63,10 @@ const main = async () => {
 
     // Create databases
     container.database = await new PrismaClient();
-    container.redis = createClient({
-      url: process.env.REDIS_URL,
+    container.redis = new Redis({
+      host: process.env.REDIS_URL,
+      db: 1
     });
-    await container.redis.connect();
 
     // Log the bot in to Discord
     await client.login(token);
@@ -83,7 +82,7 @@ const main = async () => {
 declare module '@sapphire/pieces' {
   interface Container {
     database: PrismaClient;
-    redis: RedisClientType;
+    redis: Redis;
   }
 }
 
