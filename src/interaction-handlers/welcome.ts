@@ -69,7 +69,7 @@ export class WelcomeButtonHandler extends InteractionHandler {
         await general.send(
           `${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> ` +
             `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussions and debates.` +
-            "\n\nIf you would like to be verified as a vegan, join the 'Verification' voice channel.",
+            "\n\nIf you are vegan, you can join the 'Verification' voice channel to be verified and gain access to more channels.",
         );
         return;
       }
