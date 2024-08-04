@@ -65,7 +65,7 @@ const main = async () => {
     container.database = await new PrismaClient();
     container.redis = new Redis({
       host: process.env.REDIS_URL,
-      db: 1
+      db: 1,
     });
 
     // Log the bot in to Discord
