@@ -22,7 +22,10 @@ import { ChannelType } from 'discord.js';
 import type { GuildChannel, EmbedBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
-import { checkActive, getRestrictions } from '#utils/database/moderation/restriction';
+import {
+  checkActive,
+  getRestrictions,
+} from '#utils/database/moderation/restriction';
 import { findNotes } from '#utils/database/moderation/sus';
 import {
   createRestrictLogEmbed,

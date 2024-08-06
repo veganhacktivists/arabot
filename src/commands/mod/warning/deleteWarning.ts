@@ -21,7 +21,10 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder, TextChannel } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
-import { deleteWarning, fetchWarning } from '#utils/database/moderation/warnings';
+import {
+  deleteWarning,
+  fetchWarning,
+} from '#utils/database/moderation/warnings';
 import { checkStaff } from '#utils/checker';
 
 export class DeleteWarningCommand extends Command {

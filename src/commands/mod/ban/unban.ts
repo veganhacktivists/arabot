@@ -29,7 +29,10 @@ import type {
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 import { removeBan, checkBan, addBan } from '#utils/database/moderation/ban';
-import { checkTempBan, removeTempBan } from '#utils/database/moderation/tempBan';
+import {
+  checkTempBan,
+  removeTempBan,
+} from '#utils/database/moderation/tempBan';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 
 export class UnbanCommand extends Command {

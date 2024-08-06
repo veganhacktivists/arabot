@@ -19,7 +19,11 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { GuildMember, Message } from 'discord.js';
-import { addMute, removeMute, checkActive } from '#utils/database/moderation/vcMute';
+import {
+  addMute,
+  removeMute,
+  checkActive,
+} from '#utils/database/moderation/vcMute';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 
 export class VCMuteCommand extends Command {

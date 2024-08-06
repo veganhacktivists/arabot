@@ -21,7 +21,10 @@ import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import IDs from '#utils/ids';
 import { EmbedBuilder } from 'discord.js';
 import { checkBan } from '#utils/database/moderation/ban';
-import { checkTempBan, removeTempBan } from '#utils/database/moderation/tempBan';
+import {
+  checkTempBan,
+  removeTempBan,
+} from '#utils/database/moderation/tempBan';
 
 export class TempBan extends ScheduledTask {
   public constructor(
