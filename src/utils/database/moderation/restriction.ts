@@ -114,6 +114,19 @@ export async function getSection(userId: Snowflake) {
   return restriction.section;
 }
 
+/**
+ * Returns the amount of restrictions a user has.
+ * @param userId Discord Snowflake of the user to check
+ * @return number The amount of restrictions the user has
+ */
+export async function countRestrictions(userId: Snowflake) {
+  return container.database.restrict.count({
+    where: {
+      userId,
+    },
+  });
+}
+
 // This is only for restrictions created with the old bot
 export async function unRestrictLegacy(
   userId: Snowflake,

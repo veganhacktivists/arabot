@@ -61,3 +61,16 @@ export async function deleteWarning(warningId: number) {
     },
   });
 }
+
+/**
+ * Returns the amount of warnings a user has.
+ * @param userId Discord Snowflake of the user to check
+ * @return number The amount of warnings the user has
+ */
+export async function countWarnings(userId: Snowflake) {
+  return container.database.warning.count({
+    where: {
+      userId,
+    },
+  });
+}
