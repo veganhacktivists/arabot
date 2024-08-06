@@ -66,6 +66,7 @@ model User {
   TempBanEndMod         TempBan[]         @relation("endTbanMod")
   VCMuteUser            VCMute[]          @relation("vcMuteUser")
   VCMuteMod             VCMute[]          @relation("vcMuteMod")
+  ClearCommandMod       ClearCommand[]
 }
 
 model Verify {
@@ -311,4 +312,12 @@ model VCMute {
   time    DateTime  @default(now())
   endTime DateTime?
   reason  String?
+}
+
+model ClearCommand {
+  id    Int @id @default(autoincrement())
+  mod   User    @relation(fields: [modId], references: [id])
+  modId String
+  messages  Int
+  time  DateTime    @default(now())
 }
