@@ -18,6 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
+import { PermissionFlagsBits } from 'discord.js';
 import type { Message } from 'discord.js';
 
 export class ClearCommand extends Command {
@@ -26,7 +27,8 @@ export class ClearCommand extends Command {
       ...options,
       name: 'clear',
       description: 'Deletes 1-100 messages in bulk',
-      preconditions: ['CoordinatorOnly'],
+      preconditions: [['CoordinatorOnly', 'ModOnly']],
+      requiredUserPermissions: [PermissionFlagsBits.ManageMessages]
     });
   }
 
