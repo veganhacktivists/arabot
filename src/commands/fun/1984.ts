@@ -20,7 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder, GuildMember } from 'discord.js';
 import { N1984 } from '#utils/gifs';
-import { addFunLog, countTotal } from '#utils/database/fun';
+import { addFunLog, countTotal } from '#utils/database/fun/fun';
 
 export class N1984Command extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {

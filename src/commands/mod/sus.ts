@@ -39,7 +39,7 @@ import {
   getNote,
   deactivateNote,
   deactivateAllNotes,
-} from '#utils/database/sus';
+} from '#utils/database/moderation/sus';
 import { checkStaff } from '#utils/checker';
 import IDs from '#utils/ids';
 import { createSusLogEmbed } from '#utils/embeds';

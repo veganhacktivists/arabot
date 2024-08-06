@@ -28,7 +28,7 @@ import type {
 import { ChannelType } from 'discord.js';
 import { fetchRoles, getLeaveRoles } from '#utils/database/dbExistingUser';
 import { blockTime } from '#utils/database/verification';
-import { checkActive, getSection } from '#utils/database/restriction';
+import { checkActive, getSection } from '#utils/database/moderation/restriction';
 import { blockedRoles, blockedRolesAfterRestricted } from '#utils/blockedRoles';
 import IDs from '#utils/ids';
 

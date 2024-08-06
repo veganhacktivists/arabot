@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Guild, Message } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
-import { getBalance, transfer } from '#utils/database/economy';
+import { getBalance, transfer } from '#utils/database/fun/economy';
 import { EmbedBuilder, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
 

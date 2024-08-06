@@ -18,9 +18,9 @@
 */
 import type { Guild, User } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
-import type { SusNotes } from '#utils/database/sus';
-import { RestrictionLogs } from '#utils/database/restriction';
-import { Warnings } from '#utils/database/warnings';
+import type { SusNotes } from '#utils/database/moderation/sus';
+import { RestrictionLogs } from '#utils/database/moderation/restriction';
+import { Warnings } from '#utils/database/moderation/warnings';
 
 export function createSusLogEmbed(notes: SusNotes, user: User, guild: Guild) {
   const embed = new EmbedBuilder()

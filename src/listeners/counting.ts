@@ -21,7 +21,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import { getLastCount, addCount } from '#utils/database/counting';
+import { getLastCount, addCount } from '#utils/database/fun/counting';
 import IDs from '#utils/ids';
 
 export class XpListener extends Listener {

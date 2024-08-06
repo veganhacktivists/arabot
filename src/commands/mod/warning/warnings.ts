@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { ChannelType, EmbedBuilder } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
-import { fetchWarnings } from '#utils/database/warnings';
+import { fetchWarnings } from '#utils/database/moderation/warnings';
 import { checkStaff } from '#utils/checker';
 import { createWarningsEmbed } from '#utils/embeds';
 

@@ -20,7 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { GuildBan } from 'discord.js';
 import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
-import { addBan, checkBan, removeBan } from '#utils/database/ban';
+import { addBan, checkBan, removeBan } from '#utils/database/moderation/ban';
 import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
 

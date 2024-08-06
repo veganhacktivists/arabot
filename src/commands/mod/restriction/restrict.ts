@@ -36,7 +36,7 @@ import {
   updateUser,
   fetchRoles,
 } from '#utils/database/dbExistingUser';
-import { restrict, checkActive } from '#utils/database/restriction';
+import { restrict, checkActive } from '#utils/database/moderation/restriction';
 import { randint } from '#utils/maths';
 import { blockedRolesAfterRestricted } from '#utils/blockedRoles';
 

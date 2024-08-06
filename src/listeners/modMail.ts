@@ -22,14 +22,14 @@ import { ChannelType } from 'discord.js';
 import type { GuildChannel, EmbedBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
-import { checkActive, getRestrictions } from '#utils/database/restriction';
-import { findNotes } from '#utils/database/sus';
+import { checkActive, getRestrictions } from '#utils/database/moderation/restriction';
+import { findNotes } from '#utils/database/moderation/sus';
 import {
   createRestrictLogEmbed,
   createSusLogEmbed,
   createWarningsEmbed,
 } from '#utils/embeds';
-import { fetchWarnings } from '#utils/database/warnings';
+import { fetchWarnings } from '#utils/database/moderation/warnings';
 
 export class ModMailCreateListener extends Listener {
   public constructor(

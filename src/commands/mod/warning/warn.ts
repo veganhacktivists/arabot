@@ -25,7 +25,7 @@ import {
 } from '@sapphire/framework';
 import type { User, Message, Snowflake, Guild, TextChannel } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
-import { addWarn } from '#utils/database/warnings';
+import { addWarn } from '#utils/database/moderation/warnings';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 

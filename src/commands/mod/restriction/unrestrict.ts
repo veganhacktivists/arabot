@@ -26,7 +26,7 @@ import {
   unRestrict,
   checkActive,
   unRestrictLegacy,
-} from '#utils/database/restriction';
+} from '#utils/database/moderation/restriction';
 
 export class UnRestrictCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {

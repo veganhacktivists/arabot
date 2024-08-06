@@ -21,7 +21,7 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { ChannelType, EmbedBuilder } from 'discord.js';
 import type { Message, TextChannel, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
-import { getRestrictions } from '#utils/database/restriction';
+import { getRestrictions } from '#utils/database/moderation/restriction';
 import { checkStaff } from '#utils/checker';
 
 export class RestrictLogsCommand extends Command {

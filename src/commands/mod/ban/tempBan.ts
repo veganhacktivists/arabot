@@ -22,7 +22,7 @@ import { Duration, DurationFormatter } from '@sapphire/time-utilities';
 import type { User, Snowflake, TextChannel, Guild } from 'discord.js';
 import { EmbedBuilder, Message } from 'discord.js';
 import IDs from '#utils/ids';
-import { addTempBan, checkTempBan } from '#utils/database/tempBan';
+import { addTempBan, checkTempBan } from '#utils/database/moderation/tempBan';
 import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
 
 export class TempBanCommand extends Command {

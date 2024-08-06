@@ -21,7 +21,7 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
 import type { User, Guild, GuildMember, Message } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
-import { daily, getLastDaily } from '#utils/database/economy';
+import { daily, getLastDaily } from '#utils/database/fun/economy';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 

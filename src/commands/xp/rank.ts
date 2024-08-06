@@ -20,7 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Guild, Message } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
-import { getRank, xpToNextLevel } from '#utils/database/xp';
+import { getRank, xpToNextLevel } from '#utils/database/fun/xp';
 
 export class RankCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {

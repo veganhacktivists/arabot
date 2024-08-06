@@ -19,7 +19,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { VoiceState } from 'discord.js';
-import { checkActive, removeMute } from '#utils/database/vcMute';
+import { checkActive, removeMute } from '#utils/database/moderation/vcMute';
 
 export class VCMuteListener extends Listener {
   public constructor(

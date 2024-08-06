@@ -19,7 +19,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { Message } from 'discord.js';
-import { addXp, checkCanAddXp } from '#utils/database/xp';
+import { addXp, checkCanAddXp } from '#utils/database/fun/xp';
 import { randint } from '#utils/maths';
 
 export class XpListener extends Listener {

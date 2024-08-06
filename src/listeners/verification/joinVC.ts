@@ -50,7 +50,7 @@ import {
   startVerification,
   finishVerification,
 } from '#utils/database/verification';
-import { findNotes } from '#utils/database/sus';
+import { findNotes } from '#utils/database/moderation/sus';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 import { rolesToString } from '#utils/formatter';
 import IDs from '#utils/ids';

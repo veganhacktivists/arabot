@@ -19,8 +19,8 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildMember } from 'discord.js';
-import { checkBan, getBanReason } from '#utils/database/ban';
-import { checkTempBan } from '#utils/database/tempBan';
+import { checkBan, getBanReason } from '#utils/database/moderation/ban';
+import { checkTempBan } from '#utils/database/moderation/tempBan';
 
 export class BanJoinListener extends Listener {
   public constructor(

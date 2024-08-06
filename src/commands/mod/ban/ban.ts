@@ -21,9 +21,9 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import type { User, Message, Snowflake, TextChannel, Guild } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
-import { addBan, checkBan } from '#utils/database/ban';
+import { addBan, checkBan } from '#utils/database/moderation/ban';
 import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
-import { checkTempBan, removeTempBan } from '#utils/database/tempBan';
+import { checkTempBan, removeTempBan } from '#utils/database/moderation/tempBan';
 
 export class BanCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
