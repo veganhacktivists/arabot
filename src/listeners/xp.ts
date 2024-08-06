@@ -46,6 +46,12 @@ export class XpListener extends Listener {
 
     const xp = randint(15, 25);
 
-    await addXp(user.id, xp);
+    const level = await addXp(user.id, xp);
+
+    // Emits that a user has leveled up
+    if (level !== null) {
+      this.container.logger.info('User is levelling up!');
+      this.container.client.emit('xpLevelUp', message.member, level);
+    }
   }
 }

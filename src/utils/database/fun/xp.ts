@@ -36,7 +36,7 @@ export async function addXp(userId: Snowflake, xp: number) {
     }
   }
 
-  await container.database.xp.upsert({
+  const info = await container.database.xp.upsert({
     where: {
       userId,
     },
@@ -63,6 +63,12 @@ export async function addXp(userId: Snowflake, xp: number) {
       xpForNextLevel: xp,
     },
   });
+
+  if (level === 1) {
+    return info.level;
+  } else {
+    return null;
+  }
 }
 
 export async function checkCanAddXp(userId: Snowflake) {
