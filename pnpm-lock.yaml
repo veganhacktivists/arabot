@@ -40,7 +40,7 @@ importers:
         version: 3.17.0
       bullmq:
         specifier: ^5.12.0
-        version: 5.12.0
+        version: 5.12.1
       discord.js:
         specifier: ^14.15.3
         version: 14.15.3
@@ -444,8 +444,8 @@ packages:
   bullmq@5.1.3:
     resolution: {integrity: sha512-safpGwiwKHsNPW01Wk8FPxdWbPS2mA0HZKqIhdQB10J4wWRSDWPeQE2p+YYnAmqEsk0FwJdZnzVcwCfn7w5cVA==}
 
-  bullmq@5.12.0:
-    resolution: {integrity: sha512-kOtSQx9ymylslsLNFD0xOMJM9mHqnq3x6KD7+DYkHByWe0HFRdblpYKhZyL4uR3rwaKZwzOrJVl3RwRaDjZxSg==}
+  bullmq@5.12.1:
+    resolution: {integrity: sha512-XNUnT4+hJ/bnu3HkIeauN/i+fU+DwC74rubPLktoUsds7zBfugN3jF8XbaT7Ya4U+SANR+3T4u9YG8KUbsp2+g==}
 
   callsites@3.1.0:
     resolution: {integrity: sha512-P8BjAsXvZS+VIDUI11hHCQEv74YT67YUi5JJFNWIqL235sBmjX4+qx9Muvls5ivyNENctx46xQLQ3aTuE7ssaQ==}
@@ -1397,7 +1397,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  bullmq@5.12.0:
+  bullmq@5.12.1:
     dependencies:
       cron-parser: 4.9.0
       ioredis: 5.4.1
