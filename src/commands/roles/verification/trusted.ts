@@ -146,8 +146,8 @@ export class TrustedCommand extends Command {
       .send(
         `You have been given the ${trusted.name} role by ${mod}!` +
           '\n\nThis role allows you to post attachments to the server and stream in VCs.' +
-          "\nMake sure that you follow the rules, and don't post anything NSFW, anything objectifying animals and follow Discord's ToS." +
-          `\nNot following these rules can result in the removal of the ${trusted.name} role.`,
+          "\nMake sure that you follow the rules, do **not** post anything **NSFW**, **no animal products or consumption of animal products**, and follow Discord's ToS." +
+          `\n\nNot following these rules will result in the **immediate removal** of the ${trusted.name} role.`,
       )
       .catch(() => {});
     info.success = true;
