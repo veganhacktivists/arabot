@@ -38,8 +38,9 @@ export class TrustedListener extends Listener {
   }
 
   public async run(member: GuildMember, level: number) {
-    // Checks if the member has gotten level 5
-    if (level !== 5) {
+    // Checks if the member has gotten level 7
+    // Has been nefred. Should take around 1.5 hours to get the trusted role now
+    if (level !== 7) {
       return;
     }
 
