@@ -148,7 +148,7 @@ export class VerificationLeaveVCListener extends Listener {
       listTextChannels.forEach((c) => {
         const textChannel = c as TextChannel;
         // Checks if the channel topic has the user's snowflake
-        if (textChannel.topic!.includes(userSnowflake!)) {
+        if (textChannel.topic !== null && textChannel.topic.includes(userSnowflake!)) {
           textChannel.delete();
         }
       });
