@@ -100,6 +100,7 @@ const devIDs = {
     },
     nonVegan: {
       general: '999431677325615189',
+      vcText: '999431677535338567',
     },
     vegan: {
       general: '999431677535338575',
