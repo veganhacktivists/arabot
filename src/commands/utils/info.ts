@@ -18,6 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
+import IDs from '#utils/ids';
 
 export class InfoCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -94,7 +95,9 @@ export class InfoCommand extends Command {
         message =
           "If you want to have the vegan or activist role, you'll need to do a voice verification. " +
           "To do this, hop into the 'Verification' voice channel." +
-          "\n\nIf there aren't any verifiers available, you'll be disconnected, and you can rejoin later.";
+          "\n\nIf there aren't any verifiers available, you'll be disconnected, and you can rejoin later." +
+          `\n\nAlternatively if you would like text verification, you can use \`/apply\` in <#${IDs.channels.nonVegan.vcText}> ` +
+          'to be able fill out a Vegan Verification form through the Appy Bot.';
         break;
       case 'modMail':
         message =
