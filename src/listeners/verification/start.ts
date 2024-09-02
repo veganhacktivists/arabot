@@ -80,7 +80,10 @@ export class VerificationReady extends Listener {
       const textChannel = c as TextChannel;
       // Checks if the channel topic has the user's snowflake
       emptyVC.forEach((snowflake) => {
-        if (textChannel.topic !== null && textChannel.topic.includes(snowflake)) {
+        if (
+          textChannel.topic !== null &&
+          textChannel.topic.includes(snowflake)
+        ) {
           textChannel.delete();
         }
       });

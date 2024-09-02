@@ -81,7 +81,7 @@ export class TrustedListener extends Listener {
     await member.user.send(
       `Hi, you have been given the ${trusted.name} as you have been interacting in ARA for a long enough time!` +
         '\n\nThis role allows you to post attachments to the server and stream in VCs.' +
-        "\nMake sure that you follow the rules, especially by **not** posting anything **NSFW**, and **no animal products or consumption of animal products**." +
+        '\nMake sure that you follow the rules, especially by **not** posting anything **NSFW**, and **no animal products or consumption of animal products**.' +
         `\n\nNot following these rules will result in the **immediate removal** of the ${trusted.name} role.`,
     );
   }
