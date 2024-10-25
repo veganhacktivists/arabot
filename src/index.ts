@@ -27,6 +27,10 @@ import '@sapphire/plugin-logger/register';
 import { PrismaClient } from '@prisma/client';
 import { Redis } from 'ioredis';
 
+const REDIS_PORT = process.env.REDIS_PORT
+  ? parseInt(process.env.REDIS_PORT)
+  : undefined;
+
 // Setting up the Sapphire client
 const client = new SapphireClient({
   defaultPrefix: process.env.DEFAULT_PREFIX,
@@ -49,7 +53,10 @@ const client = new SapphireClient({
   tasks: {
     bull: {
       connection: {
-        host: process.env.REDIS_URL,
+        host: process.env.REDIS_HOST,
+        username: process.env.REDIS_USER,
+        password: process.env.REDIS_PASSWORD,
+        port: REDIS_PORT,
       },
     },
   },
@@ -62,9 +69,12 @@ const main = async () => {
     client.logger.info('Logging in');
 
     // Create databases
-    container.database = await new PrismaClient();
+    container.database = new PrismaClient();
     container.redis = new Redis({
-      host: process.env.REDIS_URL,
+      host: process.env.REDIS_HOST,
+      username: process.env.REDIS_USER,
+      password: process.env.REDIS_PASSWORD,
+      port: REDIS_PORT,
       db: 1,
     });
 
