@@ -157,10 +157,10 @@ export class SusCommand extends Subcommand {
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (!(guild instanceof Guild)) {
+    if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -169,7 +169,7 @@ export class SusCommand extends Subcommand {
 
     await interaction.reply({
       content: info.message,
-      ephemeral: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
     });
   }
 
@@ -195,7 +195,7 @@ export class SusCommand extends Subcommand {
 
     const guild = message.guild;
 
-    if (!(guild instanceof Guild)) {
+    if (guild === null) {
       await message.react('❌');
       await message.reply(
         'Could not find guild! Make sure you run this command in a server.',
@@ -292,7 +292,7 @@ export class SusCommand extends Subcommand {
     if (guild == null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -306,8 +306,8 @@ export class SusCommand extends Subcommand {
     if (notes.length === 0) {
       await interaction.reply({
         content: `${user} has no sus notes!`,
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -318,8 +318,8 @@ export class SusCommand extends Subcommand {
     // Sends the notes to the user
     await interaction.reply({
       embeds: [noteEmbed],
-      ephemeral: !staffChannel,
-      fetchReply: true,
+      flags: staffChannel ? undefined : MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 
@@ -333,8 +333,8 @@ export class SusCommand extends Subcommand {
     if (guild === null || channel === null) {
       await interaction.reply({
         content: 'Error fetching guild or channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -346,8 +346,8 @@ export class SusCommand extends Subcommand {
     if (note === null) {
       await interaction.reply({
         content: 'Error fetching note from database!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -363,8 +363,8 @@ export class SusCommand extends Subcommand {
     if (user === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -475,10 +475,10 @@ export class SusCommand extends Subcommand {
   ) {
     // Find user
     let user = guild.client.users.cache.get(userId);
-    if (!(user instanceof User)) {
+    if (user === undefined) {
       user = await guild.client.users.fetch(userId).catch(() => undefined);
     }
-    if (!(user instanceof User)) return;
+    if (user === undefined) return;
 
     // Log the sus note
     let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
