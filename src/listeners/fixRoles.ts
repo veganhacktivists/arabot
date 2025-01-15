@@ -40,7 +40,7 @@ export class FixRolesOnReady extends Listener {
       // THIS SHOULD BE DISABLED BY DEFAULT
       // THIS IS ONLY USED FOR RESTORING ROLES TO THE SERVER!
       // ENABLING THIS UNINTENTIONALLY WILL CAUSE SLOWDOWNS TO THE BOT DUE TO RATE LIMITING!
-      enabled: true,
+      enabled: false,
     });
   }
 
@@ -59,7 +59,7 @@ export class FixRolesOnReady extends Listener {
 
     // Fetching the channel for the logs
     // Leave the snowflake parameter empty for no logs
-    const logChannel = await client.channels.fetch('1329152627312824320');
+    const logChannel = await client.channels.fetch('');
     const sendLogs = logChannel !== null;
 
     if (!sendLogs) {
