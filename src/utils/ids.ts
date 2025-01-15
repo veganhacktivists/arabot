@@ -25,7 +25,7 @@ let IDs = {
     booster: '731213264540795012',
     nonvegan: {
       nonvegan: '1329093962153332848',
-      vegCurious: '832656046572961803',
+      vegCurious: '1329107984227369020',
       convinced: '797132019166871612',
     },
     vegan: {
@@ -75,7 +75,7 @@ let IDs = {
     stageHost: '854893757593419786',
     patron: '765370219207852055',
     patreon: '993848684640997406',
-    verifyBlock: '1032765019269640203',
+    verifyBlock: '1329107805130461247',
     bookClub: '955516408249352212',
     debateHost: '935508325615931443',
     gameNightHost: '952779915701415966',
