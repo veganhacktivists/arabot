@@ -141,6 +141,7 @@ const devIDs = {
     private: '999431679527628818',
     restricted: '999431679812845654',
   },
+  modMail: '575252669443211264',
 };
 
 export default devIDs;

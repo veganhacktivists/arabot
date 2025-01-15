@@ -21,8 +21,14 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from '@sapphire/framework';
-import type { ButtonInteraction, GuildMember, TextChannel } from 'discord.js';
+import {
+  ButtonInteraction,
+  GuildMember,
+  MessageFlagsBitField,
+  TextChannel,
+} from 'discord.js';
 import IDs from '#utils/ids';
+import { checkActive } from '#utils/database/moderation/restriction';
 
 export class WelcomeButtonHandler extends InteractionHandler {
   public constructor(
@@ -54,13 +60,23 @@ export class WelcomeButtonHandler extends InteractionHandler {
       await interaction.reply({
         content:
           'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
     try {
       member = member as GuildMember;
+
+      // Checks if the user is currently restricted
+      if (await checkActive(member.id)) {
+        await interaction.reply({
+          content: `You are currently restricted from this server! Contact the moderators by sending a DM to <@${IDs.modMail}>.`,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+        });
+
+        return;
+      }
 
       // Give non-vegan role
       if (!member.voice.channel) {
@@ -78,13 +94,13 @@ export class WelcomeButtonHandler extends InteractionHandler {
       await interaction.reply({
         content:
           "You're currently in a verification, you'll have to leave the verification or get verified before being able to access the server again.",
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
     } catch (error) {
       await interaction.reply({
         content:
           'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
     }
   }

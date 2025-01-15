@@ -143,6 +143,7 @@ let IDs = {
     private: '992581296901599302',
     restricted: '809765577236283472',
   },
+  modMail: '575252669443211264',
 };
 
 // Check if the bot is in development mode
