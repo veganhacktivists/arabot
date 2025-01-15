@@ -83,6 +83,11 @@ export class Suggestions extends Listener {
       return;
     }
 
+    if (!mailbox.isSendable()) {
+      // TODO manage logging/errors properly
+      return;
+    }
+
     const sent = await mailbox.send({
       embeds: [suggestion],
       content: message.author.toString(),

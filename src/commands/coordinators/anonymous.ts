@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 import { ChannelType, TextChannel } from 'discord.js';
 
 export class AnonymousCommand extends Command {
@@ -67,8 +67,8 @@ export class AnonymousCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -77,8 +77,17 @@ export class AnonymousCommand extends Command {
       if (interaction.channel === null) {
         await interaction.reply({
           content: 'Error getting the channel!',
-          ephemeral: true,
-          fetchReply: true,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+          withResponse: true,
+        });
+        return;
+      }
+
+      if (!interaction.channel.isSendable()) {
+        await interaction.reply({
+          content: `I do not have sufficient permissions to send a message in ${interaction.channel}!`,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+          withResponse: true,
         });
         return;
       }
@@ -86,8 +95,8 @@ export class AnonymousCommand extends Command {
       await interaction.channel.send(message);
       await interaction.reply({
         content: 'Sent the message',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -95,8 +104,8 @@ export class AnonymousCommand extends Command {
     if (channel.type !== ChannelType.GuildText) {
       await interaction.reply({
         content: 'Could not send, unsupported text channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
     }
 
@@ -105,8 +114,8 @@ export class AnonymousCommand extends Command {
 
     await interaction.reply({
       content: 'Sent the message',
-      ephemeral: true,
-      fetchReply: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 
@@ -121,7 +130,7 @@ export class AnonymousCommand extends Command {
       return;
     }
 
-    if (channel.isTextBased()) {
+    if (channel.isSendable()) {
       await channel.send(text);
     } else {
       await message.react('❌');

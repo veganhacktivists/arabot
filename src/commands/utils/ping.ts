@@ -17,9 +17,8 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import { Command } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 
 export class PingCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -41,12 +40,13 @@ export class PingCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     const msg = await interaction.reply({
       content: 'Ping?',
-      ephemeral: true,
-      fetchReply: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
 
-    if (isMessageInstance(msg)) {
-      const diff = msg.createdTimestamp - interaction.createdTimestamp;
+    if (msg.resource !== null && msg.resource.message !== null) {
+      const diff =
+        msg.resource.message.createdTimestamp - interaction.createdTimestamp;
       const ping = Math.round(this.container.client.ws.ping);
       return interaction.editReply(
         `Pong 🏓! (Round trip took: ${diff}ms. Heartbeat: ${ping}ms.)`,
@@ -57,6 +57,11 @@ export class PingCommand extends Command {
   }
 
   public async messageRun(message: Message) {
+    if (!message.channel.isSendable()) {
+      // TODO manage logging/errors properly
+      return;
+    }
+
     const msg = await message.channel.send('Ping?');
 
     const diff = msg.createdTimestamp - message.createdTimestamp;

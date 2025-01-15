@@ -49,6 +49,11 @@ export class XpListener extends Listener {
     // If no counts exist on the database, then create the first count from the bot
     if (lastCount === null) {
       if (this.container.client.id === null) {
+        if (!message.channel.isSendable()) {
+          // TODO manage logging/errors properly
+          return;
+        }
+
         message.channel.send(
           'An unexpected error occurred trying to set up the counting channel, please contact a developer!',
         );
@@ -63,6 +68,11 @@ export class XpListener extends Listener {
 
       lastCount = await getLastCount();
       if (lastCount === null) {
+        if (!message.channel.isSendable()) {
+          // TODO manage logging/errors properly
+          return;
+        }
+
         message.channel.send(
           'An unexpected error occurred, please contact a developer!',
         );

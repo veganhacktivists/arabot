@@ -30,9 +30,9 @@ import {
   TextChannel,
   GuildMember,
   Snowflake,
+  MessageFlagsBitField,
 } from 'discord.js';
 import type { Message } from 'discord.js';
-import { isMessageInstance } from '@sapphire/discord.js-utilities';
 import {
   addSusNoteDB,
   findNotes,
@@ -407,13 +407,18 @@ export class SusCommand extends Subcommand {
     const message = await interaction.reply({
       embeds: [noteEmbed],
       components: [buttons],
-      ephemeral: true,
-      fetchReply: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
 
     // Checks if the message is not an APIMessage
-    if (!isMessageInstance(message)) {
+    if (message.resource === null) {
       await interaction.editReply('Failed to retrieve the message :(');
+      return;
+    }
+
+    if (!channel.isSendable()) {
+      await interaction.editReply('Cannot send messages in this channel!');
       return;
     }
 
@@ -519,8 +524,8 @@ export class SusCommand extends Subcommand {
     if (guild === null || channel === null) {
       await interaction.reply({
         content: 'Error fetching guild or channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -531,8 +536,8 @@ export class SusCommand extends Subcommand {
     if (member === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -545,8 +550,8 @@ export class SusCommand extends Subcommand {
     if (notes.length === 0) {
       await interaction.reply({
         content: `${user} had no notes!`,
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -596,13 +601,18 @@ export class SusCommand extends Subcommand {
     const message = await interaction.reply({
       embeds: [noteEmbed],
       components: [buttons],
-      ephemeral: true,
-      fetchReply: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
 
     // Checks if the message is not an APIMessage
-    if (!isMessageInstance(message)) {
+    if (message.resource === null) {
       await interaction.editReply('Failed to retrieve the message :(');
+      return;
+    }
+
+    if (!channel.isSendable()) {
+      await interaction.editReply('Cannot send messages in this channel!');
       return;
     }
 

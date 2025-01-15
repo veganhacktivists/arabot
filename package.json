@@ -34,30 +34,30 @@
     "pnpm": ">=9"
   },
   "dependencies": {
-    "@prisma/client": "^5.18.0",
-    "@sapphire/discord.js-utilities": "^7.3.0",
-    "@sapphire/framework": "^5.2.1",
+    "@prisma/client": "^5.22.0",
+    "@sapphire/discord.js-utilities": "^7.3.2",
+    "@sapphire/framework": "^5.3.2",
     "@sapphire/plugin-logger": "^4.0.2",
-    "@sapphire/plugin-scheduled-tasks": "^10.0.1",
+    "@sapphire/plugin-scheduled-tasks": "^10.0.2",
     "@sapphire/plugin-subcommands": "^6.0.3",
-    "@sapphire/stopwatch": "^1.5.2",
-    "@sapphire/time-utilities": "^1.7.12",
+    "@sapphire/stopwatch": "^1.5.4",
+    "@sapphire/time-utilities": "^1.7.14",
     "@sapphire/ts-config": "^5.0.1",
-    "@sapphire/utilities": "^3.17.0",
-    "bullmq": "^5.12.10",
-    "discord.js": "^14.15.3",
-    "ioredis": "^5.4.1",
+    "@sapphire/utilities": "^3.18.1",
+    "bullmq": "^5.34.10",
+    "discord.js": "^14.17.3",
+    "ioredis": "^5.4.2",
     "ts-node": "^10.9.2",
     "typescript": "~5.4.5"
   },
   "devDependencies": {
-    "@types/node": "^20.16.1",
+    "@types/node": "^20.17.13",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "@typescript-eslint/parser": "^6.21.0",
     "eslint": "8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "prettier": "3.2.4",
-    "prisma": "^5.18.0"
+    "prisma": "^5.22.0"
   },
   "packageManager": "pnpm@9.12.2+sha512.22721b3a11f81661ae1ec68ce1a7b879425a1ca5b991c975b074ac220b187ce56c708fe5db69f4c962c989452eee76c82877f4ee80f474cebd61ee13461b6228"
 }
