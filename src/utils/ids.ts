@@ -20,6 +20,7 @@
 import devIDs from '#utils/devIDs';
 
 let IDs = {
+  guild: '730907954345279591',
   roles: {
     trusted: '1329089675977035879',
     booster: '731213264540795012',
@@ -128,6 +129,7 @@ let IDs = {
     },
     logs: {
       restricted: '920993034462715925',
+      bot: '872126272015314966',
       economy: '932050015034159174',
       sus: '872884989950324826',
     },

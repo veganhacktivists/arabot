@@ -22,6 +22,7 @@
 
 import { Listener } from '@sapphire/framework';
 import type { Client } from 'discord.js';
+import IDs from '#utils/ids';
 
 export class ReadyListener extends Listener {
   public constructor(
@@ -35,8 +36,24 @@ export class ReadyListener extends Listener {
     });
   }
 
-  public run(client: Client) {
+  public async run(client: Client) {
     const { username, id } = client.user!;
     this.container.logger.info(`Successfully logged in as ${username} (${id})`);
+
+    const botLogChannel = await client.channels.fetch(IDs.channels.logs.bot);
+
+    if (botLogChannel === null) {
+      this.container.logger.error(
+        'ReadyListener: Could not find the channel for bot logs.',
+      );
+      return;
+    } else if (!botLogChannel.isSendable()) {
+      this.container.logger.info(
+        'ReadyListener: No permission to send in bots logs channel.',
+      );
+      return;
+    }
+
+    botLogChannel.send('The bot has started up!');
   }
 }
