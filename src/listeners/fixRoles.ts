@@ -24,6 +24,8 @@ import { Listener } from '@sapphire/framework';
 import { DurationFormatter } from '@sapphire/time-utilities';
 import type { Client } from 'discord.js';
 import IDs from '#utils/ids';
+import { fetchRoles } from '#utils/database/dbExistingUser';
+import { checkActive } from '#utils/database/moderation/restriction';
 
 export class FixRolesOnReady extends Listener {
   public constructor(
@@ -38,7 +40,7 @@ export class FixRolesOnReady extends Listener {
       // THIS SHOULD BE DISABLED BY DEFAULT
       // THIS IS ONLY USED FOR RESTORING ROLES TO THE SERVER!
       // ENABLING THIS UNINTENTIONALLY WILL CAUSE SLOWDOWNS TO THE BOT DUE TO RATE LIMITING!
-      enabled: true,
+      enabled: false,
     });
   }
 
@@ -57,7 +59,7 @@ export class FixRolesOnReady extends Listener {
 
     // Fetching the channel for the logs
     // Leave the snowflake parameter empty for no logs
-    const logChannel = await client.channels.fetch('1329152627312824320');
+    const logChannel = await client.channels.fetch('');
     const sendLogs = logChannel !== null;
 
     if (!sendLogs) {
@@ -77,23 +79,8 @@ export class FixRolesOnReady extends Listener {
       logChannel.send('Fetching all the users in ARA!');
     }
 
-    await guild.members.fetch();
+    const members = await guild.members.fetch().catch(() => undefined);
 
-    // const members = await guild.members.fetch().catch(() => undefined);
-    const role = await guild.roles
-      .fetch(IDs.roles.vegan.vegan)
-      .catch(() => null);
-    if (role === null) {
-      this.container.logger.error(
-        'FixRolesOnReady: Could fetch all the members, this function is stopping now.1',
-      );
-      if (sendLogs) {
-        logChannel.send("Never mind, something went wrong :'(1");
-      }
-      return;
-    }
-
-    const members = role.members;
     if (members === undefined) {
       this.container.logger.error(
         'FixRolesOnReady: Could fetch all the members, this function is stopping now.',
@@ -118,12 +105,11 @@ export class FixRolesOnReady extends Listener {
       'FixRolesOnReady: Starting the process of fixing the roles for every member...',
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    for (const [_, member] of members) {
+    for (const [userId, member] of members) {
       // Send a message with an update for every 50 completions
       // Checks if `channelLog` has been set to null
       // The RHS of the modulo should be around 100
-      if (sendLogs && count % 100 === 0) {
+      if (sendLogs && count % 250 === 0) {
         const currentTime = new Date().getTime();
         const runningTime = currentTime - startTime;
 
@@ -133,39 +119,32 @@ export class FixRolesOnReady extends Listener {
         const estimate = new DurationFormatter().format(eta);
 
         logChannel.send(
-          `Removed roles from ${count} out of ${totalMembers} members. Estimated time until completion: ${estimate}`,
+          `Given roles to ${count} out of ${totalMembers} members. Estimated time until completion: ${estimate}`,
         );
       }
 
-      // // Checks if the user is restricted, and skips over them if they are
-      // const restricted = await checkActive(userId);
-      //
-      // if (restricted) {
-      //   continue;
-      // }
-      //
-      // // Fetch the roles for the member in the database
-      // const dbRoles = await fetchRoles(userId);
-      //
-      // // Filters out the roles that the member does not have
-      // const roles = dbRoles.filter((role) => !member.roles.cache.has(role));
-      //
-      // // Give the roles to the member
-      // if (roles.length > 0) {
-      //   await member.roles.add(roles);
-      // }
+      // Checks if the user is restricted, and skips over them if they are
+      const restricted = await checkActive(userId);
 
-      if (
-        member.roles.cache.has(IDs.roles.vegan.vegan) &&
-        member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
-      ) {
-        await member.roles.remove(IDs.roles.nonvegan.nonvegan);
+      if (restricted) {
+        continue;
+      }
+
+      // Fetch the roles for the member in the database
+      const dbRoles = await fetchRoles(userId);
+
+      // Filters out the roles that the member does not have
+      const roles = dbRoles.filter((role) => !member.roles.cache.has(role));
+
+      // Give the roles to the member
+      if (roles.length > 0) {
+        await member.roles.add(roles);
       }
 
       // Log the completion
       count += 1;
       this.container.logger.info(
-        `FixRolesOnReady: Removed roles from ${count}/${totalMembers}.`,
+        `FixRolesOnReady: Given roles to ${count}/${totalMembers}.`,
       );
     }
 
