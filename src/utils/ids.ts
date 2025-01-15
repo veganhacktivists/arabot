@@ -21,10 +21,10 @@ import devIDs from '#utils/devIDs';
 
 let IDs = {
   roles: {
-    trusted: '731563158011117590',
+    trusted: '1329089675977035879',
     booster: '731213264540795012',
     nonvegan: {
-      nonvegan: '774763753308815400',
+      nonvegan: '1329093962153332848',
       vegCurious: '832656046572961803',
       convinced: '797132019166871612',
     },
