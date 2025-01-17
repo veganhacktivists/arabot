@@ -160,6 +160,9 @@ export class FixRolesOnReady extends Listener {
           count++;
           continue;
         }
+      } else {
+        count++;
+        continue;
       }
 
       // Give the roles to the member
