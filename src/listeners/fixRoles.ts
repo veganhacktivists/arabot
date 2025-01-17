@@ -83,7 +83,7 @@ export class FixRolesOnReady extends Listener {
 
     if (members === undefined) {
       this.container.logger.error(
-        'FixRolesOnReady: Could fetch all the members, this function is stopping now.',
+        'FixRolesOnReady: Could not fetch all the members, this function is stopping now.',
       );
       if (sendLogs) {
         logChannel.send("Never mind, something went wrong :'(");
