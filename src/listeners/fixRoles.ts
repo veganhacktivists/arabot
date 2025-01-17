@@ -128,6 +128,7 @@ export class FixRolesOnReady extends Listener {
 
       // Checks if the user is vegan
       if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        count++;
         continue;
       }
 
@@ -140,6 +141,7 @@ export class FixRolesOnReady extends Listener {
         member.roles.cache.has(IDs.roles.restrictions.restricted2) ||
         member.roles.cache.has(IDs.roles.restrictions.restrictedVegan)
       ) {
+        count++;
         continue;
       }
 
@@ -155,6 +157,7 @@ export class FixRolesOnReady extends Listener {
         if (xp !== null && xp.xp > 0) {
           roles.push(IDs.roles.nonvegan.nonvegan);
         } else {
+          count++;
           continue;
         }
       }
