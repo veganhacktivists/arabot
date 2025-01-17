@@ -131,6 +131,7 @@ export class FixRolesOnReady extends Listener {
         member.roles.cache.has(IDs.roles.vegan.vegan) ||
         member.roles.cache.has(IDs.roles.nonvegan.nonvegan)
       ) {
+        await this.delay(1000);
         count++;
         continue;
       }
