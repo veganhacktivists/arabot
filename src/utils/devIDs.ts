@@ -42,6 +42,7 @@ const devIDs = {
       restricted2: '999431674997788676',
       restricted3: '999431674997788675',
       restricted4: '999431674997788674',
+      restrictedVegan: '1075952207091994726',
       restricted: [
         '999431674997788677', // Restricted 1
         '999431674997788676', // Restricted 2

@@ -44,6 +44,7 @@ let IDs = {
       restricted2: '872482843304001566',
       restricted3: '1329126085207789658',
       restricted4: '1329126181164945499',
+      restrictedVegan: '1075951477379567646',
       restricted: [
         '809769217477050369', // Restricted 1
         '872482843304001566', // Restricted 2
