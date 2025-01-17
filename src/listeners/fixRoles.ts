@@ -174,7 +174,7 @@ export class FixRolesOnReady extends Listener {
       );
 
       // Add a delay so that there's around 4 users processed a second
-      await this.delay(500);
+      await this.delay(5000);
     }
 
     // Send the logs that the fix has finished.
