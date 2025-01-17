@@ -22,10 +22,11 @@
 
 import { Listener } from '@sapphire/framework';
 import { DurationFormatter } from '@sapphire/time-utilities';
-import type { Client } from 'discord.js';
+import { Client } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchRoles } from '#utils/database/dbExistingUser';
 import { checkActive } from '#utils/database/moderation/restriction';
+import { getUser } from '#utils/database/fun/xp';
 
 export class FixRolesOnReady extends Listener {
   public constructor(
@@ -40,13 +41,13 @@ export class FixRolesOnReady extends Listener {
       // THIS SHOULD BE DISABLED BY DEFAULT
       // THIS IS ONLY USED FOR RESTORING ROLES TO THE SERVER!
       // ENABLING THIS UNINTENTIONALLY WILL CAUSE SLOWDOWNS TO THE BOT DUE TO RATE LIMITING!
-      enabled: false,
+      enabled: true,
     });
   }
 
   public async run(client: Client) {
     this.container.logger.info(
-      'FixRolesOnReady: Preparation before starting to fix the roles for each user...',
+      'FixRolesOnReady: Preparation before starting to fix the roles for nonvegans...',
     );
 
     // Fetching the Guild
@@ -109,7 +110,7 @@ export class FixRolesOnReady extends Listener {
       // Send a message with an update for every 50 completions
       // Checks if `channelLog` has been set to null
       // The RHS of the modulo should be around 100
-      if (sendLogs && count % 250 === 0) {
+      if (sendLogs && count % 50 === 0) {
         const currentTime = new Date().getTime();
         const runningTime = currentTime - startTime;
 
@@ -123,10 +124,20 @@ export class FixRolesOnReady extends Listener {
         );
       }
 
+      // Checks if the user is vegan
+      if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
+        continue;
+      }
+
       // Checks if the user is restricted, and skips over them if they are
       const restricted = await checkActive(userId);
 
-      if (restricted) {
+      if (
+        restricted ||
+        member.roles.cache.has(IDs.roles.restrictions.restricted1) ||
+        member.roles.cache.has(IDs.roles.restrictions.restricted2) ||
+        member.roles.cache.has(IDs.roles.restrictions.restrictedVegan)
+      ) {
         continue;
       }
 
@@ -135,6 +146,14 @@ export class FixRolesOnReady extends Listener {
 
       // Filters out the roles that the member does not have
       const roles = dbRoles.filter((role) => !member.roles.cache.has(role));
+
+      if (!roles.includes(IDs.roles.nonvegan.nonvegan)) {
+        const xp = await getUser(userId);
+
+        if (xp !== null && xp.xp > 0) {
+          roles.push(IDs.roles.nonvegan.nonvegan);
+        }
+      }
 
       // Give the roles to the member
       if (roles.length > 0) {
@@ -146,6 +165,9 @@ export class FixRolesOnReady extends Listener {
       this.container.logger.info(
         `FixRolesOnReady: Given roles to ${count}/${totalMembers}.`,
       );
+
+      // Add a delay so that there's around 4 users processed a second
+      await this.delay(250);
     }
 
     // Send the logs that the fix has finished.
@@ -158,5 +180,9 @@ export class FixRolesOnReady extends Listener {
     if (sendLogs) {
       logChannel.send(finishMessage);
     }
+  }
+
+  private delay(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
