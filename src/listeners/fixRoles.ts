@@ -60,7 +60,9 @@ export class FixRolesOnReady extends Listener {
 
     // Fetching the channel for the logs
     // Leave the snowflake parameter empty for no logs
-    const logChannel = await client.channels.fetch('');
+    const logChannel = await client.channels
+      .fetch('1329152627312824320')
+      .catch(() => null);
     const sendLogs = logChannel !== null;
 
     if (!sendLogs) {
@@ -152,6 +154,8 @@ export class FixRolesOnReady extends Listener {
 
         if (xp !== null && xp.xp > 0) {
           roles.push(IDs.roles.nonvegan.nonvegan);
+        } else {
+          continue;
         }
       }
 
@@ -167,7 +171,7 @@ export class FixRolesOnReady extends Listener {
       );
 
       // Add a delay so that there's around 4 users processed a second
-      await this.delay(250);
+      await this.delay(500);
     }
 
     // Send the logs that the fix has finished.
