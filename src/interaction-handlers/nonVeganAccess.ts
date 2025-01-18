@@ -21,7 +21,11 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from '@sapphire/framework';
-import type { ButtonInteraction, GuildMember } from 'discord.js';
+import {
+  ButtonInteraction,
+  GuildMember,
+  MessageFlagsBitField,
+} from 'discord.js';
 import IDs from '#utils/ids';
 
 export class NonVeganAccessButtonHandler extends InteractionHandler {
@@ -51,7 +55,7 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
     if (member === null) {
       await interaction.reply({
         content: errorMessage,
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -62,7 +66,7 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
       if (!member.roles.cache.has(IDs.roles.vegan.vegan)) {
         await interaction.reply({
           content: 'You need to be vegan to use this button!',
-          ephemeral: true,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
         });
         return;
       }
@@ -73,7 +77,7 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
           content:
             'Your access from the non vegan section has been removed. ' +
             'If you want to gain access again, click this button again.',
-          ephemeral: true,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
         });
         return;
       }
@@ -83,13 +87,13 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
         content:
           'Your access to the non vegan section has been given back. ' +
           'If you want to remove access again, click this button again.',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
     } catch (error) {
       this.container.logger.error(`Non Vegan Access Interaction: ${error}`);
       await interaction.reply({
         content: errorMessage,
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
     }
   }
