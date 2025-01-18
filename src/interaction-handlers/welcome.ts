@@ -25,7 +25,6 @@ import {
   ButtonInteraction,
   GuildMember,
   MessageFlagsBitField,
-  TextChannel,
 } from 'discord.js';
 import IDs from '#utils/ids';
 import { checkActive } from '#utils/database/moderation/restriction';
@@ -48,60 +47,98 @@ export class WelcomeButtonHandler extends InteractionHandler {
   }
 
   public async run(interaction: ButtonInteraction) {
-    let { member } = interaction;
-    const general = this.container.client.channels.cache.get(
+    const { member } = interaction;
+    let general = this.container.client.channels.cache.get(
       IDs.channels.nonVegan.general,
-    ) as TextChannel | undefined;
+    );
+
+    // Messages that are used multiple times
+    const roleErrorMessage =
+      'There was an error giving you the role, please try again later or contact ModMail to be let into this server.';
+    const welcomeMessage =
+      `${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> ` +
+      `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussions and debates.` +
+      `\n\nIf you are vegan, you can join the 'Verification' voice channel, or use \`/apply\` with the Appy bot in <#${IDs.channels.nonVegan.vcText}>, ` +
+      'to be verified and gain access to more channels.';
+
+    // Checks if general is not in the cache
     if (general === undefined) {
-      return;
-    }
+      // Sends an API request to get the channel
+      const generalFetch = await this.container.client.channels
+        .fetch(IDs.channels.nonVegan.general)
+        .catch(() => undefined);
 
-    if (member === null) {
-      await interaction.reply({
-        content:
-          'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-      return;
-    }
-
-    try {
-      member = member as GuildMember;
-
-      // Checks if the user is currently restricted
-      if (await checkActive(member.id)) {
+      // If general does not exist
+      if (generalFetch === null || generalFetch === undefined) {
+        this.container.logger.error(
+          'WelcomeButtonHandler: Could not find and fetch the general channel!',
+        );
         await interaction.reply({
-          content: `You are currently restricted from this server! Contact the moderators by sending a DM to <@${IDs.modMail}>.`,
+          content:
+            'Sorry there was a problem trying to give you access to the server. Please try again later.',
           flags: MessageFlagsBitField.Flags.Ephemeral,
         });
 
         return;
       }
 
-      // Give non-vegan role
-      if (!member.voice.channel) {
-        await member.roles.add(IDs.roles.nonvegan.nonvegan);
+      // Replace fetched version of general with the cached version
+      general = generalFetch;
+    }
 
-        await general.send(
-          `${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> ` +
-            `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussions and debates.` +
-            `\n\nIf you are vegan, you can join the 'Verification' voice channel, or use \`/apply\` with the Appy bot in <#${IDs.channels.nonVegan.vcText}>, ` +
-            'to be verified and gain access to more channels.',
-        );
-        return;
-      }
+    // If the member could not be found
+    if (!(member instanceof GuildMember)) {
+      await interaction.reply({
+        content: roleErrorMessage,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
 
+      return;
+    }
+
+    // Checks if the user is currently restricted
+    if (await checkActive(member.id)) {
+      await interaction.reply({
+        content: `You are currently restricted from this server! Contact the moderators by sending a DM to <@${IDs.modMail}>.`,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+
+      return;
+    }
+
+    // Give non-vegan role
+    if (member.voice.channel) {
       await interaction.reply({
         content:
           "You're currently in a verification, you'll have to leave the verification or get verified before being able to access the server again.",
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
-    } catch (error) {
+
+      return;
+    }
+
+    // Give the role to the member
+    const role = await member.roles
+      .add(IDs.roles.nonvegan.nonvegan)
+      .catch(() => undefined);
+
+    // If the role could not be given
+    if (role === undefined) {
       await interaction.reply({
-        content:
-          'There was an error giving you the role, please try again later or contact ModMail to be let into this server.',
+        content: roleErrorMessage,
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
+
+      return;
+    }
+
+    if (general.isSendable()) {
+      await general.send(welcomeMessage);
+    } else {
+      this.container.logger.error(
+        'WelcomeButtonHandler: The bot does not have permission to send in general!',
+      );
+      await member.send(welcomeMessage);
     }
   }
 }
