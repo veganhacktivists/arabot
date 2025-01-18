@@ -17,20 +17,18 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-import type {
-  GuildMember,
-  GuildMemberRoleManager,
-  Snowflake,
-} from 'discord.js';
+import { GuildMember, GuildMemberRoleManager, Snowflake } from 'discord.js';
 import { container } from '@sapphire/framework';
 import IDs from '#utils/ids';
+import { Prisma } from '@prisma/client';
+import { DefaultArgs, GetResult } from '@prisma/client/runtime/binary';
 
 /**
  * Checks if the user exists on the User table in the database
  * @param {string} userId Snowflake for the user being checked
- * @return {boolean} If the user was found
+ * @return {Promise<boolean>} If the user was found
  */
-export async function userExists(userId: Snowflake) {
+export async function userExists(userId: Snowflake): Promise<boolean> {
   // Counts if the user is on the database by their snowflake
   const userQuery = await container.database.user.findFirst({
     where: {
@@ -68,7 +66,7 @@ function getRoles(roles: GuildMemberRoleManager) {
 
 /**
  * Adds a new user to the server
- * @param userId the `User` snowflake to be added to the database
+ * @param {Snowflake} userId the `User` snowflake to be added to the database
  */
 export async function addUser(userId: Snowflake) {
   // Uses upsert just in case the user has joined the server previously but has not gotten the roles previously
@@ -175,9 +173,9 @@ export async function updateUser(member: GuildMember) {
 /**
  * Gets the roles that the user that is on the User table.
  * @param {string} userId Snowflake of the user to fetch roles from
- * @return {Snowflake[]} Array of Role Snowflakes
+ * @return {Promise<Snowflake[]>} Array of Role Snowflakes
  */
-export async function fetchRoles(userId: Snowflake) {
+export async function fetchRoles(userId: Snowflake): Promise<Snowflake[]> {
   // Get the user's roles
   const roleQuery = await container.database.user.findUnique({
     where: {
@@ -250,12 +248,26 @@ export async function logLeaving(member: GuildMember) {
   });
 }
 
+// The type returned by `getLeaveRoles`.
+// Includes a list of all the role Snowflakes when the user last left the server
+type GetLeaveRoles = Prisma.Prisma__LeaveLogClient<
+  GetResult<
+    Prisma.$LeaveLogPayload<DefaultArgs>,
+    {
+      select: { roles: boolean };
+    },
+    'findFirst'
+  > | null,
+  null,
+  DefaultArgs
+>;
+
 /**
  * Get the roles that the user had prior to when they left the server.
  * @param {string} userId Snowflake of the user who joined the server
- * @return {string[]} Array of Role Snowflakes
+ * @return {GetLeaveRoles} Array of Role Snowflakes
  */
-export async function getLeaveRoles(userId: Snowflake) {
+export function getLeaveRoles(userId: Snowflake): GetLeaveRoles {
   const roles = container.database.leaveLog.findFirst({
     where: {
       userId,
