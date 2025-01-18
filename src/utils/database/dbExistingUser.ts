@@ -67,6 +67,26 @@ function getRoles(roles: GuildMemberRoleManager) {
 }
 
 /**
+ * Adds a new user to the server
+ * @param userId the `User` snowflake to be added to the database
+ */
+export async function addUser(userId: Snowflake) {
+  // Uses upsert just in case the user has joined the server previously but has not gotten the roles previously
+  await container.database.user.upsert({
+    where: {
+      id: userId,
+    },
+    update: {
+      notVegan: true,
+    },
+    create: {
+      id: userId,
+      notVegan: true,
+    },
+  });
+}
+
+/**
  * Add user to the database, if they have not been added beforehand
  * @param {GuildMember} member GuildMember for the user to be added to the database
  */

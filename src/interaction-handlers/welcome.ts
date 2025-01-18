@@ -28,6 +28,7 @@ import {
 } from 'discord.js';
 import IDs from '#utils/ids';
 import { checkActive } from '#utils/database/moderation/restriction';
+import { addUser } from '#utils/database/dbExistingUser';
 
 export class WelcomeButtonHandler extends InteractionHandler {
   public constructor(
@@ -116,6 +117,9 @@ export class WelcomeButtonHandler extends InteractionHandler {
 
       return;
     }
+
+    // Add the user to the database
+    await addUser(member.id);
 
     // Give the role to the member
     const role = await member.roles
