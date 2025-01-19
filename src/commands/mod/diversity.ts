@@ -25,6 +25,7 @@ import {
   ChannelType,
   GuildMember,
   Message,
+  MessageFlagsBitField,
   PermissionsBitField,
 } from 'discord.js';
 import type { TextChannel, Snowflake } from 'discord.js';
@@ -93,8 +94,8 @@ export class DiversityCommand extends Subcommand {
     if (interaction.guild === null) {
       await interaction.reply({
         content: 'Guild not found!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -105,8 +106,8 @@ export class DiversityCommand extends Subcommand {
     if (channel === undefined) {
       await interaction.reply({
         content: 'Channel not found!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -115,8 +116,8 @@ export class DiversityCommand extends Subcommand {
     if (channel.type !== ChannelType.GuildText) {
       await interaction.reply({
         content: 'Channel is not a text channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -128,8 +129,8 @@ export class DiversityCommand extends Subcommand {
     if (channel.parentId !== IDs.categories.diversity) {
       await interaction.reply({
         content: 'Command was not run in the Diversity section!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -146,7 +147,7 @@ export class DiversityCommand extends Subcommand {
 
     await interaction.reply({
       content: `${!open ? 'Opened' : 'Closed'} this channel.`,
-      fetchReply: true,
+      withResponse: true,
     });
   }
 
@@ -163,8 +164,8 @@ export class DiversityCommand extends Subcommand {
     if (user === null || guild === null || mod === null) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -177,8 +178,8 @@ export class DiversityCommand extends Subcommand {
     if (guildMember === undefined || diversity === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -190,7 +191,7 @@ export class DiversityCommand extends Subcommand {
       await this.threadManager(guildMember.id, false);
       await interaction.reply({
         content: `Removed the ${diversity.name} role from ${user}`,
-        fetchReply: true,
+        withResponse: true,
       });
       return;
     }
@@ -199,7 +200,7 @@ export class DiversityCommand extends Subcommand {
     await this.threadManager(guildMember.id, true);
     await interaction.reply({
       content: `Gave ${user} the ${diversity.name} role!`,
-      fetchReply: true,
+      withResponse: true,
     });
     await user
       .send(`You have been given the ${diversity.name} role by ${mod}!`)

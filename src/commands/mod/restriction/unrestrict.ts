@@ -18,13 +18,19 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { CategoryChannel, ChannelType, EmbedBuilder } from 'discord.js';
-import type { User, Message, TextChannel, Guild, Snowflake } from 'discord.js';
-import IDs from '#utils/ids';
-import { fetchRoles, addExistingUser } from '#utils/database/dbExistingUser';
+import type { Guild, Message, Snowflake, User } from 'discord.js';
 import {
-  unRestrict,
+  CategoryChannel,
+  ChannelType,
+  EmbedBuilder,
+  MessageFlagsBitField,
+  TextChannel,
+} from 'discord.js';
+import IDs from '#utils/ids';
+import { addExistingUser, fetchRoles } from '#utils/database/dbExistingUser';
+import {
   checkActive,
+  unRestrict,
   unRestrictLegacy,
 } from '#utils/database/moderation/restriction';
 
@@ -69,14 +75,14 @@ export class UnRestrictCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
     await interaction.deferReply();
 
-    const info = await this.unRestrictRun(user?.id, mod.id, guild);
+    const info = await this.unRestrictRun(user.id, mod.id, guild);
 
     await interaction.editReply({
       content: info.message,
@@ -108,7 +114,7 @@ export class UnRestrictCommand extends Command {
     const channelRun = message.channel;
 
     const info = await this.unRestrictRun(
-      user?.id,
+      user.id,
       mod.id,
       guild,
       channelRun.id,
@@ -135,7 +141,8 @@ export class UnRestrictCommand extends Command {
     let user = guild.client.users.cache.get(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
+      user = await guild.client.users.fetch(userId).catch(() => undefined);
+
       if (user === undefined) {
         info.message = 'Error fetching user';
         return info;
@@ -159,11 +166,12 @@ export class UnRestrictCommand extends Command {
 
     if (member === undefined) {
       member = await guild.members.fetch(userId).catch(() => undefined);
-    }
 
-    if (member === undefined) {
-      info.message = "Can't unrestrict the user as they are not on this server";
-      return info;
+      if (member === undefined) {
+        info.message =
+          "Can't unrestrict the user as they are not on this server";
+        return info;
+      }
     }
 
     // Check if user is in database
@@ -180,16 +188,20 @@ export class UnRestrictCommand extends Command {
     if (await checkActive(userId)) {
       const roles = await fetchRoles(userId);
       await member.roles.add(roles);
+
       // Unrestricts the user on the database
       await unRestrict(userId, modId);
     } else {
       let section = 1;
+
       for (let i = 0; i < restrictRoles.length; i += 1) {
         if (member.roles.cache.has(restrictRoles[i])) {
           section = i + 1;
         }
       }
+
       await member.roles.add(IDs.roles.nonvegan.nonvegan);
+
       // Unrestricts the user on the database but for restricts done on the old bot
       await unRestrictLegacy(userId, modId, section);
     }
@@ -198,57 +210,92 @@ export class UnRestrictCommand extends Command {
 
     // Remove vegan restrict channels
     if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      const category = guild.channels.cache.get(IDs.categories.restricted) as
-        | CategoryChannel
-        | undefined;
+      const category = guild.channels.cache.get(IDs.categories.restricted);
+
+      if (!(category instanceof CategoryChannel)) {
+        info.message =
+          'Could not find the restricted category! The channels will have to be deleted manually.';
+        return info;
+      }
 
       let topic: string[];
 
-      if (category !== undefined) {
-        const textChannels = category.children.cache.filter(
-          (c) => c.type === ChannelType.GuildText,
-        );
-        textChannels.forEach((c) => {
-          const textChannel = c as TextChannel;
-          // Checks if the channel topic has the user's snowflake
-          if (textChannel.topic?.includes(userId)) {
-            if (textChannel.id === channelRun) {
-              info.runInVeganRestrict = true;
-            }
-            topic = textChannel.topic.split(' ');
-            const vcId = topic[topic.indexOf(userId) + 1];
-            const voiceChannel = guild.channels.cache.get(vcId);
+      const textChannels = category.children.cache.filter(
+        (c) => c.type === ChannelType.GuildText,
+      );
 
-            if (
-              voiceChannel !== undefined &&
-              voiceChannel.parentId === IDs.categories.restricted
-            ) {
-              voiceChannel.delete();
-            }
-            textChannel.delete();
+      for (const channel of textChannels) {
+        const textChannel = channel[1];
+
+        // Checks that the channel is a text channel
+        if (!(textChannel instanceof TextChannel)) {
+          continue;
+        }
+
+        // Checks that the channel has a topic
+        if (textChannel.topic === null) {
+          continue;
+        }
+
+        // Checks if the channel topic has the user's snowflake
+        if (textChannel.topic.includes(userId)) {
+          if (textChannel.id === channelRun) {
+            info.runInVeganRestrict = true;
           }
-        });
+
+          topic = textChannel.topic.split(' ');
+          const vcId = topic[topic.indexOf(user.id) + 1];
+          let voiceChannel = guild.channels.cache.get(vcId);
+
+          if (voiceChannel === undefined) {
+            const fetchVoiceChannel = await guild.channels
+              .fetch(vcId)
+              .catch(() => undefined);
+
+            if (fetchVoiceChannel !== null && fetchVoiceChannel !== undefined) {
+              voiceChannel = fetchVoiceChannel;
+            }
+          }
+
+          if (
+            voiceChannel !== undefined &&
+            // Used for sanitising the channel topic, so another voice channel does not get deleted
+            voiceChannel.parentId === IDs.categories.restricted
+          ) {
+            await voiceChannel.delete();
+          }
+
+          await textChannel.delete();
+        }
       }
     }
 
     info.success = true;
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
+      const fetchLogChannel = await guild.channels.fetch(
         IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error(
-          'Restrict Error: Could not fetch log channel',
-        );
+      );
+      if (fetchLogChannel === null || fetchLogChannel === undefined) {
+        this.container.logger.error('Unrestrict: Could not fetch log channel');
         info.message = `Unrestricted ${user} but could not find the log channel. This has been logged to the database.`;
+
         return info;
+      } else {
+        logChannel = fetchLogChannel;
       }
+    }
+
+    if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Unrestrict: The bot does not have permission to send in the logs channel!',
+      );
+      info.message = `Unrestricted ${user} but could not find the log channel. This hasn't been logged in a text channel as the bot does not have permission to send logs!`;
+
+      return info;
     }
 
     const message = new EmbedBuilder()

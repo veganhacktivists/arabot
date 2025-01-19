@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 
 export class ClearCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -60,8 +60,8 @@ export class ClearCommand extends Command {
     if (channel === null || channel.isDMBased()) {
       await interaction.reply({
         content: 'Could not fetch channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -70,8 +70,8 @@ export class ClearCommand extends Command {
 
     await interaction.reply({
       content: `Successfully deleted ${messages} messages!`,
-      ephemeral: true,
-      fetchReply: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 

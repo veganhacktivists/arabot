@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Guild, User, Message } from 'discord.js';
+import { Guild, User, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
 
@@ -63,13 +63,15 @@ export class MentorCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const info = await this.manageMentor(user, mod, guild);
 

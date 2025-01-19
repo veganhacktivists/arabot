@@ -19,7 +19,13 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { Time } from '@sapphire/time-utilities';
-import type { User, Guild, GuildMember, Message } from 'discord.js';
+import {
+  User,
+  Guild,
+  GuildMember,
+  Message,
+  MessageFlagsBitField,
+} from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { daily, getLastDaily } from '#utils/database/fun/economy';
 import { EmbedBuilder } from 'discord.js';
@@ -51,7 +57,7 @@ export class DailyCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Could not find the guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -67,14 +73,8 @@ export class DailyCommand extends Command {
   }
 
   public async messageRun(message: Message) {
-    const user = message.member?.user;
+    const user = message.author;
     const { guild } = message;
-
-    if (user === undefined) {
-      await message.react('❌');
-      await message.reply('Could not find your user!');
-      return;
-    }
 
     if (guild === null) {
       await message.react('❌');

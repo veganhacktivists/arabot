@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message, TextBasedChannel } from 'discord.js';
+import { Message, MessageFlagsBitField, TextBasedChannel } from 'discord.js';
 import { ChannelType } from 'discord.js';
 import { Duration, DurationFormatter } from '@sapphire/time-utilities';
 import { isNumber } from '#utils/maths';
@@ -61,8 +61,8 @@ export class SlowmodeCommand extends Command {
     if (channel === null) {
       await interaction.reply({
         content: 'Could not fetch channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }

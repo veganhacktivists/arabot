@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import { GuildMember, Message, MessageFlagsBitField } from 'discord.js';
 import {
   addMute,
   removeMute,
@@ -73,8 +73,8 @@ export class VCMuteCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -87,8 +87,8 @@ export class VCMuteCommand extends Command {
     if (member === undefined || mod === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -102,8 +102,8 @@ export class VCMuteCommand extends Command {
 
       await interaction.reply({
         content: `Removed server mute from ${user}`,
-        fetchReply: true,
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -118,8 +118,8 @@ export class VCMuteCommand extends Command {
     await addMute(member.id, mod.id, reason);
     await interaction.reply({
       content: `Server muted ${user}`,
-      fetchReply: true,
-      ephemeral: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 

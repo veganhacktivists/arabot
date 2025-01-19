@@ -17,16 +17,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import {
-  Args,
-  Command,
-  container,
-  RegisterBehavior,
-} from '@sapphire/framework';
-import type { User, Message, Snowflake, Guild, TextChannel } from 'discord.js';
+  EmbedBuilder,
+  Guild,
+  Message,
+  MessageFlagsBitField,
+  Snowflake,
+  User,
+} from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { addWarn } from '#utils/database/moderation/warnings';
-import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class WarnCommand extends Command {
@@ -76,8 +77,8 @@ export class WarnCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -190,19 +191,30 @@ export class WarnCommand extends Command {
     await user.send({ embeds: [dmEmbed] }).catch(() => {});
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
-        | TextChannel
-        | undefined;
-      if (logChannel === undefined) {
-        container.logger.error('Warn Error: Could not fetch log channel');
+      const fetchLogChannel = await guild.channels
+        .fetch(IDs.channels.logs.sus)
+        .catch(() => undefined);
+
+      if (fetchLogChannel === null || fetchLogChannel === undefined) {
+        this.container.logger.error('Warn: Could not fetch log channel');
         info.message = `Warned ${user} but could not find the log channel. This has been logged to the database.`;
+
         return info;
+      } else {
+        logChannel = fetchLogChannel;
       }
+    }
+
+    if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Warn: The bot does not have permission to send in the logs channel!',
+      );
+      info.message = `Warned ${user}, but the bot does not have permission to send in the logs channel!`;
+
+      return info;
     }
 
     const message = new EmbedBuilder()

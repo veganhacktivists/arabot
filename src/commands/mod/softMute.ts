@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import { GuildMember, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class SoftMuteCommand extends Command {
@@ -64,8 +64,8 @@ export class SoftMuteCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching the guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -77,8 +77,8 @@ export class SoftMuteCommand extends Command {
     if (guildMember === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -87,7 +87,7 @@ export class SoftMuteCommand extends Command {
       await guildMember.roles.remove(IDs.roles.restrictions.softMute);
       await interaction.reply({
         content: `Removed soft muted for ${user}`,
-        fetchReply: true,
+        withResponse: true,
       });
       return;
     }
@@ -96,7 +96,7 @@ export class SoftMuteCommand extends Command {
 
     await interaction.reply({
       content: `Soft muted ${user}`,
-      fetchReply: true,
+      withResponse: true,
     });
   }
 

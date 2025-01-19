@@ -18,7 +18,13 @@
  */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message, User, Guild, Snowflake } from 'discord.js';
+import {
+  Message,
+  User,
+  Guild,
+  Snowflake,
+  MessageFlagsBitField,
+} from 'discord.js';
 import IDs from '#utils/ids';
 import {
   finishVerifyMessages,
@@ -77,8 +83,8 @@ export class VerifyCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -93,7 +99,7 @@ export class VerifyCommand extends Command {
 
     await interaction.reply({
       content: verify.message,
-      fetchReply: true,
+      withResponse: true,
     });
   }
 

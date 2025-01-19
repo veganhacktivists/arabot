@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, EmbedBuilder } from 'discord.js';
+import { ChannelType, EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import type { Message, TextChannel, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 import { getRestrictions } from '#utils/database/moderation/restriction';
@@ -63,8 +63,8 @@ export class RestrictLogsCommand extends Command {
     if (guild === null || channel === null) {
       await interaction.reply({
         content: 'Error fetching guild or channel!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -86,7 +86,6 @@ export class RestrictLogsCommand extends Command {
           // Checks if the channel topic has the user's snowflake
           if (channel.topic !== null) {
             topic = channel.topic.split(' ');
-            // eslint-disable-next-line prefer-destructuring
             userId = topic[2];
           }
         }
@@ -95,8 +94,8 @@ export class RestrictLogsCommand extends Command {
       if (userId === null) {
         await interaction.reply({
           content: 'User could not be found or was not provided!',
-          ephemeral: true,
-          fetchReply: true,
+          flags: MessageFlagsBitField.Flags.Ephemeral,
+          withResponse: true,
         });
         return;
       }
@@ -106,8 +105,8 @@ export class RestrictLogsCommand extends Command {
       await interaction.reply({
         embeds: info.embeds,
         content: info.message,
-        fetchReply: true,
-        ephemeral: !staffChannel,
+        withResponse: true,
+        flags: staffChannel ? undefined : MessageFlagsBitField.Flags.Ephemeral,
       });
     }
   }
@@ -176,7 +175,7 @@ export class RestrictLogsCommand extends Command {
     let user = guild.client.users.cache.get(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
+      user = await guild.client.users.fetch(userId).catch(() => undefined);
       if (user === undefined) {
         info.message = 'Error fetching user';
         return info;

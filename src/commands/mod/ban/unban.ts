@@ -18,13 +18,13 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type {
+import {
   User,
   Message,
   Snowflake,
-  TextChannel,
   Guild,
   GuildBan,
+  MessageFlagsBitField,
 } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
@@ -75,8 +75,8 @@ export class UnbanCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -191,19 +191,30 @@ export class UnbanCommand extends Command {
     info.success = true;
 
     // Log unban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
+      const fetchLogChannel = await guild.channels.fetch(
         IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Ban Error: Could not fetch log channel');
-        info.message = `${user} has been banned. This hasn't been logged in a text channel as log channel could not be found`;
+      );
+
+      if (fetchLogChannel === null || fetchLogChannel === undefined) {
+        this.container.logger.error('Unban Error: Could not fetch log channel');
+        info.message = `${user} has been unbanned. This hasn't been logged in a text channel as log channel could not be found`;
+
         return info;
+      } else {
+        logChannel = fetchLogChannel;
       }
+    }
+
+    if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Unban: The bot does not have permission to send in the logs channel!',
+      );
+      info.message = `${user} has been unbanned. This hasn't been logged in a text channel as the bot does not have permission to send logs!`;
+
+      return info;
     }
 
     const log = new EmbedBuilder()

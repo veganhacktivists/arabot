@@ -18,7 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType } from 'discord.js';
+import { ChannelType, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class AccessCommand extends Command {
@@ -79,7 +79,7 @@ export class AccessCommand extends Command {
     if (!interaction.inCachedGuild()) {
       await interaction.reply({
         content: 'This command can only be run in a server!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -94,7 +94,7 @@ export class AccessCommand extends Command {
     if (user === null && role === null) {
       await interaction.reply({
         content: 'Error fetching slash command data!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -104,7 +104,7 @@ export class AccessCommand extends Command {
       await interaction.reply({
         content:
           'You have entered a user and a role at the same time! Please only enter one at a time.',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -116,7 +116,7 @@ export class AccessCommand extends Command {
     ) {
       await interaction.reply({
         content: 'Please only select a text or voice channel!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -129,7 +129,7 @@ export class AccessCommand extends Command {
     ) {
       await interaction.reply({
         content: 'Channel is not in ModMail/Private/Restricted category!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -143,7 +143,7 @@ export class AccessCommand extends Command {
     } else {
       await interaction.reply({
         content: 'Could not find the role to edit permissions!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -185,7 +185,7 @@ export class AccessCommand extends Command {
         default:
           await interaction.reply({
             content: 'Incorrect permission option!',
-            ephemeral: true,
+            flags: MessageFlagsBitField.Flags.Ephemeral,
           });
           return;
       }
@@ -220,7 +220,7 @@ export class AccessCommand extends Command {
         default:
           await interaction.reply({
             content: 'Incorrect permission option!',
-            ephemeral: true,
+            flags: MessageFlagsBitField.Flags.Ephemeral,
           });
           return;
       }

@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { User, Message } from 'discord.js';
+import { User, Message, MessageFlagsBitField } from 'discord.js';
 import { restrictRun } from './restrict';
 
 export class RestrictToleranceCommand extends Command {
@@ -69,15 +69,17 @@ export class RestrictToleranceCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
-    const info = await restrictRun(user?.id, mod.id, reason, guild, true);
+    const info = await restrictRun(user.id, mod.id, reason, guild, true);
 
     await interaction.editReply({
       content: info.message,
@@ -112,7 +114,7 @@ export class RestrictToleranceCommand extends Command {
       return;
     }
 
-    const info = await restrictRun(user?.id, mod.id, reason, guild, true);
+    const info = await restrictRun(user.id, mod.id, reason, guild, true);
 
     await message.reply(info.message);
     await message.react(info.success ? '✅' : '❌');

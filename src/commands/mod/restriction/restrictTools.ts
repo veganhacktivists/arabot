@@ -19,7 +19,7 @@
 
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import type { TextChannel } from 'discord.js';
+import { MessageFlagsBitField, TextChannel } from 'discord.js';
 import { CategoryChannel, ChannelType } from 'discord.js';
 import IDs from '#utils/ids';
 
@@ -78,7 +78,9 @@ export class RestrictToolsCommand extends Subcommand {
     const user = interaction.options.getUser('user');
     const { guild, channel } = interaction;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     // Checks if all the variables are of the right type
     if (guild === null || channel === null) {
@@ -142,11 +144,9 @@ export class RestrictToolsCommand extends Subcommand {
       return;
     }
 
-    const category = guild.channels.cache.get(IDs.categories.restricted) as
-      | CategoryChannel
-      | undefined;
+    const category = guild.channels.cache.get(IDs.categories.restricted);
 
-    if (category === undefined) {
+    if (!(category instanceof CategoryChannel)) {
       await interaction.editReply({
         content: 'Could not find category!',
       });
@@ -156,23 +156,45 @@ export class RestrictToolsCommand extends Subcommand {
     const textChannels = category.children.cache.filter(
       (c) => c.type === ChannelType.GuildText,
     );
-    textChannels.forEach((c) => {
-      const textChannel = c as TextChannel;
+
+    for (const channel of textChannels) {
+      const textChannel = channel[1];
+
+      // Checks that the channel is a text channel
+      if (!(textChannel instanceof TextChannel)) {
+        continue;
+      }
+
+      // Checks that the channel has a topic
+      if (textChannel.topic === null) {
+        continue;
+      }
+
       // Checks if the channel topic has the user's snowflake
-      if (textChannel.topic?.includes(user?.id)) {
+      if (textChannel.topic.includes(user.id)) {
         topic = textChannel.topic.split(' ');
-        const vcId = topic[topic.indexOf(user?.id) + 1];
-        const voiceChannel = guild.channels.cache.get(vcId);
+        const vcId = topic[topic.indexOf(user.id) + 1];
+        let voiceChannel = guild.channels.cache.get(vcId);
+
+        if (voiceChannel === undefined) {
+          const fetchVoiceChannel = await guild.channels
+            .fetch(vcId)
+            .catch(() => undefined);
+
+          if (fetchVoiceChannel !== null && fetchVoiceChannel !== undefined) {
+            voiceChannel = fetchVoiceChannel;
+          }
+        }
 
         if (
           voiceChannel !== undefined &&
           voiceChannel.parentId === IDs.categories.restricted
         ) {
-          voiceChannel.delete();
+          await voiceChannel.delete();
         }
-        textChannel.delete();
+        await textChannel.delete();
       }
-    });
+    }
 
     await interaction.editReply({
       content: `Successfully deleted the channel for ${user}`,

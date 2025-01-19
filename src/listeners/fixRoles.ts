@@ -134,11 +134,7 @@ export class FixRolesOnReady extends Listener {
 
       if (
         restricted ||
-        member.roles.cache.has(IDs.roles.restrictions.restricted1) ||
-        member.roles.cache.has(IDs.roles.restrictions.restricted2) ||
-        member.roles.cache.has(IDs.roles.restrictions.restricted3) ||
-        member.roles.cache.has(IDs.roles.restrictions.restricted4) ||
-        member.roles.cache.has(IDs.roles.restrictions.restrictedVegan)
+        member.roles.cache.hasAny(...IDs.roles.restrictions.restricted)
       ) {
         continue;
       }

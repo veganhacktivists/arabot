@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { User, Guild, Message } from 'discord.js';
+import { User, Guild, Message, MessageFlagsBitField } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import { getRank, xpToNextLevel } from '#utils/database/fun/xp';
 
@@ -55,7 +55,7 @@ export class RankCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Could not find the guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }

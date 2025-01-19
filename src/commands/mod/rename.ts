@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { GuildMember, Message } from 'discord.js';
+import { GuildMember, Message, MessageFlagsBitField } from 'discord.js';
 
 export class RenameUserCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -68,8 +68,8 @@ export class RenameUserCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -81,8 +81,8 @@ export class RenameUserCommand extends Command {
     if (member === undefined) {
       await interaction.reply({
         content: 'Error fetching user!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -93,15 +93,15 @@ export class RenameUserCommand extends Command {
     } catch {
       await interaction.reply({
         content: "Bot doesn't have permission to change the user's name!",
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
     await interaction.reply({
       content: `Changed ${user}'s nickname`,
-      fetchReply: true,
-      ephemeral: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 

@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
 import { Kill } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
 
@@ -59,8 +59,8 @@ export class KillCommand extends Command {
     // Type checks
     if (!(sender instanceof GuildMember)) {
       await interaction.reply({
-        ephemeral: true,
         content: 'Failed to fetch your user on the bot!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -92,7 +92,7 @@ export class KillCommand extends Command {
     await interaction.reply({
       content: `${user}`,
       embeds: [killEmbed],
-      fetchReply: true,
+      withResponse: true,
     });
   }
 }

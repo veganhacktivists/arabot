@@ -19,7 +19,12 @@
 
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import { RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, PermissionsBitField, Snowflake } from 'discord.js';
+import {
+  ChannelType,
+  MessageFlagsBitField,
+  PermissionsBitField,
+  Snowflake,
+} from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import {
   addStatUser,
@@ -190,7 +195,7 @@ export class OutreachCommand extends Subcommand {
     if (guild === null) {
       await interaction.reply({
         content: 'Mod or guild was not found!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -200,7 +205,7 @@ export class OutreachCommand extends Subcommand {
     if (mod === undefined) {
       await interaction.reply({
         content: 'Outreach Leader was not found!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -208,7 +213,7 @@ export class OutreachCommand extends Subcommand {
     if (!mod.roles.cache.has(IDs.roles.staff.outreachLeader)) {
       await interaction.reply({
         content: 'You need to be an Outreach Leader to run this command!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -216,7 +221,7 @@ export class OutreachCommand extends Subcommand {
     if (await checkActiveEvent()) {
       await interaction.reply({
         content: 'There is already an active event!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -227,7 +232,7 @@ export class OutreachCommand extends Subcommand {
 
     await interaction.reply({
       content: 'Created the event!',
-      ephemeral: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
     });
   }
 
@@ -238,7 +243,7 @@ export class OutreachCommand extends Subcommand {
     if (guild === null) {
       await interaction.reply({
         content: 'Guild not found!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -248,7 +253,7 @@ export class OutreachCommand extends Subcommand {
     if (mod === undefined) {
       await interaction.reply({
         content: 'Your guild member was not found!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -256,12 +261,14 @@ export class OutreachCommand extends Subcommand {
     if (!mod.roles.cache.has(IDs.roles.staff.outreachLeader)) {
       await interaction.reply({
         content: 'You need to be an Outreach Leader to run this command!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const event = await getCurrentEvent();
 
@@ -351,12 +358,14 @@ export class OutreachCommand extends Subcommand {
     if (guild === null) {
       await interaction.reply({
         content: 'Guild not found!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     if ((await getStatFromLeader(leader.id)) !== null) {
       await interaction.editReply(
@@ -462,12 +471,14 @@ export class OutreachCommand extends Subcommand {
     if (guild === null) {
       await interaction.reply({
         content: 'Could not find guild!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     let statId: number;
     let roleId: Snowflake | undefined;
@@ -571,12 +582,14 @@ export class OutreachCommand extends Subcommand {
     if (leader === null) {
       await interaction.reply({
         content: 'Could not find your user!',
-        ephemeral: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const stat = await getStatFromLeader(leader.id);
 

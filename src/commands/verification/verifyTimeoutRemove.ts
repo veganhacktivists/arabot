@@ -20,6 +20,7 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import IDs from '#utils/ids';
 import { checkVerificationFinish } from '#utils/database/verification';
+import { MessageFlagsBitField } from 'discord.js';
 
 export class VerifyTimeoutRemoveCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -60,13 +61,15 @@ export class VerifyTimeoutRemoveCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     let member = guild.members.cache.get(user.id);
 

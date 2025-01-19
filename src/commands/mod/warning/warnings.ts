@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, EmbedBuilder } from 'discord.js';
+import { ChannelType, EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchWarnings } from '#utils/database/moderation/warnings';
@@ -65,15 +65,17 @@ export class WarningsCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
     const staffChannel = checkStaff(interaction.channel);
 
-    await interaction.deferReply({ ephemeral: !staffChannel });
+    await interaction.deferReply({
+      flags: staffChannel ? undefined : MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const info = await this.warnings(user, guild);
 

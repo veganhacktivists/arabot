@@ -18,7 +18,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, TextChannel } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import {
@@ -68,15 +68,17 @@ export class DeleteWarningCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
     const staffChannel = checkStaff(interaction.channel);
 
-    await interaction.deferReply({ ephemeral: !staffChannel });
+    await interaction.deferReply({
+      flags: staffChannel ? undefined : MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const info = await this.deleteWarning(warningId, mod, guild);
 
@@ -145,23 +147,35 @@ export class DeleteWarningCommand extends Command {
     }
 
     // Log the warnings deletion
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
-        | TextChannel
-        | undefined;
-      if (logChannel === undefined) {
+      const fetchLogChannel = await guild.channels
+        .fetch(IDs.channels.logs.sus)
+        .catch(() => undefined);
+      if (fetchLogChannel === null || fetchLogChannel === undefined) {
         this.container.logger.error(
-          'Delete Warning Error: Could not fetch log channel',
+          'Delete Warning: Could not fetch log channel',
         );
         info.message =
           `Deleted warning for ${user} (Warning ID: ${warningId} but ` +
           'could not find the log channel.';
+
         return info;
+      } else {
+        logChannel = fetchLogChannel;
       }
+    }
+
+    if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Delete Warning: The bot does not have permission to send in the logs channel!',
+      );
+      info.message =
+        `Deleted warning for ${user} (Warning ID: ${warningId} but ` +
+        "But this hasn't been logged in a text channel as the bot does not have permission to send logs!";
+
+      return info;
     }
 
     const message = new EmbedBuilder()

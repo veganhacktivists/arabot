@@ -21,7 +21,7 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 import { ChannelType } from 'discord.js';
 
 export class MoveAllCommand extends Command {
@@ -61,7 +61,9 @@ export class MoveAllCommand extends Command {
     const { member } = interaction;
     const { guild } = interaction;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     if (
       channel.type !== ChannelType.GuildVoice &&

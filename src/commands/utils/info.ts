@@ -19,6 +19,7 @@
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import IDs from '#utils/ids';
+import { MessageFlagsBitField } from 'discord.js';
 
 export class InfoCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -66,11 +67,7 @@ export class InfoCommand extends Command {
     const option = interaction.options.getString('info', true);
     let ephemeral = interaction.options.getBoolean('visible');
 
-    if (ephemeral === null) {
-      ephemeral = true;
-    } else {
-      ephemeral = !ephemeral;
-    }
+    ephemeral = ephemeral !== true;
 
     let message: string;
 
@@ -115,7 +112,7 @@ export class InfoCommand extends Command {
 
     await interaction.reply({
       content: message,
-      ephemeral,
+      flags: ephemeral ? MessageFlagsBitField.Flags.Ephemeral : undefined,
     });
   }
 }

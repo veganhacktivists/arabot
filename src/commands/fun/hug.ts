@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
 import { Hugs } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
 
@@ -60,8 +60,8 @@ export class HugCommand extends Command {
 
     if (!(hugger instanceof GuildMember)) {
       await interaction.reply({
-        ephemeral: true,
         content: 'Failed to fetch your user on the bot!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -96,7 +96,7 @@ export class HugCommand extends Command {
     await interaction.reply({
       content: `${user}`,
       embeds: [hugEmbed],
-      fetchReply: true,
+      withResponse: true,
     });
   }
 }

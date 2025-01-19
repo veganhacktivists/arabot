@@ -19,7 +19,7 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Duration, DurationFormatter } from '@sapphire/time-utilities';
-import type { User, Snowflake, TextChannel, Guild } from 'discord.js';
+import { User, Snowflake, Guild, MessageFlagsBitField } from 'discord.js';
 import { EmbedBuilder, Message } from 'discord.js';
 import IDs from '#utils/ids';
 import { addTempBan, checkTempBan } from '#utils/database/moderation/tempBan';
@@ -79,8 +79,8 @@ export class TempBanCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -94,7 +94,9 @@ export class TempBanCommand extends Command {
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     const ban = await this.ban(user.id, mod.id, time, reason, guild);
 
@@ -273,23 +275,35 @@ export class TempBanCommand extends Command {
     info.success = true;
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-      | TextChannel
-      | undefined;
+    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
 
     if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
+      const fetchLogChannel = await guild.channels.fetch(
         IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error(
-          'Temp Ban Error: Could not fetch log channel',
-        );
+      );
+
+      if (fetchLogChannel === null || fetchLogChannel === undefined) {
+        this.container.logger.error('Temp Ban: Could not fetch log channel');
+
         info.message =
           `${user} has been temporarily banned for ${banLength}. ` +
           "This hasn't been logged in a text channel as log channel could not be found";
+
         return info;
+      } else {
+        logChannel = fetchLogChannel;
       }
+    }
+
+    if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Temp Ban: The bot does not have permission to send in the logs channel!',
+      );
+      info.message =
+        `${user} has been temporarily banned for ${banLength}. ` +
+        "This hasn't been logged in a text channel as the bot does not have permission to send logs!";
+
+      return info;
     }
 
     const log = new EmbedBuilder()

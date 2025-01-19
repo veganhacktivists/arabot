@@ -26,6 +26,7 @@ import {
 import {
   ChannelType,
   EmbedBuilder,
+  MessageFlagsBitField,
   PermissionsBitField,
   time,
 } from 'discord.js';
@@ -55,7 +56,7 @@ export async function restrictRun(
   let user = guild.client.users.cache.get(userId);
 
   if (user === undefined) {
-    user = await guild.client.users.fetch(userId);
+    user = await guild.client.users.fetch(userId).catch(() => undefined);
     if (user === undefined) {
       info.message = 'Error fetching user';
       return info;
@@ -242,19 +243,29 @@ export async function restrictRun(
   await user.send({ embeds: [dmEmbed] }).catch(() => {});
 
   // Log the ban
-  let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-    | TextChannel
-    | undefined;
+  let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
 
   if (logChannel === undefined) {
-    logChannel = (await guild.channels.fetch(IDs.channels.logs.restricted)) as
-      | TextChannel
-      | undefined;
-    if (logChannel === undefined) {
-      container.logger.error('Restrict Error: Could not fetch log channel');
+    const fetchLogChannel = await guild.channels.fetch(
+      IDs.channels.logs.restricted,
+    );
+    if (fetchLogChannel === null || fetchLogChannel === undefined) {
+      container.logger.error('Restrict: Could not fetch log channel');
       info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
+
       return info;
+    } else {
+      logChannel = fetchLogChannel;
     }
+  }
+
+  if (!logChannel.isSendable()) {
+    container.logger.error(
+      'Restrict: The bot does not have permission to send in the logs channel!',
+    );
+    info.message = `${user} has been restricted. This hasn't been logged in a text channel as the bot does not have permission to send logs!`;
+
+    return info;
   }
 
   const message = new EmbedBuilder()
@@ -324,15 +335,17 @@ export class RestrictCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
-    const info = await restrictRun(user?.id, mod.id, reason, guild);
+    const info = await restrictRun(user.id, mod.id, reason, guild);
 
     await interaction.editReply({
       content: info.message,
@@ -367,7 +380,7 @@ export class RestrictCommand extends Command {
       return;
     }
 
-    const info = await restrictRun(user?.id, mod.id, reason, guild);
+    const info = await restrictRun(user.id, mod.id, reason, guild);
 
     await message.reply(info.message);
     await message.react(info.success ? '✅' : '❌');

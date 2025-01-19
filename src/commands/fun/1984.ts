@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
 import { N1984 } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
 
@@ -50,8 +50,8 @@ export class N1984Command extends Command {
     // Type checks
     if (!(member instanceof GuildMember)) {
       await interaction.reply({
-        ephemeral: true,
         content: 'Failed to fetch your user on the bot!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -79,6 +79,6 @@ export class N1984Command extends Command {
       .setFooter({ text: embedFooter });
 
     // Send the embed
-    await interaction.reply({ embeds: [n1984Embed], fetchReply: true });
+    await interaction.reply({ embeds: [n1984Embed], withResponse: true });
   }
 }

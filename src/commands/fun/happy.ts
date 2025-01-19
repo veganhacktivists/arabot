@@ -18,7 +18,7 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember } from 'discord.js';
+import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
 import { Happy } from '#utils/gifs';
 
 export class HappyCommand extends Command {
@@ -48,8 +48,8 @@ export class HappyCommand extends Command {
     // Type checks
     if (!(member instanceof GuildMember)) {
       await interaction.reply({
-        ephemeral: true,
         content: 'Failed to fetch your user on the bot!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
       });
       return;
     }
@@ -62,6 +62,6 @@ export class HappyCommand extends Command {
       .setImage(randomHappy);
 
     // Send the embed
-    await interaction.reply({ embeds: [happyEmbed], fetchReply: true });
+    await interaction.reply({ embeds: [happyEmbed], withResponse: true });
   }
 }

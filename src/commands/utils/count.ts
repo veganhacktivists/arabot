@@ -18,7 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 
 export class RenameUserCommand extends Command {
@@ -47,22 +47,22 @@ export class RenameUserCommand extends Command {
     if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
 
     await guild.members.fetch();
 
-    const vegan = await guild.roles.cache.get(IDs.roles.vegan.vegan);
-    const notVegan = await guild.roles.cache.get(IDs.roles.nonvegan.nonvegan);
+    const vegan = guild.roles.cache.get(IDs.roles.vegan.vegan);
+    const notVegan = guild.roles.cache.get(IDs.roles.nonvegan.nonvegan);
 
     if (vegan === undefined || notVegan === undefined) {
       await interaction.reply({
         content: 'Error fetching roles!',
-        ephemeral: true,
-        fetchReply: true,
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
       });
       return;
     }
@@ -71,7 +71,7 @@ export class RenameUserCommand extends Command {
       content:
         `${vegan.name}s: \`${vegan.members.size}\`` +
         `\n${notVegan.name}s: \`${notVegan.members.size}\``,
-      fetchReply: true,
+      withResponse: true,
     });
   }
 
@@ -88,8 +88,8 @@ export class RenameUserCommand extends Command {
 
     await guild.members.fetch();
 
-    const vegan = await guild.roles.cache.get(IDs.roles.vegan.vegan);
-    const notVegan = await guild.roles.cache.get(IDs.roles.nonvegan.nonvegan);
+    const vegan = guild.roles.cache.get(IDs.roles.vegan.vegan);
+    const notVegan = guild.roles.cache.get(IDs.roles.nonvegan.nonvegan);
 
     if (vegan === undefined || notVegan === undefined) {
       await message.react('❌');

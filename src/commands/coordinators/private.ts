@@ -19,7 +19,12 @@
 
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import type { Guild, TextChannel, Snowflake } from 'discord.js';
+import {
+  Guild,
+  TextChannel,
+  Snowflake,
+  MessageFlagsBitField,
+} from 'discord.js';
 import {
   CategoryChannel,
   ChannelType,
@@ -93,7 +98,9 @@ export class PrivateCommand extends Subcommand {
     const modUser = interaction.user;
     const { guild } = interaction;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     // Checks if all the variables are of the right type
     if (guild === null) {
@@ -235,7 +242,9 @@ export class PrivateCommand extends Subcommand {
     const modUser = interaction.user;
     const { guild, channel } = interaction;
 
-    await interaction.deferReply({ ephemeral: true });
+    await interaction.deferReply({
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+    });
 
     // Checks if all the variables are of the right type
     if (guild === null || channel === null) {

@@ -18,7 +18,7 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import type { Message } from 'discord.js';
+import { Message, MessageFlagsBitField } from 'discord.js';
 
 export class ApplyCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -47,8 +47,8 @@ export class ApplyCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     await interaction.reply({
       content: this.message,
-      fetchReply: true,
-      ephemeral: true,
+      flags: MessageFlagsBitField.Flags.Ephemeral,
+      withResponse: true,
     });
   }
 
