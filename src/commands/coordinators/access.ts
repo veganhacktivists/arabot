@@ -18,8 +18,10 @@
 */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, MessageFlagsBitField } from 'discord.js';
+import { MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
+import { isRole, isUser } from '#utils/typeChecking';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class AccessCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -91,7 +93,7 @@ export class AccessCommand extends Command {
     const role = interaction.options.getRole('role');
 
     // Checks if all the variables are of the right type
-    if (user === null && role === null) {
+    if (!isUser(user) && !isRole(role)) {
       await interaction.reply({
         content: 'Error fetching slash command data!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -100,7 +102,7 @@ export class AccessCommand extends Command {
     }
 
     // If user and role is provided, the return an error
-    if (user !== null && role !== null) {
+    if (isUser(user) && isRole(role)) {
       await interaction.reply({
         content:
           'You have entered a user and a role at the same time! Please only enter one at a time.',
@@ -110,10 +112,7 @@ export class AccessCommand extends Command {
     }
 
     // Checks that the channel is a GuildText or GuildVoice, otherwise, return error
-    if (
-      channel.type !== ChannelType.GuildText &&
-      channel.type !== ChannelType.GuildVoice
-    ) {
+    if (!isTextChannel(channel) && !channel.isVoiceBased()) {
       await interaction.reply({
         content: 'Please only select a text or voice channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -149,7 +148,7 @@ export class AccessCommand extends Command {
     }
 
     // Set permissions of voice channel
-    if (channel.type === ChannelType.GuildVoice) {
+    if (channel.isVoiceBased()) {
       switch (permission) {
         case 'add':
           await channel.permissionOverwrites.create(permId, {

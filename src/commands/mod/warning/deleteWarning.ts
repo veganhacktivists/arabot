@@ -19,13 +19,16 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
-import type { Message, Guild, User } from 'discord.js';
+import type { Message, User } from 'discord.js';
 import IDs from '#utils/ids';
 import {
   deleteWarning,
   fetchWarning,
 } from '#utils/database/moderation/warnings';
 import { checkStaff } from '#utils/checker';
+import { getTextBasedChannel, getUser } from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class DeleteWarningCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -62,17 +65,6 @@ export class DeleteWarningCommand extends Command {
     // Get the arguments
     const warningId = interaction.options.getInteger('id', true);
     const mod = interaction.user;
-    const { guild } = interaction;
-
-    // Checks if all the variables are of the right type
-    if (guild === null) {
-      await interaction.reply({
-        content: 'Error fetching guild!',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-        withResponse: true,
-      });
-      return;
-    }
 
     const staffChannel = checkStaff(interaction.channel);
 
@@ -80,7 +72,7 @@ export class DeleteWarningCommand extends Command {
       flags: staffChannel ? undefined : MessageFlagsBitField.Flags.Ephemeral,
     });
 
-    const info = await this.deleteWarning(warningId, mod, guild);
+    const info = await this.deleteWarning(warningId, mod);
 
     await interaction.editReply({
       content: info.message,
@@ -110,7 +102,7 @@ export class DeleteWarningCommand extends Command {
       return;
     }
 
-    const info = await this.deleteWarning(warningId, mod, guild);
+    const info = await this.deleteWarning(warningId, mod);
 
     await message.reply({ content: info.message, embeds: info.embeds });
     if (!info.success) {
@@ -118,7 +110,7 @@ export class DeleteWarningCommand extends Command {
     }
   }
 
-  private async deleteWarning(warningId: number, mod: User, guild: Guild) {
+  private async deleteWarning(warningId: number, mod: User) {
     const info = {
       message: '',
       embeds: [] as EmbedBuilder[],
@@ -136,38 +128,26 @@ export class DeleteWarningCommand extends Command {
     info.success = true;
 
     const userId = warning.userId;
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
-      if (user === undefined) {
-        info.message = `Deleted warning ID \`${warningId}\`, but the user could not be found!`;
-        return info;
-      }
+    if (!isUser(user)) {
+      info.message = `Deleted warning ID \`${warningId}\`, but the user could not be found!`;
+      return info;
     }
 
     // Log the warnings deletion
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus);
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.sus);
 
-    if (logChannel === undefined) {
-      const fetchLogChannel = await guild.channels
-        .fetch(IDs.channels.logs.sus)
-        .catch(() => undefined);
-      if (fetchLogChannel === null || fetchLogChannel === undefined) {
-        this.container.logger.error(
-          'Delete Warning: Could not fetch log channel',
-        );
-        info.message =
-          `Deleted warning for ${user} (Warning ID: ${warningId} but ` +
-          'could not find the log channel.';
+    if (!isTextChannel(logChannel)) {
+      this.container.logger.error(
+        'Delete Warning: Could not fetch log channel',
+      );
+      info.message =
+        `Deleted warning for ${user} (Warning ID: ${warningId} but ` +
+        'could not find the log channel.';
 
-        return info;
-      } else {
-        logChannel = fetchLogChannel;
-      }
-    }
-
-    if (!logChannel.isSendable()) {
+      return info;
+    } else if (!logChannel.isSendable()) {
       this.container.logger.error(
         'Delete Warning: The bot does not have permission to send in the logs channel!',
       );

@@ -18,9 +18,9 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { container } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class RestrictedMessageTask extends ScheduledTask {
   public constructor(
@@ -34,14 +34,20 @@ export class RestrictedMessageTask extends ScheduledTask {
   }
 
   public async run() {
-    const { client } = container;
-
-    const restricted = client.channels.cache.get(
+    const restricted = await getTextBasedChannel(
       IDs.channels.restricted.restricted,
-    ) as TextChannel;
-    const tolerance = client.channels.cache.get(
+    );
+    const tolerance = await getTextBasedChannel(
       IDs.channels.restricted.tolerance,
-    ) as TextChannel;
+    );
+
+    if (!isTextBasedChannel(restricted) || !isTextBasedChannel(tolerance)) {
+      this.container.logger.error(
+        'Restricted Reminder: The bot could not find both of the channels!',
+      );
+
+      return;
+    }
 
     await restricted.send(this.message(IDs.roles.restrictions.restricted1));
     await tolerance.send(this.message(IDs.roles.restrictions.restricted3));

@@ -19,10 +19,8 @@
 
 import { container, Listener } from '@sapphire/framework';
 import type {
-  CategoryChannel,
   ColorResolvable,
   TextChannel,
-  VoiceChannel,
   VoiceState,
   GuildMember,
   Guild,
@@ -30,7 +28,6 @@ import type {
 } from 'discord.js';
 import {
   time,
-  ChannelType,
   PermissionsBitField,
   ButtonBuilder,
   ButtonInteraction,
@@ -54,6 +51,16 @@ import { findNotes } from '#utils/database/moderation/sus';
 import { addExistingUser } from '#utils/database/dbExistingUser';
 import { rolesToString } from '#utils/formatter';
 import IDs from '#utils/ids';
+import {
+  getCategoryChannel,
+  getGuildMember,
+  getVoiceChannel,
+} from '#utils/fetcher';
+import {
+  isCategoryChannel,
+  isGuildMember,
+  isVoiceChannel,
+} from '@sapphire/discord.js-utilities';
 
 export class VerificationJoinVCListener extends Listener {
   public constructor(
@@ -84,20 +91,19 @@ export class VerificationJoinVCListener extends Listener {
     const { client } = container;
     const guild = client.guilds.cache.get(newState.guild.id);
 
-    if (channel === null || member === null || guild === undefined) {
+    if (member === null || guild === undefined) {
       this.container.logger.error('Verification channel not found');
       return;
     }
 
     // Get current category and channel
-    const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
-    const currentChannelGuild = guild.channels.cache.get(channel.id);
-    if (currentChannelGuild === undefined || categoryGuild === undefined) {
+    const category = await getCategoryChannel(IDs.categories.verification);
+    const currentChannel = await getVoiceChannel(channel.id);
+
+    if (!isCategoryChannel(category) || !isVoiceChannel(currentChannel)) {
       this.container.logger.error('Verification channel not found');
       return;
     }
-    const currentChannel = currentChannelGuild as VoiceChannel;
-    const category = categoryGuild as CategoryChannel;
 
     const roles: Snowflake[] = [];
 
@@ -167,8 +173,8 @@ export class VerificationJoinVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildVoice,
+    const listVoiceChannels = category.children.cache.filter((channel) =>
+      isVoiceChannel(channel),
     );
 
     // Create a text channel for verifiers only
@@ -300,11 +306,12 @@ export class VerificationJoinVCListener extends Listener {
       i += 1
     ) {
       // Get mod name
-      const modGuildMember = guild.members.cache.get(notes[i].modId);
+      const modGuildMember = await getGuildMember(notes[i].modId, guild);
       let mod = notes[i].modId;
-      if (modGuildMember !== undefined) {
+      if (isGuildMember(modGuildMember)) {
         mod = modGuildMember.displayName;
       }
+
       // Add sus note to embed
       embed.addFields({
         name: `Sus ID: ${
@@ -495,10 +502,8 @@ export class VerificationJoinVCListener extends Listener {
       // Confirming and finishing the verification
       if (button.customId === 'confirm' && info.page >= questionLength) {
         // Check verifier is on the database
-        const verifierGuildMember = await guild.members.cache.get(
-          button.user.id,
-        );
-        if (verifierGuildMember === undefined) {
+        const verifierGuildMember = await getGuildMember(button.user.id, guild);
+        if (!isGuildMember(verifierGuildMember)) {
           await message.edit({ content: 'Verifier not found!' });
           return;
         }

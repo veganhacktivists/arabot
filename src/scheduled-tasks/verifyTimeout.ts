@@ -18,7 +18,11 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { ChannelType } from 'discord.js';
+import { getGuildMember, getVoiceBasedChannel } from '#utils/fetcher';
+import {
+  isGuildMember,
+  isVoiceBasedChannel,
+} from '@sapphire/discord.js-utilities';
 
 export class VerifyTimeout extends ScheduledTask {
   public constructor(
@@ -30,29 +34,17 @@ export class VerifyTimeout extends ScheduledTask {
 
   public async run(payload: { channelId: string; userId: string }) {
     // Get the guild where the user is in
-    let channel = this.container.client.channels.cache.get(payload.channelId);
-    if (channel === undefined) {
-      const channelFetch = await this.container.client.channels
-        .fetch(payload.channelId)
-        .catch(() => null);
-      if (channelFetch === null) {
-        this.container.logger.error('verifyTimeout: Channel not found!');
-        return;
-      }
+    const channel = await getVoiceBasedChannel(payload.channelId);
 
-      channel = channelFetch;
-    }
-
-    if (channel.type !== ChannelType.GuildVoice) {
-      this.container.logger.error(
-        'verifyTimeout: Channel is not a voice channel!',
-      );
+    if (!isVoiceBasedChannel(channel)) {
+      this.container.logger.error('verifyTimeout: Channel not found!');
       return;
     }
 
     if (channel.members.size < 2 && channel.members.has(payload.userId)) {
-      const user = channel.members.get(payload.userId);
-      if (user === undefined) {
+      const user = await getGuildMember(payload.userId, channel.guild);
+
+      if (!isGuildMember(user)) {
         this.container.logger.error('verifyTimeout: GuildMember not found!');
         return;
       }

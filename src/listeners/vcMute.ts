@@ -20,6 +20,7 @@
 import { Listener } from '@sapphire/framework';
 import type { VoiceState } from 'discord.js';
 import { checkActive, removeMute } from '#utils/database/moderation/vcMute';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class VCMuteListener extends Listener {
   public constructor(
@@ -37,7 +38,7 @@ export class VCMuteListener extends Listener {
     if (oldState.channel === null && newState.channel !== null) {
       const { member } = newState;
 
-      if (member === null) {
+      if (!isGuildMember(member)) {
         this.container.logger.error(
           'VCMute Listener - GuildMember not found when joining',
         );

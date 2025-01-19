@@ -19,9 +19,15 @@
 
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
-import { MessageFlagsBitField, TextChannel } from 'discord.js';
-import { CategoryChannel, ChannelType } from 'discord.js';
+import { MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
+import { isUser } from '#utils/typeChecking';
+import {
+  isCategoryChannel,
+  isTextChannel,
+  isVoiceChannel,
+} from '@sapphire/discord.js-utilities';
+import { getCategoryChannel, getVoiceChannel } from '#utils/fetcher';
 
 export class RestrictToolsCommand extends Subcommand {
   public constructor(
@@ -92,8 +98,8 @@ export class RestrictToolsCommand extends Subcommand {
 
     let topic: string[];
 
-    if (user === null) {
-      if (channel.type !== ChannelType.GuildText) {
+    if (!isUser(user)) {
+      if (!isTextChannel(channel)) {
         await interaction.editReply({
           content:
             'Please make sure you ran this command in the original restricted text channel!',
@@ -132,10 +138,10 @@ export class RestrictToolsCommand extends Subcommand {
       await channel.delete();
 
       const vcId = topic[3];
-      const voiceChannel = guild.channels.cache.get(vcId);
+      const voiceChannel = await getVoiceChannel(vcId);
 
       if (
-        voiceChannel !== undefined &&
+        isVoiceChannel(voiceChannel) &&
         voiceChannel.parentId === IDs.categories.restricted
       ) {
         await voiceChannel.delete();
@@ -144,55 +150,45 @@ export class RestrictToolsCommand extends Subcommand {
       return;
     }
 
-    const category = guild.channels.cache.get(IDs.categories.restricted);
+    const category = await getCategoryChannel(IDs.categories.restricted);
 
-    if (!(category instanceof CategoryChannel)) {
+    if (!isCategoryChannel(category)) {
       await interaction.editReply({
         content: 'Could not find category!',
       });
       return;
     }
 
-    const textChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildText,
+    const textChannels = category.children.cache.filter((channel) =>
+      isTextChannel(channel),
     );
 
-    for (const channel of textChannels) {
-      const textChannel = channel[1];
+    for (const c of textChannels) {
+      const channel = c[1];
 
       // Checks that the channel is a text channel
-      if (!(textChannel instanceof TextChannel)) {
+      if (!isTextChannel(channel)) {
         continue;
       }
 
       // Checks that the channel has a topic
-      if (textChannel.topic === null) {
+      if (channel.topic === null) {
         continue;
       }
 
       // Checks if the channel topic has the user's snowflake
-      if (textChannel.topic.includes(user.id)) {
-        topic = textChannel.topic.split(' ');
+      if (channel.topic.includes(user.id)) {
+        topic = channel.topic.split(' ');
         const vcId = topic[topic.indexOf(user.id) + 1];
-        let voiceChannel = guild.channels.cache.get(vcId);
-
-        if (voiceChannel === undefined) {
-          const fetchVoiceChannel = await guild.channels
-            .fetch(vcId)
-            .catch(() => undefined);
-
-          if (fetchVoiceChannel !== null && fetchVoiceChannel !== undefined) {
-            voiceChannel = fetchVoiceChannel;
-          }
-        }
+        const voiceChannel = await getVoiceChannel(vcId);
 
         if (
-          voiceChannel !== undefined &&
+          isVoiceChannel(voiceChannel) &&
           voiceChannel.parentId === IDs.categories.restricted
         ) {
           await voiceChannel.delete();
         }
-        await textChannel.delete();
+        await channel.delete();
       }
     }
 

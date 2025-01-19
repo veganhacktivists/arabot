@@ -21,6 +21,8 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { User, Guild, Message, MessageFlagsBitField } from 'discord.js';
 import { EmbedBuilder } from 'discord.js';
 import { getRank, xpToNextLevel } from '#utils/database/fun/xp';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class RankCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -108,14 +110,11 @@ export class RankCommand extends Command {
       success: false,
     };
 
-    let member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    if (member === undefined) {
-      member = await guild.members.fetch(user.id).catch(() => undefined);
-      if (member === undefined) {
-        info.message = 'The user is not on this server!';
-        return info;
-      }
+    if (!isGuildMember(member)) {
+      info.message = 'The user is not on this server!';
+      return info;
     }
 
     const rank = await getRank(user.id);

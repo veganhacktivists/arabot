@@ -20,6 +20,8 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { GuildMember, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class SoftMuteCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -70,11 +72,11 @@ export class SoftMuteCommand extends Command {
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
+    // Gets GuildMember whilst removing the ability of each other variables being null
+    const member = await getGuildMember(user.id, guild);
 
     // Checks if guildMember is null
-    if (guildMember === undefined) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: 'Error fetching user!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -83,8 +85,8 @@ export class SoftMuteCommand extends Command {
       return;
     }
 
-    if (guildMember.roles.cache.has(IDs.roles.restrictions.softMute)) {
-      await guildMember.roles.remove(IDs.roles.restrictions.softMute);
+    if (member.roles.cache.has(IDs.roles.restrictions.softMute)) {
+      await member.roles.remove(IDs.roles.restrictions.softMute);
       await interaction.reply({
         content: `Removed soft muted for ${user}`,
         withResponse: true,
@@ -92,7 +94,7 @@ export class SoftMuteCommand extends Command {
       return;
     }
 
-    await guildMember.roles.add(IDs.roles.restrictions.softMute);
+    await member.roles.add(IDs.roles.restrictions.softMute);
 
     await interaction.reply({
       content: `Soft muted ${user}`,

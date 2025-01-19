@@ -21,12 +21,9 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from '@sapphire/framework';
-import {
-  ButtonInteraction,
-  GuildMember,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { ButtonInteraction, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class NonVeganAccessButtonHandler extends InteractionHandler {
   public constructor(
@@ -46,13 +43,13 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
   }
 
   public async run(interaction: ButtonInteraction) {
-    let { member } = interaction;
+    const { member } = interaction;
 
     const errorMessage =
       'There was an error giving you the role, please try again later or contact ModMail/the developer ' +
       'to sort out this problem.';
 
-    if (member === null) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: errorMessage,
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -60,39 +57,27 @@ export class NonVeganAccessButtonHandler extends InteractionHandler {
       return;
     }
 
-    try {
-      member = member as GuildMember;
-
-      if (!member.roles.cache.has(IDs.roles.vegan.vegan)) {
-        await interaction.reply({
-          content: 'You need to be vegan to use this button!',
-          flags: MessageFlagsBitField.Flags.Ephemeral,
-        });
-        return;
-      }
-
-      if (member.roles.cache.has(IDs.roles.vegan.nvAccess)) {
-        await member.roles.remove(IDs.roles.vegan.nvAccess);
-        await interaction.reply({
-          content:
-            'Your access from the non vegan section has been removed. ' +
-            'If you want to gain access again, click this button again.',
-          flags: MessageFlagsBitField.Flags.Ephemeral,
-        });
-        return;
-      }
-
+    if (!member.roles.cache.has(IDs.roles.vegan.vegan)) {
+      await interaction.reply({
+        content: 'You need to be vegan to use this button!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    } else if (member.roles.cache.has(IDs.roles.vegan.nvAccess)) {
+      await member.roles.remove(IDs.roles.vegan.nvAccess);
+      await interaction.reply({
+        content:
+          'Your access from the non vegan section has been removed. ' +
+          'If you want to gain access again, click this button again.',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    } else {
       await member.roles.add(IDs.roles.vegan.nvAccess);
       await interaction.reply({
         content:
           'Your access to the non vegan section has been given back. ' +
           'If you want to remove access again, click this button again.',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-    } catch (error) {
-      this.container.logger.error(`Non Vegan Access Interaction: ${error}`);
-      await interaction.reply({
-        content: errorMessage,
         flags: MessageFlagsBitField.Flags.Ephemeral,
       });
     }

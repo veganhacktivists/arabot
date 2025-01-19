@@ -19,10 +19,12 @@
 
 import { Listener } from '@sapphire/framework';
 import type { GuildBan } from 'discord.js';
-import { AuditLogEvent, EmbedBuilder, TextChannel } from 'discord.js';
+import { AuditLogEvent, EmbedBuilder } from 'discord.js';
 import { addBan, checkBan, removeBan } from '#utils/database/moderation/ban';
 import IDs from '#utils/ids';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
+import { getGuildMember, getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class UnbanListener extends Listener {
   public constructor(
@@ -71,17 +73,12 @@ export class UnbanListener extends Listener {
     const { guild } = ban;
 
     // Gets mod's GuildMember
-    let mod = guild.members.cache.get(executor.id);
+    const mod = await getGuildMember(executor.id, guild);
 
     // Checks if GuildMember is null
     if (mod === undefined) {
-      mod = await guild.members.fetch(executor.id).catch(() => undefined);
-      if (mod === undefined) {
-        this.container.logger.error(
-          'UnbanListener: Could not fetch moderator.',
-        );
-        return;
-      }
+      this.container.logger.error('UnbanListener: Could not fetch moderator.');
+      return;
     }
 
     // Check if mod is in database
@@ -100,20 +97,11 @@ export class UnbanListener extends Listener {
     await removeBan(user.id, mod.id);
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted) as
-      | TextChannel
-      | undefined;
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.restricted);
 
-    if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(
-        IDs.channels.logs.restricted,
-      )) as TextChannel | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error(
-          'UnbanListener: Could not fetch log channel',
-        );
-        return;
-      }
+    if (!isTextBasedChannel(logChannel)) {
+      this.container.logger.error('UnbanListener: Could not fetch log channel');
+      return;
     }
 
     const log = new EmbedBuilder()

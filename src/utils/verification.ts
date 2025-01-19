@@ -23,12 +23,16 @@ import {
   ChannelType,
   GuildMember,
   PermissionsBitField,
-  TextChannel,
   time,
   User,
 } from 'discord.js';
 import type { Snowflake, VoiceBasedChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import {
+  isDMChannel,
+  isTextBasedChannel,
+} from '@sapphire/discord.js-utilities';
 
 export async function createVerificationText(
   member: GuildMember,
@@ -252,12 +256,16 @@ export async function finishVerifyMessages(
 
   // Not vegan
   if (!roles.vegan) {
-    const general = container.client.channels.cache.get(
-      IDs.channels.nonVegan.general,
-    ) as TextChannel | undefined;
-    if (general === undefined) {
+    const general = await getTextBasedChannel(IDs.channels.nonVegan.general);
+
+    if (!isTextBasedChannel(general)) {
+      container.logger.error(
+        'Verification: Could not find general chat to welcome a non-vegan!',
+      );
+
       return;
     }
+
     let msg =
       `${user}, you have been verified! Please check <#${IDs.channels.information.roles}> ` +
       `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`;
@@ -270,10 +278,13 @@ export async function finishVerifyMessages(
   }
 
   // Vegan
-  const general = container.client.channels.cache.get(
-    IDs.channels.vegan.general,
-  ) as TextChannel | undefined;
-  if (general === undefined) {
+  const general = await getTextBasedChannel(IDs.channels.vegan.general);
+
+  if (!isTextBasedChannel(general)) {
+    container.logger.error(
+      'Verification: Could not find general chat to welcome a vegan!',
+    );
+
     return;
   }
   const msg = `Welcome ${user}! Please check out <#${IDs.channels.information.roles}> :)`;
@@ -289,14 +300,16 @@ export async function finishVerifyMessages(
       '3. Have evidence for claims you make. "I don\'t know" is an acceptable answer. Chances are someone here knows or you can take time to find out\n' +
       "4. Don't advocate for baby steps towards veganism. Participation in exploitation can stop today\n" +
       '5. Differences in opinion between activists should be resolved in vegan spaces, not in the chat with non-vegans';
-    await user.send(activistMsg).catch(() => {
-      const activist = container.client.channels.cache.get(
+    await user.send(activistMsg).catch(async () => {
+      const activist = await getTextBasedChannel(
         IDs.channels.activism.activism,
-      ) as TextChannel | undefined;
-      if (activist === undefined) {
+      );
+
+      if (!isDMChannel(activist)) {
         return;
       }
-      activist.send(activistMsg);
+
+      await activist.send(activistMsg);
     });
   }
 }

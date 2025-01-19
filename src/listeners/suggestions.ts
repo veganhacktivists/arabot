@@ -21,6 +21,8 @@ import { Listener } from '@sapphire/framework';
 import { EmbedBuilder } from 'discord.js';
 import type { Message } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class Suggestions extends Listener {
   public constructor(
@@ -38,14 +40,19 @@ export class Suggestions extends Listener {
       return;
     }
 
-    const mailbox = await this.container.client.channels.cache.get(
-      IDs.channels.staff.mailbox,
-    );
+    const mailbox = await getTextBasedChannel(IDs.channels.staff.mailbox);
 
-    if (mailbox === undefined || !mailbox.isTextBased()) {
+    if (!isTextChannel(mailbox)) {
       this.container.logger.error(
         'Mailbox is not a TextBased channel or is undefined',
       );
+
+      return;
+    } else if (!mailbox.isSendable()) {
+      this.container.logger.error(
+        'Suggestions: The bot does not have permissions to send messages in the mailbox!',
+      );
+
       return;
     }
 
@@ -80,11 +87,6 @@ export class Suggestions extends Listener {
             'There was an error sending your suggestion, please try again later or contact the devs!',
         })
         .catch(() => {});
-      return;
-    }
-
-    if (!mailbox.isSendable()) {
-      // TODO manage logging/errors properly
       return;
     }
 

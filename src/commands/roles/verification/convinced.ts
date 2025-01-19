@@ -21,6 +21,9 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Guild, User, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
+import { getGuildMember, getRole } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
+import { isRole } from '#utils/typeChecking';
 
 export class ConvincedCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -91,12 +94,6 @@ export class ConvincedCommand extends Command {
 
     const mod = message.author;
 
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Mod not found! Try again or contact a developer!');
-      return;
-    }
-
     const { guild } = message;
 
     if (guild === null) {
@@ -116,16 +113,16 @@ export class ConvincedCommand extends Command {
       message: '',
       success: false,
     };
-    const member = guild.members.cache.get(user.id);
-    const convinced = guild.roles.cache.get(IDs.roles.nonvegan.convinced);
+    const member = await getGuildMember(user.id, guild);
+    const convinced = await getRole(IDs.roles.nonvegan.convinced, guild);
 
     // Checks if user's GuildMember was found in cache
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Error fetching guild member for the user!';
       return info;
     }
 
-    if (convinced === undefined) {
+    if (!isRole(convinced)) {
       info.message = 'Error fetching coordinator role from cache!';
       return info;
     }

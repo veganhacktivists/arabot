@@ -18,12 +18,15 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, EmbedBuilder, MessageFlagsBitField } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import type { Message, Guild, User } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchWarnings } from '#utils/database/moderation/warnings';
 import { checkStaff } from '#utils/checker';
 import { createWarningsEmbed } from '#utils/embeds';
+import { isUser } from '#utils/typeChecking';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
+import { getUser } from '#utils/fetcher';
 
 export class WarningsCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -103,10 +106,10 @@ export class WarningsCommand extends Command {
       return;
     }
 
-    if (user === undefined) {
+    if (!isUser(user)) {
       const { channel } = message;
 
-      if (channel.type !== ChannelType.GuildText) {
+      if (!isTextChannel(channel)) {
         await message.react('❌');
         await message.reply('User was not provided!');
         return;
@@ -121,18 +124,16 @@ export class WarningsCommand extends Command {
           // eslint-disable-next-line prefer-destructuring
           const userId = topic[2];
 
-          user = guild.client.users.cache.get(userId);
-
-          if (user === undefined) {
-            user = await guild.client.users.fetch(userId);
-          }
+          user = await getUser(userId);
         }
       }
     }
 
-    if (user === undefined) {
+    if (!isUser(user)) {
       await message.react('❌');
-      await message.reply('User was not provided!');
+      await message.reply(
+        'User was not provided! (You most likely provided a user incorrectly.)',
+      );
       return;
     }
 

@@ -27,8 +27,6 @@ import {
   ButtonStyle,
   User,
   Guild,
-  TextChannel,
-  GuildMember,
   Snowflake,
   MessageFlagsBitField,
 } from 'discord.js';
@@ -43,6 +41,13 @@ import {
 import { checkStaff } from '#utils/checker';
 import IDs from '#utils/ids';
 import { createSusLogEmbed } from '#utils/embeds';
+import { getGuildMember, getTextBasedChannel, getUser } from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
+import {
+  isGuildMember,
+  isTextBasedChannel,
+  isTextChannel,
+} from '@sapphire/discord.js-utilities';
 
 // TODO add a check when they join the server to give the user the sus role again
 
@@ -229,19 +234,20 @@ export class SusCommand extends Subcommand {
     info.success = true;
 
     // Log the sus note
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
-      | TextChannel
-      | undefined;
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.sus);
 
-    if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
-        | TextChannel
-        | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Sus Error: Could not fetch log channel');
-        info.message = `Added a sus note for ${user} but could not find the log channel. This has been logged to the database.`;
-        return info;
-      }
+    if (!isTextBasedChannel(logChannel)) {
+      this.container.logger.error('Sus: Could not fetch log channel.');
+      info.message = `Added a sus note for ${user} but could not find the log channel. This has been logged to the database.`;
+
+      return info;
+    } else if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Sus: Does not have permission to message in the log channel.',
+      );
+      info.message = `Added a sus note for ${user} but could not send in the logs channel. This has been logged to the database.`;
+
+      return info;
     }
 
     const message = new EmbedBuilder()
@@ -265,15 +271,9 @@ export class SusCommand extends Subcommand {
 
   private async addSusRole(user: User, guild: Guild) {
     // Get GuildMember for user to add a sus note for
-    let member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    // Checks if Member was not found in cache
-    if (member === undefined) {
-      // Fetches Member from API call to Discord
-      member = await guild.members.fetch(user.id).catch(() => undefined);
-    }
-
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       return;
     }
 
@@ -289,7 +289,7 @@ export class SusCommand extends Subcommand {
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild == null) {
+    if (guild === null) {
       await interaction.reply({
         content: 'Error fetching guild!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -330,7 +330,7 @@ export class SusCommand extends Subcommand {
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null || channel === null) {
+    if (guild === null || !isTextBasedChannel(channel)) {
       await interaction.reply({
         content: 'Error fetching guild or channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -356,11 +356,8 @@ export class SusCommand extends Subcommand {
     const modId = note.modId;
 
     // Get user GuildMembers for user and mod and person who ran command
-    let user = guild.client.users.cache.get(userId);
-    if (!(user instanceof User)) {
-      user = await guild.client.users.fetch(userId).catch(() => undefined);
-    }
-    if (user === undefined) {
+    const user = await getUser(userId);
+    if (!isUser(user)) {
       await interaction.reply({
         content: 'Error fetching user!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -369,15 +366,11 @@ export class SusCommand extends Subcommand {
       return;
     }
 
-    let modCreator = guild.client.users.cache.get(modId);
-    if (!(modCreator instanceof User)) {
-      modCreator = await guild.client.users.fetch(modId).catch(() => undefined);
-    }
+    const modCreator = await getUser(modId);
 
-    let modCreatorDisplay = modId;
-    if (modCreator instanceof User) {
-      modCreatorDisplay = modCreator.displayName;
-    }
+    const modCreatorDisplay = isUser(modCreator)
+      ? modCreator.displayName
+      : modId;
 
     // Create an embed for the note
     const noteEmbed = new EmbedBuilder()
@@ -443,18 +436,15 @@ export class SusCommand extends Subcommand {
 
         // Checks if there are no notes on the user and if there's none, remove the sus role
         if (notes.length === 0) {
-          let member = guild.members.cache.get(userId);
-          if (!(member instanceof GuildMember)) {
-            member = await guild.members.fetch(userId).catch(() => undefined);
-          }
+          const member = guild.members.cache.get(userId);
 
-          if (member instanceof GuildMember) {
+          if (isGuildMember(member)) {
             await member.roles.remove(IDs.roles.restrictions.sus);
           }
         }
 
         // Logs the removal of the sus note
-        await this.deleteNoteLogger(userId, mod, noteId, guild);
+        await this.deleteNoteLogger(userId, mod, noteId);
       }
     });
 
@@ -467,32 +457,22 @@ export class SusCommand extends Subcommand {
   }
 
   // Logs removal of 1 sus note
-  private async deleteNoteLogger(
-    userId: Snowflake,
-    mod: User,
-    noteId: number,
-    guild: Guild,
-  ) {
+  private async deleteNoteLogger(userId: Snowflake, mod: User, noteId: number) {
     // Find user
-    let user = guild.client.users.cache.get(userId);
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId).catch(() => undefined);
-    }
-    if (user === undefined) return;
+    const user = await getUser(userId);
+    if (!isUser(user)) return;
 
     // Log the sus note
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
-      | TextChannel
-      | undefined;
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.sus);
 
-    if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
-        | TextChannel
-        | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Sus Error: Could not fetch log channel');
-        return;
-      }
+    if (!isTextBasedChannel(logChannel)) {
+      this.container.logger.error('Sus: Could not fetch log channel.');
+      return;
+    } else if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Sus: The bot does not have permission to send in the log channel',
+      );
+      return;
     }
 
     const embed = new EmbedBuilder()
@@ -521,7 +501,7 @@ export class SusCommand extends Subcommand {
     const { guild, channel } = interaction;
 
     // Checks if all the variables are of the right type
-    if (guild === null || channel === null) {
+    if (guild === null || !isTextBasedChannel(channel)) {
       await interaction.reply({
         content: 'Error fetching guild or channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -530,10 +510,10 @@ export class SusCommand extends Subcommand {
       return;
     }
 
-    const member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
     // Checks if managed to find GuildMember for the user
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: 'Error fetching user!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -570,10 +550,11 @@ export class SusCommand extends Subcommand {
     ) {
       // Get mod name
       let mod = notes[i].modId;
-      const modGuildMember = guild.members.cache.get(mod);
-      if (modGuildMember !== undefined) {
+      const modGuildMember = await getGuildMember(mod, guild);
+      if (isGuildMember(modGuildMember)) {
         mod = modGuildMember.displayName;
       }
+
       // Add sus note to embed
       noteEmbed.addFields({
         name: `Sus ID: ${
@@ -633,7 +614,7 @@ export class SusCommand extends Subcommand {
         });
       }
 
-      await this.deleteAllNotesLogger(user, mod, guild);
+      await this.deleteAllNotesLogger(user, mod);
     });
 
     // Remove the buttons after they have been clicked
@@ -648,20 +629,18 @@ export class SusCommand extends Subcommand {
   }
 
   // Logs removal of 1 sus note
-  private async deleteAllNotesLogger(user: User, mod: User, guild: Guild) {
+  private async deleteAllNotesLogger(user: User, mod: User) {
     // Log the sus note
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus) as
-      | TextChannel
-      | undefined;
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.sus);
 
-    if (logChannel === undefined) {
-      logChannel = (await guild.channels.fetch(IDs.channels.logs.sus)) as
-        | TextChannel
-        | undefined;
-      if (logChannel === undefined) {
-        this.container.logger.error('Sus Error: Could not fetch log channel');
-        return;
-      }
+    if (!isTextChannel(logChannel)) {
+      this.container.logger.error('Sus: Could not fetch log channel.');
+      return;
+    } else if (!logChannel.isSendable()) {
+      this.container.logger.error(
+        'Sus: Could not not send in the log channel.',
+      );
+      return;
     }
 
     const embed = new EmbedBuilder()

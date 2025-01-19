@@ -25,6 +25,9 @@ import {
   checkTempBan,
   removeTempBan,
 } from '#utils/database/moderation/tempBan';
+import { getGuild, getTextBasedChannel, getUser } from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class TempBan extends ScheduledTask {
   public constructor(
@@ -36,30 +39,24 @@ export class TempBan extends ScheduledTask {
 
   public async run(payload: { userId: string; guildId: string }) {
     this.container.logger.debug('Temp Unban Task: Currently running unban');
+
     // Get the guild where the user is in
-    let guild = this.container.client.guilds.cache.get(payload.guildId);
+    const guild = await getGuild(payload.guildId);
+
     if (guild === undefined) {
-      guild = await this.container.client.guilds
-        .fetch(payload.guildId)
-        .catch(() => undefined);
-      if (guild === undefined) {
-        this.container.logger.error('Temp Unban Task: Guild not found!');
-        return;
-      }
+      this.container.logger.error('Temp Unban Task: Guild not found!');
+      return;
     }
 
     const { userId } = payload;
 
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId).catch(() => undefined);
-      if (user === undefined) {
-        this.container.logger.error(
-          'Temp Unban Task: Could not fetch banned user!',
-        );
-        return;
-      }
+    if (!isUser(user)) {
+      this.container.logger.error(
+        'Temp Unban Task: Could not fetch banned user!',
+      );
+      return;
     }
 
     if ((await checkBan(userId)) || !(await checkTempBan(userId))) {
@@ -75,25 +72,11 @@ export class TempBan extends ScheduledTask {
     await removeTempBan(userId);
 
     // Log unban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.restricted);
 
-    if (logChannel === undefined) {
-      const logChannelFetch = await guild.channels
-        .fetch(IDs.channels.logs.restricted)
-        .catch(() => null);
-      if (logChannelFetch === null) {
-        this.container.logger.error(
-          `Temp Ban Listener: Could not fetch log channel. User Snowflake: ${userId}`,
-        );
-        return;
-      }
-
-      logChannel = logChannelFetch;
-    }
-
-    if (!logChannel.isTextBased()) {
+    if (!isTextChannel(logChannel)) {
       this.container.logger.error(
-        'Temp Ban Listener: Log channel is not a text based channel!',
+        `Temp Ban Listener: Could not fetch log channel. User Snowflake: ${userId}`,
       );
       return;
     }

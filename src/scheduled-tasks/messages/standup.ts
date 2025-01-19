@@ -18,9 +18,9 @@
  */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { container } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class StandupTask extends ScheduledTask {
   public constructor(
@@ -34,11 +34,15 @@ export class StandupTask extends ScheduledTask {
   }
 
   public async run() {
-    const { client } = container;
+    const channel = await getTextBasedChannel(IDs.channels.staff.coordinators);
 
-    const channel = client.channels.cache.get(
-      IDs.channels.staff.coordinators,
-    ) as TextChannel;
+    if (!isTextBasedChannel(channel)) {
+      this.container.logger.error(
+        'Standup: The bot could not find the channel to post the standup in!',
+      );
+
+      return;
+    }
 
     await channel.send(`Hiya <@&${IDs.roles.staff.coordinator}> it's time for your weekly standup!
                             \nPlease submit it in <#${IDs.channels.staff.standup}> :)`);

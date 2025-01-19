@@ -22,6 +22,8 @@ import { User, Guild, Message, MessageFlagsBitField } from 'discord.js';
 import { updateUser } from '#utils/database/dbExistingUser';
 import { getBalance } from '#utils/database/fun/economy';
 import { EmbedBuilder } from 'discord.js';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class BalanceCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -93,9 +95,9 @@ export class BalanceCommand extends Command {
       success: false,
     };
 
-    const member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Could not find your guild member!';
       return info;
     }

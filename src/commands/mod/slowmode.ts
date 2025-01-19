@@ -19,9 +19,12 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Message, MessageFlagsBitField, TextBasedChannel } from 'discord.js';
-import { ChannelType } from 'discord.js';
 import { Duration, DurationFormatter } from '@sapphire/time-utilities';
 import { isNumber } from '#utils/maths';
+import {
+  isTextBasedChannel,
+  isTextChannel,
+} from '@sapphire/discord.js-utilities';
 
 export class SlowmodeCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -58,7 +61,7 @@ export class SlowmodeCommand extends Command {
     const duration = interaction.options.getString('duration', true);
     const { channel } = interaction;
 
-    if (channel === null) {
+    if (!isTextBasedChannel(channel)) {
       await interaction.reply({
         content: 'Could not fetch channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -94,7 +97,7 @@ export class SlowmodeCommand extends Command {
       message: '',
       success: false,
     };
-    if (channel.type !== ChannelType.GuildText) {
+    if (!isTextChannel(channel)) {
       info.message = 'Channel is not a text channel!';
       return info;
     }

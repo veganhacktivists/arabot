@@ -18,9 +18,10 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import { Hugs } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class HugCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -58,7 +59,7 @@ export class HugCommand extends Command {
 
     // Type Checks
 
-    if (!(hugger instanceof GuildMember)) {
+    if (!isGuildMember(hugger)) {
       await interaction.reply({
         content: 'Failed to fetch your user on the bot!',
         flags: MessageFlagsBitField.Flags.Ephemeral,

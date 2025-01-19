@@ -18,15 +18,15 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import type {
-  Client,
-  CategoryChannel,
-  TextChannel,
-  VoiceChannel,
-} from 'discord.js';
-import { ChannelType } from 'discord.js';
+import type { VoiceChannel } from 'discord.js';
 import { createVerificationVoice } from '#utils/verification';
 import IDs from '#utils/ids';
+import { getCategoryChannel } from '#utils/fetcher';
+import {
+  isCategoryChannel,
+  isTextChannel,
+  isVoiceChannel,
+} from '@sapphire/discord.js-utilities';
 
 export class VerificationReady extends Listener {
   public constructor(
@@ -40,62 +40,67 @@ export class VerificationReady extends Listener {
     });
   }
 
-  public async run(client: Client) {
+  public async run() {
     // Get verification category
-    let category = client.channels.cache.get(IDs.categories.verification) as
-      | CategoryChannel
-      | undefined;
-    if (category === undefined) {
-      category = (await client.channels.fetch(IDs.categories.verification)) as
-        | CategoryChannel
-        | undefined;
-      if (category === undefined) {
-        this.container.logger.error('verifyStart: Channel not found');
-        return;
-      }
+    const category = await getCategoryChannel(IDs.categories.verification);
+
+    if (!isCategoryChannel(category)) {
+      this.container.logger.error('verifyStart: Channel not found');
+      return;
     }
 
     // Check how many voice channels there are
-    const voiceChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildVoice,
+    const voiceChannels = category.children.cache.filter((channel) =>
+      isVoiceChannel(channel),
     );
     const currentVCs: VoiceChannel[] = [];
     const emptyVC: string[] = [];
+
     // Delete voice channels
-    voiceChannels.forEach((c) => {
-      const voiceChannel = c as VoiceChannel;
-      if (voiceChannel.members.size === 0) {
-        emptyVC.push(voiceChannel.id);
-        voiceChannel.delete();
-      } else {
-        currentVCs.push(voiceChannel);
+    for (const c of voiceChannels) {
+      const channel = c[1];
+
+      if (!isVoiceChannel(channel)) {
+        continue;
       }
-    });
+
+      if (channel.members.size === 0) {
+        emptyVC.push(channel.id);
+        await channel.delete();
+      } else {
+        currentVCs.push(channel);
+      }
+    }
 
     // Delete text channels
-    const textChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildText,
+    const textChannels = category.children.cache.filter((channel) =>
+      isTextChannel(channel),
     );
-    textChannels.forEach((c) => {
-      const textChannel = c as TextChannel;
+
+    for (const c of textChannels) {
+      const channel = c[1];
+
+      if (!isTextChannel(channel)) {
+        continue;
+      }
+
       // Checks if the channel topic has the user's snowflake
-      emptyVC.forEach((snowflake) => {
-        if (
-          textChannel.topic !== null &&
-          textChannel.topic.includes(snowflake)
-        ) {
-          textChannel.delete();
+      for (const snowflake in emptyVC) {
+        if (channel.topic !== null && channel.topic.includes(snowflake)) {
+          await channel.delete();
         }
-      });
-    });
+      }
+    }
 
     // Check if there is no voice channels, create verification
     let verification = false;
-    currentVCs.forEach((c) => {
-      if (c.name === 'Verification') {
+
+    currentVCs.forEach((channel) => {
+      if (channel.name === 'Verification') {
         verification = true;
       }
     });
+
     if (!verification) {
       await createVerificationVoice(category);
     }

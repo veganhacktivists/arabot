@@ -18,9 +18,9 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { container } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class DiversityWedMessageTask extends ScheduledTask {
   public constructor(
@@ -34,8 +34,6 @@ export class DiversityWedMessageTask extends ScheduledTask {
   }
 
   public async run() {
-    const { client } = container;
-
     const message =
       '**📌 Diversity Section Code of Conduct**\n\n' +
       '❤️  Be *Kind*\n' +
@@ -47,12 +45,18 @@ export class DiversityWedMessageTask extends ScheduledTask {
       '❤️  Respect the creativity of others.\n' +
       '🧡  Actively seek to include others, especially moderators, in heated discourse for the purpose of de-escalation.';
 
-    const women = client.channels.cache.get(
-      IDs.channels.diversity.women,
-    ) as TextChannel;
-    const disabilities = client.channels.cache.get(
+    const women = await getTextBasedChannel(IDs.channels.diversity.women);
+    const disabilities = await getTextBasedChannel(
       IDs.channels.diversity.disabilities,
-    ) as TextChannel;
+    );
+
+    if (!isTextBasedChannel(women) || !isTextBasedChannel(disabilities)) {
+      this.container.logger.error(
+        'Diversity Wednesday: The bot could not find both of the channels!',
+      );
+
+      return;
+    }
 
     await women.send(message);
     await disabilities.send(message);

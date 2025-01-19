@@ -25,6 +25,8 @@ import {
   checkActive,
 } from '#utils/database/moderation/vcMute';
 import { addExistingUser } from '#utils/database/dbExistingUser';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class VCMuteCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -66,7 +68,7 @@ export class VCMuteCommand extends Command {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
     const reason = interaction.options.getString('reason');
-    const modUser = interaction.user;
+    const mod = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
@@ -80,13 +82,22 @@ export class VCMuteCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    const member = guild.members.cache.get(user.id);
-    const mod = guild.members.cache.get(modUser.id);
+    const member = await getGuildMember(user.id, guild);
 
-    // Checks if guildMember is null
-    if (member === undefined || mod === undefined) {
+    // Checks if `member` was found
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: 'Error fetching user!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
+      });
+      return;
+    }
+
+    // Checks if `mod` was found
+    if (!isGuildMember(mod)) {
+      await interaction.reply({
+        content: 'Error fetching your user!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
         withResponse: true,
       });
@@ -137,7 +148,7 @@ export class VCMuteCommand extends Command {
     const reason = args.finished ? null : await args.rest('string');
     const mod = message.member;
 
-    if (mod === null) {
+    if (!isGuildMember(mod)) {
       await message.react('❌');
       await message.reply(
         'Moderator not found! Try again or contact a developer!',

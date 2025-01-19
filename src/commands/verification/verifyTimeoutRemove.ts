@@ -21,6 +21,8 @@ import { Command, RegisterBehavior } from '@sapphire/framework';
 import IDs from '#utils/ids';
 import { checkVerificationFinish } from '#utils/database/verification';
 import { MessageFlagsBitField } from 'discord.js';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class VerifyTimeoutRemoveCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -71,14 +73,11 @@ export class VerifyTimeoutRemoveCommand extends Command {
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
 
-    let member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    if (member === undefined) {
-      member = await guild.members.fetch(user.id).catch(undefined);
-      if (member === undefined) {
-        await interaction.editReply(`${user} is not on this server!`);
-        return;
-      }
+    if (!isGuildMember(member)) {
+      await interaction.editReply(`${user} is not on this server!`);
+      return;
     }
 
     if (!member.roles.cache.has(IDs.roles.verifyBlock)) {

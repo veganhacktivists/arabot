@@ -19,6 +19,8 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { GuildMember, Message, MessageFlagsBitField } from 'discord.js';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class RenameUserCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -75,10 +77,10 @@ export class RenameUserCommand extends Command {
     }
 
     // Gets guildMember whilst removing the ability of each other variables being null
-    const member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
     // Checks if guildMember is null
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: 'Error fetching user!',
         flags: MessageFlagsBitField.Flags.Ephemeral,

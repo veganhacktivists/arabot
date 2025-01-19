@@ -19,14 +19,8 @@
 
 import { RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
+import { TextChannel, Snowflake, MessageFlagsBitField } from 'discord.js';
 import {
-  Guild,
-  TextChannel,
-  Snowflake,
-  MessageFlagsBitField,
-} from 'discord.js';
-import {
-  CategoryChannel,
   ChannelType,
   EmbedBuilder,
   GuildMember,
@@ -34,6 +28,19 @@ import {
   time,
 } from 'discord.js';
 import IDs from '#utils/ids';
+import {
+  isCategoryChannel,
+  isGuildBasedChannel,
+  isGuildMember,
+  isTextChannel,
+  isVoiceChannel,
+} from '@sapphire/discord.js-utilities';
+import {
+  getCategoryChannel,
+  getGuildMember,
+  getVoiceChannel,
+} from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
 
 export class PrivateCommand extends Subcommand {
   public constructor(
@@ -110,11 +117,11 @@ export class PrivateCommand extends Subcommand {
       return;
     }
 
-    const member = guild.members.cache.get(user.id);
-    const mod = guild.members.cache.get(modUser.id);
+    const member = await getGuildMember(user.id, guild);
+    const mod = await getGuildMember(modUser.id, guild);
 
     // Checks if guildMember is null
-    if (member === undefined || mod === undefined) {
+    if (!isGuildMember(member) || !isGuildMember(mod)) {
       await interaction.editReply({
         content: 'Error fetching users!',
       });
@@ -123,7 +130,7 @@ export class PrivateCommand extends Subcommand {
 
     const [name, coordinator] = this.getCoordinator(mod);
 
-    if (this.checkPrivate(member.id, coordinator, guild)) {
+    if (await this.checkPrivate(member.id, coordinator)) {
       await interaction.editReply({
         content: 'A private channel already exists!',
       });
@@ -247,17 +254,17 @@ export class PrivateCommand extends Subcommand {
     });
 
     // Checks if all the variables are of the right type
-    if (guild === null || channel === null) {
+    if (guild === null || !isGuildBasedChannel(channel)) {
       await interaction.editReply({
         content: 'Error fetching user!',
       });
       return;
     }
 
-    const mod = guild.members.cache.get(modUser.id);
+    const mod = await getGuildMember(modUser.id, guild);
 
     // Checks if guildMember is null
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       await interaction.editReply({
         content: 'Error fetching users!',
       });
@@ -268,8 +275,8 @@ export class PrivateCommand extends Subcommand {
     const coordinator = coordinatorInfo[1];
     let topic: string[];
 
-    if (user === null) {
-      if (channel.type !== ChannelType.GuildText) {
+    if (!isUser(user)) {
+      if (!isTextChannel(channel)) {
         await interaction.editReply({
           content:
             'Please make sure you ran this command in the original private text channel!',
@@ -296,10 +303,10 @@ export class PrivateCommand extends Subcommand {
       await channel.delete();
 
       const vcId = topic[topic.indexOf(coordinator) + 1];
-      const voiceChannel = guild.channels.cache.get(vcId);
+      const voiceChannel = await getVoiceChannel(vcId);
 
       if (
-        voiceChannel !== undefined &&
+        isVoiceChannel(voiceChannel) &&
         voiceChannel.parentId === IDs.categories.private
       ) {
         await voiceChannel.delete();
@@ -307,9 +314,7 @@ export class PrivateCommand extends Subcommand {
 
       return;
     }
-    const category = guild.channels.cache.get(IDs.categories.private) as
-      | CategoryChannel
-      | undefined;
+    const category = await getCategoryChannel(IDs.categories.private);
 
     if (category === undefined) {
       await interaction.editReply({
@@ -318,26 +323,32 @@ export class PrivateCommand extends Subcommand {
       return;
     }
 
-    const textChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildText,
+    const textChannels = category.children.cache.filter((channel) =>
+      isTextChannel(channel),
     );
-    textChannels.forEach((c) => {
-      const textChannel = c as TextChannel;
+
+    for (const c of textChannels) {
+      const channel = c[1];
+
+      if (!isTextChannel(channel)) {
+        continue;
+      }
+
       // Checks if the channel topic has the user's snowflake
-      if (textChannel.topic?.includes(user?.id)) {
-        topic = textChannel.topic.split(' ');
+      if (channel.topic !== null && channel.topic.includes(user.id)) {
+        topic = channel.topic.split(' ');
         const vcId = topic[topic.indexOf(coordinator) + 1];
-        const voiceChannel = guild.channels.cache.get(vcId);
+        const voiceChannel = await getVoiceChannel(vcId);
 
         if (
-          voiceChannel !== undefined &&
+          isVoiceChannel(voiceChannel) &&
           voiceChannel.parentId === IDs.categories.private
         ) {
-          voiceChannel.delete();
+          await voiceChannel.delete();
         }
-        textChannel.delete();
+        await channel.delete();
       }
-    });
+    }
 
     await interaction.editReply({
       content: `Successfully deleted the channel for ${user}`,
@@ -378,29 +389,35 @@ export class PrivateCommand extends Subcommand {
     return [name, id];
   }
 
-  private checkPrivate(user: Snowflake, coordinator: string, guild: Guild) {
-    const category = guild.channels.cache.get(IDs.categories.private) as
-      | CategoryChannel
-      | undefined;
+  private async checkPrivate(user: Snowflake, coordinator: string) {
+    const category = await getCategoryChannel(IDs.categories.private);
 
-    if (category === undefined) {
+    if (!isCategoryChannel(category)) {
       return true;
     }
 
     const textChannels = category.children.cache.filter(
       (c) => c.type === ChannelType.GuildText,
     );
+
     let exists = false;
-    textChannels.forEach((c) => {
-      const textChannel = c as TextChannel;
+
+    for (const c of textChannels) {
+      const channel = c[1];
+
+      if (!isTextChannel(channel)) {
+        continue;
+      }
+
       // Checks if the channel topic has the user's snowflake
       if (
-        textChannel.topic?.includes(user) &&
-        textChannel.topic?.includes(coordinator)
+        channel.topic !== null &&
+        channel.topic.includes(user) &&
+        channel.topic.includes(coordinator)
       ) {
         exists = true;
       }
-    });
+    }
     return exists;
   }
 }

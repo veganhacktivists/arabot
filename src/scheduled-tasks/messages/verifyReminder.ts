@@ -18,9 +18,9 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { container } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class VerifyReminder extends ScheduledTask {
   public constructor(
@@ -34,8 +34,6 @@ export class VerifyReminder extends ScheduledTask {
   }
 
   public async run() {
-    const { client } = container;
-
     // Get the total messages sent in non-vegan general since last message
     const redisKey = 'verifyReminderMessageCounter';
 
@@ -45,9 +43,15 @@ export class VerifyReminder extends ScheduledTask {
     if (!messageCount || +messageCount < 100) return;
 
     // Send verification reminder to non-vegan general
-    const channel = client.channels.cache.get(
-      IDs.channels.nonVegan.general,
-    ) as TextChannel;
+    const channel = await getTextBasedChannel(IDs.channels.nonVegan.general);
+
+    if (!isTextBasedChannel(channel)) {
+      this.container.logger.error(
+        'Verify Reminder: The bot could not find the channel to post the reminder!',
+      );
+
+      return;
+    }
 
     await channel.send(
       "If you want to have the vegan or activist role, you'll need to do a voice verification. " +

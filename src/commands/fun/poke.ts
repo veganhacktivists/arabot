@@ -18,9 +18,10 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import { Poke } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class PokeCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -57,7 +58,7 @@ export class PokeCommand extends Command {
     const sender = interaction.member;
 
     // Type checks
-    if (!(sender instanceof GuildMember)) {
+    if (!isGuildMember(sender)) {
       await interaction.reply({
         content: 'Failed to fetch your user on the bot!',
         flags: MessageFlagsBitField.Flags.Ephemeral,

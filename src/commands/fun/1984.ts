@@ -18,9 +18,10 @@
  */
 
 import { Command, RegisterBehavior } from '@sapphire/framework';
-import { EmbedBuilder, GuildMember, MessageFlagsBitField } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
 import { N1984 } from '#utils/gifs';
 import { addFunLog, countTotal } from '#utils/database/fun/fun';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class N1984Command extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -48,7 +49,7 @@ export class N1984Command extends Command {
     const { member } = interaction;
 
     // Type checks
-    if (!(member instanceof GuildMember)) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: 'Failed to fetch your user on the bot!',
         flags: MessageFlagsBitField.Flags.Ephemeral,

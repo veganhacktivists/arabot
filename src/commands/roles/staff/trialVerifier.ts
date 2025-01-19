@@ -21,6 +21,9 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Guild, User, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
+import { getGuildMember, getRole } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
+import { isRole } from '#utils/typeChecking';
 
 export class TrialVerifierCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -90,14 +93,6 @@ export class TrialVerifierCommand extends Command {
 
     const mod = message.author;
 
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply(
-        'Verifier coordinator not found! Try again or contact a developer!',
-      );
-      return;
-    }
-
     const { guild } = message;
 
     if (guild === null) {
@@ -117,16 +112,16 @@ export class TrialVerifierCommand extends Command {
       message: '',
       success: false,
     };
-    const member = guild.members.cache.get(user.id);
-    const trialVerifier = guild.roles.cache.get(IDs.roles.staff.trialVerifier);
+    const member = await getGuildMember(user.id, guild);
+    const trialVerifier = await getRole(IDs.roles.staff.trialVerifier, guild);
 
     // Checks if user's GuildMember was found in cache
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Error fetching guild member for the user!';
       return info;
     }
 
-    if (trialVerifier === undefined) {
+    if (!isRole(trialVerifier)) {
       info.message = 'Error fetching the trial verifier role from cache!';
       return info;
     }

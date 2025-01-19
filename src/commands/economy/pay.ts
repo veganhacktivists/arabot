@@ -23,6 +23,8 @@ import { updateUser } from '#utils/database/dbExistingUser';
 import { getBalance, transfer } from '#utils/database/fun/economy';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
+import { getGuildMember, getTextBasedChannel } from '#utils/fetcher';
+import { isGuildMember, isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class BalanceCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -158,15 +160,15 @@ export class BalanceCommand extends Command {
       return info;
     }
 
-    const member = guild.members.cache.get(user.id);
-    const recipientMember = guild.members.cache.get(recipient.id);
+    const member = await getGuildMember(user.id, guild);
+    const recipientMember = await getGuildMember(recipient.id, guild);
 
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Could not find your guild member!';
       return info;
     }
 
-    if (recipientMember === undefined) {
+    if (!isGuildMember(recipientMember)) {
       info.message = 'Could not find the user!';
       return info;
     }
@@ -200,22 +202,12 @@ export class BalanceCommand extends Command {
     info.embeds.push(embed);
 
     // Log the payment in the server
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.economy);
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.economy);
 
-    if (logChannel === undefined) {
-      const fetchLogChannel = await guild.channels
-        .fetch(IDs.channels.logs.economy)
-        .catch(() => undefined);
-
-      if (fetchLogChannel === null || fetchLogChannel === undefined) {
-        this.container.logger.error('Pay: Could not fetch log channel');
-        return info;
-      } else {
-        logChannel = fetchLogChannel;
-      }
-    }
-
-    if (!logChannel.isSendable()) {
+    if (!isTextChannel(logChannel)) {
+      this.container.logger.error('Pay: Could not fetch log channel');
+      return info;
+    } else if (!logChannel.isSendable()) {
       this.container.logger.error(
         'Pay: the bot does not have permission to send in the log channel',
       );

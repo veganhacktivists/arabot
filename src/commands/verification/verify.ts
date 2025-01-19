@@ -31,6 +31,8 @@ import {
   giveVerificationRoles,
 } from '#utils/verification';
 import { manualVerification } from '#utils/database/verification';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class VerifyCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -165,15 +167,12 @@ export class VerifyCommand extends Command {
       convinced: false,
     };
 
-    let member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
     // Checks if member is null
-    if (member === undefined) {
-      member = await guild.members.fetch(user.id).catch(() => undefined);
-      if (member === undefined) {
-        info.message = 'Failed to fetch member';
-        return info;
-      }
+    if (!isGuildMember(member)) {
+      info.message = 'Failed to fetch member';
+      return info;
     }
 
     if (member.roles.cache.hasAny(...IDs.roles.restrictions.restricted)) {
@@ -181,15 +180,12 @@ export class VerifyCommand extends Command {
       return info;
     }
 
-    let verifier = guild.members.cache.get(verifierId);
+    const verifier = await getGuildMember(verifierId, guild);
 
     // Checks if verifier is null
-    if (verifier === undefined) {
-      verifier = await guild.members.fetch(user.id).catch(() => undefined);
-      if (verifier === undefined) {
-        info.message = 'Failed to fetch verifier';
-        return info;
-      }
+    if (!isGuildMember(verifier)) {
+      info.message = 'Failed to fetch verifier';
+      return info;
     }
 
     const roleArgs = rolesString.split(' ');

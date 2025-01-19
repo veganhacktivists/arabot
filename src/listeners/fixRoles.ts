@@ -22,11 +22,12 @@
 
 import { Listener } from '@sapphire/framework';
 import { DurationFormatter } from '@sapphire/time-utilities';
-import { Client } from 'discord.js';
 import IDs from '#utils/ids';
 import { fetchRoles } from '#utils/database/dbExistingUser';
 import { checkActive } from '#utils/database/moderation/restriction';
 import { getUser } from '#utils/database/fun/xp';
+import { getGuild, getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class FixRolesOnReady extends Listener {
   public constructor(
@@ -45,13 +46,13 @@ export class FixRolesOnReady extends Listener {
     });
   }
 
-  public async run(client: Client) {
+  public async run() {
     this.container.logger.info(
       'FixRolesOnReady: Preparation before starting to fix the roles for each user...',
     );
 
     // Fetching the Guild
-    const guild = await client.guilds.fetch(IDs.guild).catch(() => undefined);
+    const guild = await getGuild(IDs.guild);
 
     if (guild === undefined) {
       this.container.logger.error('FixRolesOnReady: Could not find the server');
@@ -60,8 +61,8 @@ export class FixRolesOnReady extends Listener {
 
     // Fetching the channel for the logs
     // Leave the snowflake parameter empty for no logs
-    const logChannel = await client.channels.fetch('').catch(() => null);
-    const sendLogs = logChannel !== null;
+    const logChannel = await getTextBasedChannel('');
+    const sendLogs = isTextBasedChannel(logChannel);
 
     if (!sendLogs) {
       this.container.logger.error(

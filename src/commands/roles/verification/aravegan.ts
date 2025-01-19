@@ -21,6 +21,9 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Guild, User, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
+import { getGuildMember, getRole } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
+import { isRole } from '#utils/typeChecking';
 
 export class ARAVeganCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -92,12 +95,6 @@ export class ARAVeganCommand extends Command {
 
     const mod = message.author;
 
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply('Staff not found! Try again or contact a developer!');
-      return;
-    }
-
     const { guild } = message;
 
     if (guild === null) {
@@ -117,22 +114,22 @@ export class ARAVeganCommand extends Command {
       message: '',
       success: false,
     };
-    const member = guild.members.cache.get(user.id);
-    const modMember = guild.members.cache.get(mod.id);
-    const vegan = guild.roles.cache.get(IDs.roles.vegan.araVegan);
+    const member = await getGuildMember(user.id, guild);
+    const modMember = await getGuildMember(mod.id, guild);
+    const vegan = await getRole(IDs.roles.vegan.araVegan, guild);
 
     // Checks if user's GuildMember was found in cache
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Error fetching guild member for the user!';
       return info;
     }
 
-    if (modMember === undefined) {
+    if (!isGuildMember(modMember)) {
       info.message = "Error fetching the staff's guild member!";
       return info;
     }
 
-    if (vegan === undefined) {
+    if (!isRole(vegan)) {
       info.message = 'Error fetching vegan role from cache!';
       return info;
     }

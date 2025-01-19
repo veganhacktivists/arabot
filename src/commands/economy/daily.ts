@@ -30,6 +30,8 @@ import { updateUser } from '#utils/database/dbExistingUser';
 import { daily, getLastDaily } from '#utils/database/fun/economy';
 import { EmbedBuilder } from 'discord.js';
 import IDs from '#utils/ids';
+import { getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class DailyCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -114,9 +116,9 @@ export class DailyCommand extends Command {
       return info;
     }
 
-    const member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Could not find your guild member!';
       return info;
     }

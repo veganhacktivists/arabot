@@ -20,6 +20,7 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Message, MessageFlagsBitField } from 'discord.js';
 import { ChannelType, TextChannel } from 'discord.js';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class AnonymousCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -74,7 +75,7 @@ export class AnonymousCommand extends Command {
     }
 
     if (channel === null) {
-      if (interaction.channel === null) {
+      if (!isTextChannel(interaction.channel)) {
         await interaction.reply({
           content: 'Error getting the channel!',
           flags: MessageFlagsBitField.Flags.Ephemeral,

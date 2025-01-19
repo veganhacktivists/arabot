@@ -34,6 +34,12 @@ import {
   removeTempBan,
 } from '#utils/database/moderation/tempBan';
 import { addEmptyUser, addExistingUser } from '#utils/database/dbExistingUser';
+import { getGuildMember, getTextBasedChannel, getUser } from '#utils/fetcher';
+import {
+  isGuildMember,
+  isTextBasedChannel,
+} from '@sapphire/discord.js-utilities';
+import { isNullish } from '@sapphire/utilities';
 
 export class UnbanCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -123,10 +129,10 @@ export class UnbanCommand extends Command {
     };
 
     // Gets mod's GuildMember
-    const mod = guild.members.cache.get(modId);
+    const mod = await getGuildMember(modId, guild);
 
     // Checks if guildMember is null
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       info.message = 'Error fetching mod!';
       return info;
     }
@@ -134,14 +140,11 @@ export class UnbanCommand extends Command {
     // Check if mod is in database
     await addExistingUser(mod);
 
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
     if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
-      if (user === undefined) {
-        info.message = 'Could not fetch the user!';
-        return info;
-      }
+      info.message = 'Could not fetch the user!';
+      return info;
     }
 
     let dbBan = await checkBan(userId);
@@ -161,7 +164,7 @@ export class UnbanCommand extends Command {
       }
       let { reason } = ban;
 
-      if (reason === null || reason === undefined) {
+      if (isNullish(reason)) {
         reason = '';
       }
 
@@ -191,23 +194,14 @@ export class UnbanCommand extends Command {
     info.success = true;
 
     // Log unban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
+    let logChannel = await getTextBasedChannel(IDs.channels.logs.restricted);
 
-    if (logChannel === undefined) {
-      const fetchLogChannel = await guild.channels.fetch(
-        IDs.channels.logs.restricted,
-      );
+    if (!isTextBasedChannel(logChannel)) {
+      this.container.logger.error('Unban Error: Could not fetch log channel');
+      info.message = `${user} has been unbanned. This hasn't been logged in a text channel as log channel could not be found`;
 
-      if (fetchLogChannel === null || fetchLogChannel === undefined) {
-        this.container.logger.error('Unban Error: Could not fetch log channel');
-        info.message = `${user} has been unbanned. This hasn't been logged in a text channel as log channel could not be found`;
-
-        return info;
-      } else {
-        logChannel = fetchLogChannel;
-      }
+      return info;
     }
-
     if (!logChannel.isSendable()) {
       this.container.logger.error(
         'Unban: The bot does not have permission to send in the logs channel!',

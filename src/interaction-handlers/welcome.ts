@@ -21,14 +21,12 @@ import {
   InteractionHandler,
   InteractionHandlerTypes,
 } from '@sapphire/framework';
-import {
-  ButtonInteraction,
-  GuildMember,
-  MessageFlagsBitField,
-} from 'discord.js';
+import { ButtonInteraction, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { checkActive } from '#utils/database/moderation/restriction';
 import { addUser } from '#utils/database/dbExistingUser';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isGuildMember, isTextChannel } from '@sapphire/discord.js-utilities';
 
 export class WelcomeButtonHandler extends InteractionHandler {
   public constructor(
@@ -49,9 +47,7 @@ export class WelcomeButtonHandler extends InteractionHandler {
 
   public async run(interaction: ButtonInteraction) {
     const { member } = interaction;
-    let general = this.container.client.channels.cache.get(
-      IDs.channels.nonVegan.general,
-    );
+    const general = await getTextBasedChannel(IDs.channels.nonVegan.general);
 
     // Messages that are used multiple times
     const roleErrorMessage =
@@ -63,32 +59,21 @@ export class WelcomeButtonHandler extends InteractionHandler {
       'to be verified and gain access to more channels.';
 
     // Checks if general is not in the cache
-    if (general === undefined) {
-      // Sends an API request to get the channel
-      const generalFetch = await this.container.client.channels
-        .fetch(IDs.channels.nonVegan.general)
-        .catch(() => undefined);
+    if (!isTextChannel(general)) {
+      this.container.logger.error(
+        'WelcomeButtonHandler: Could not find and fetch the general channel!',
+      );
+      await interaction.reply({
+        content:
+          'Sorry there was a problem trying to give you access to the server. Please try again later.',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
 
-      // If general does not exist
-      if (generalFetch === null || generalFetch === undefined) {
-        this.container.logger.error(
-          'WelcomeButtonHandler: Could not find and fetch the general channel!',
-        );
-        await interaction.reply({
-          content:
-            'Sorry there was a problem trying to give you access to the server. Please try again later.',
-          flags: MessageFlagsBitField.Flags.Ephemeral,
-        });
-
-        return;
-      }
-
-      // Replace fetched version of general with the cached version
-      general = generalFetch;
+      return;
     }
 
     // If the member could not be found
-    if (!(member instanceof GuildMember)) {
+    if (!isGuildMember(member)) {
       await interaction.reply({
         content: roleErrorMessage,
         flags: MessageFlagsBitField.Flags.Ephemeral,

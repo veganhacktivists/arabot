@@ -21,6 +21,9 @@ import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Guild, User, Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
 import { roleAddLog, roleRemoveLog } from '#utils/logging/role';
+import { getGuildMember, getRole } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
+import { isRole } from '#utils/typeChecking';
 
 export class TrialModCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -91,14 +94,6 @@ export class TrialModCommand extends Command {
 
     const mod = message.author;
 
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply(
-        'Mod coordinator not found! Try again or contact a developer!',
-      );
-      return;
-    }
-
     const { guild } = message;
 
     if (guild === null) {
@@ -118,16 +113,16 @@ export class TrialModCommand extends Command {
       message: '',
       success: false,
     };
-    const member = guild.members.cache.get(user.id);
-    const moderator = guild.roles.cache.get(IDs.roles.staff.trialModerator);
+    const member = await getGuildMember(user.id, guild);
+    const moderator = await getRole(IDs.roles.staff.trialModerator, guild);
 
     // Checks if user's GuildMember was found in cache
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       info.message = 'Error fetching guild member for the user!';
       return info;
     }
 
-    if (moderator === undefined) {
+    if (!isRole(moderator)) {
       info.message = 'Error fetching the trial moderator role from cache!';
       return info;
     }

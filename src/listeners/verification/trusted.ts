@@ -21,6 +21,8 @@ import { Listener } from '@sapphire/framework';
 import { GuildMember } from 'discord.js';
 import IDs from '#utils/ids';
 import { noModHistory, userPreviouslyHadRole } from '#utils/database/memberMod';
+import { getRole } from '#utils/fetcher';
+import { isRole } from '#utils/typeChecking';
 
 /**
  * Gives the trusted role to users who have levelled up to level 5
@@ -51,9 +53,9 @@ export class TrustedListener extends Listener {
     }
 
     const { guild } = member;
-    const trusted = guild.roles.cache.get(IDs.roles.trusted);
+    const trusted = await getRole(IDs.roles.trusted, guild);
 
-    if (trusted === undefined) {
+    if (!isRole(trusted)) {
       this.container.logger.error(
         'TrustedXP Listener: the Trusted role could not be found in the guild.',
       );

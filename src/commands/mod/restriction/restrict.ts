@@ -40,6 +40,11 @@ import {
 import { restrict, checkActive } from '#utils/database/moderation/restriction';
 import { randint } from '#utils/maths';
 import { blockedRolesAfterRestricted } from '#utils/blockedRoles';
+import { getGuildMember, getTextBasedChannel, getUser } from '#utils/fetcher';
+import {
+  isGuildMember,
+  isTextBasedChannel,
+} from '@sapphire/discord.js-utilities';
 
 export async function restrictRun(
   userId: Snowflake,
@@ -53,21 +58,18 @@ export async function restrictRun(
     success: false,
   };
 
-  let user = guild.client.users.cache.get(userId);
+  const user = await getUser(userId);
 
   if (user === undefined) {
-    user = await guild.client.users.fetch(userId).catch(() => undefined);
-    if (user === undefined) {
-      info.message = 'Error fetching user';
-      return info;
-    }
+    info.message = 'Error fetching user';
+    return info;
   }
 
   // Gets mod's GuildMember
-  const mod = guild.members.cache.get(modId);
+  const mod = await getGuildMember(modId, guild);
 
   // Checks if guildMember is null
-  if (mod === undefined) {
+  if (!isGuildMember(mod)) {
     info.message = 'Error fetching mod';
     return info;
   }
@@ -81,17 +83,13 @@ export async function restrictRun(
   }
 
   // Gets guildMember
-  let member = guild.members.cache.get(userId);
-
-  if (member === undefined) {
-    member = await guild.members.fetch(userId).catch(() => undefined);
-  }
+  const member = await getGuildMember(userId, guild);
 
   const restrictRoles = IDs.roles.restrictions.restricted;
 
   let section = tolerance ? randint(3, 4) : randint(1, 2);
 
-  if (member !== undefined) {
+  if (isGuildMember(member)) {
     // Checks if the user is not restricted
     if (member.roles.cache.hasAny(...restrictRoles)) {
       info.message = `${member} is already restricted!`;
@@ -219,7 +217,7 @@ export async function restrictRun(
     }
   }
 
-  if (member !== undefined && member.voice.channelId !== null) {
+  if (isGuildMember(member) && member.voice.channelId !== null) {
     await member.voice.disconnect();
   }
 
@@ -243,23 +241,14 @@ export async function restrictRun(
   await user.send({ embeds: [dmEmbed] }).catch(() => {});
 
   // Log the ban
-  let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
+  const logChannel = await getTextBasedChannel(IDs.channels.logs.restricted);
 
-  if (logChannel === undefined) {
-    const fetchLogChannel = await guild.channels.fetch(
-      IDs.channels.logs.restricted,
-    );
-    if (fetchLogChannel === null || fetchLogChannel === undefined) {
-      container.logger.error('Restrict: Could not fetch log channel');
-      info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
+  if (!isTextBasedChannel(logChannel)) {
+    container.logger.error('Restrict: Could not fetch log channel');
+    info.message = `Restricted ${user} but could not find the log channel. This has been logged to the database.`;
 
-      return info;
-    } else {
-      logChannel = fetchLogChannel;
-    }
-  }
-
-  if (!logChannel.isSendable()) {
+    return info;
+  } else if (!logChannel.isSendable()) {
     container.logger.error(
       'Restrict: The bot does not have permission to send in the logs channel!',
     );

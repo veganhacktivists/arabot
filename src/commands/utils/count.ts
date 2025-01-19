@@ -20,6 +20,8 @@
 import { Command, RegisterBehavior } from '@sapphire/framework';
 import { Message, MessageFlagsBitField } from 'discord.js';
 import IDs from '#utils/ids';
+import { getRole } from '#utils/fetcher';
+import { isRole } from '#utils/typeChecking';
 
 export class RenameUserCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -55,10 +57,10 @@ export class RenameUserCommand extends Command {
 
     await guild.members.fetch();
 
-    const vegan = guild.roles.cache.get(IDs.roles.vegan.vegan);
-    const notVegan = guild.roles.cache.get(IDs.roles.nonvegan.nonvegan);
+    const vegan = await getRole(IDs.roles.vegan.vegan, guild);
+    const notVegan = await getRole(IDs.roles.nonvegan.nonvegan, guild);
 
-    if (vegan === undefined || notVegan === undefined) {
+    if (!isRole(vegan) || !isRole(notVegan)) {
       await interaction.reply({
         content: 'Error fetching roles!',
         flags: MessageFlagsBitField.Flags.Ephemeral,

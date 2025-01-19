@@ -29,6 +29,9 @@ import {
 import { updateUser } from '#utils/database/dbExistingUser';
 import { addWarn } from '#utils/database/moderation/warnings';
 import IDs from '#utils/ids';
+import { getGuildMember, getTextBasedChannel, getUser } from '#utils/fetcher';
+import { isGuildMember, isTextChannel } from '@sapphire/discord.js-utilities';
+import { isUser } from '#utils/typeChecking';
 
 export class WarnCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -104,19 +107,11 @@ export class WarnCommand extends Command {
       return;
     }
     const reason = args.finished ? null : await args.rest('string');
-    const mod = message.member;
+    const mod = message.author;
 
     if (reason === null) {
       await message.react('❌');
       await message.reply('Warn reason was not provided!');
-      return;
-    }
-
-    if (mod === null) {
-      await message.react('❌');
-      await message.reply(
-        'Moderator not found! Try again or contact a developer!',
-      );
       return;
     }
 
@@ -150,10 +145,10 @@ export class WarnCommand extends Command {
     };
 
     // Gets mod's GuildMember
-    const mod = guild.members.cache.get(modId);
+    const mod = await getGuildMember(modId, guild);
 
     // Checks if guildMember is null
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       info.message = 'Error fetching mod!';
       return info;
     }
@@ -162,14 +157,11 @@ export class WarnCommand extends Command {
     await updateUser(mod);
 
     // Gets User for person being restricted
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
-      if (user === undefined) {
-        info.message = 'Error fetching user';
-        return info;
-      }
+    if (!isUser(user)) {
+      info.message = 'Error fetching user';
+      return info;
     }
 
     await addWarn(userId, modId, reason);
@@ -191,24 +183,14 @@ export class WarnCommand extends Command {
     await user.send({ embeds: [dmEmbed] }).catch(() => {});
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.sus);
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.sus);
 
-    if (logChannel === undefined) {
-      const fetchLogChannel = await guild.channels
-        .fetch(IDs.channels.logs.sus)
-        .catch(() => undefined);
+    if (!isTextChannel(logChannel)) {
+      this.container.logger.error('Warn: Could not fetch log channel');
+      info.message = `Warned ${user} but could not find the log channel. This has been logged to the database.`;
 
-      if (fetchLogChannel === null || fetchLogChannel === undefined) {
-        this.container.logger.error('Warn: Could not fetch log channel');
-        info.message = `Warned ${user} but could not find the log channel. This has been logged to the database.`;
-
-        return info;
-      } else {
-        logChannel = fetchLogChannel;
-      }
-    }
-
-    if (!logChannel.isSendable()) {
+      return info;
+    } else if (!logChannel.isSendable()) {
       this.container.logger.error(
         'Warn: The bot does not have permission to send in the logs channel!',
       );

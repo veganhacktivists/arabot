@@ -18,11 +18,14 @@
 */
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
-import { ChannelType, EmbedBuilder, MessageFlagsBitField } from 'discord.js';
-import type { Message, TextChannel, Guild, Snowflake } from 'discord.js';
+import { EmbedBuilder, MessageFlagsBitField } from 'discord.js';
+import type { Message, Guild, Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
 import { getRestrictions } from '#utils/database/moderation/restriction';
 import { checkStaff } from '#utils/checker';
+import { isUser } from '#utils/typeChecking';
+import { isGuildMember, isTextChannel } from '@sapphire/discord.js-utilities';
+import { getGuildMember, getUser } from '#utils/fetcher';
 
 export class RestrictLogsCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -56,7 +59,7 @@ export class RestrictLogsCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user');
-    let { channel } = interaction;
+    const { channel } = interaction;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
@@ -71,26 +74,28 @@ export class RestrictLogsCommand extends Command {
 
     let userId: Snowflake | null = null;
 
-    if (user !== undefined && user !== null) {
+    if (isUser(user)) {
       userId = user.id;
     }
 
     const staffChannel = checkStaff(channel);
     if (staffChannel) {
-      channel = channel as TextChannel;
-
+      // Checking Channel topic for Snowflake
       if (userId === null) {
         let topic: string[];
 
-        if (channel.parentId === IDs.categories.modMail) {
+        if (
+          isTextChannel(channel) &&
+          channel.parentId === IDs.categories.modMail &&
+          channel.topic !== null
+        ) {
           // Checks if the channel topic has the user's snowflake
-          if (channel.topic !== null) {
-            topic = channel.topic.split(' ');
-            userId = topic[2];
-          }
+          topic = channel.topic.split(' ');
+          userId = topic[2];
         }
       }
 
+      // If no Snowflake was provided/found
       if (userId === null) {
         await interaction.reply({
           content: 'User could not be found or was not provided!',
@@ -130,10 +135,11 @@ export class RestrictLogsCommand extends Command {
       return;
     }
 
+    // Attempting to get the user's Snowflake from the channel topic.
     if (userId === null) {
       const { channel } = message;
 
-      if (channel.type !== ChannelType.GuildText) {
+      if (!isTextChannel(channel)) {
         await message.react('❌');
         await message.reply('User was not provided!');
         return;
@@ -141,13 +147,13 @@ export class RestrictLogsCommand extends Command {
 
       let topic: string[];
 
-      if (channel.parentId === IDs.categories.modMail) {
-        // Checks if the channel topic has the user's snowflake
-        if (channel.topic !== null) {
-          topic = channel.topic.split(' ');
-          // eslint-disable-next-line prefer-destructuring
-          userId = topic[2];
-        }
+      // Checks if the channel topic has the user's snowflake
+      if (
+        channel.parentId === IDs.categories.modMail &&
+        channel.topic !== null
+      ) {
+        topic = channel.topic.split(' ');
+        userId = topic[2];
       }
     }
 
@@ -172,14 +178,12 @@ export class RestrictLogsCommand extends Command {
       success: false,
     };
 
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId).catch(() => undefined);
-      if (user === undefined) {
-        info.message = 'Error fetching user';
-        return info;
-      }
+    if (!isUser(user)) {
+      info.message =
+        'Error fetching user. (You probably provided an incorrect user.)';
+      return info;
     }
 
     const restrictions = await getRestrictions(userId);
@@ -204,14 +208,15 @@ export class RestrictLogsCommand extends Command {
     ) {
       // Get mod names
       let restMod = restrictions[i].modId;
-      const restModMember = guild.members.cache.get(restMod);
-      if (restModMember !== undefined) {
+      const restModMember = await getGuildMember(restMod, guild);
+      if (isGuildMember(restModMember)) {
         restMod = restModMember.displayName;
       }
+
       let endRestMod = restrictions[i].endModId;
       if (endRestMod !== null) {
-        const endRestModMember = guild.members.cache.get(endRestMod);
-        if (endRestModMember !== undefined) {
+        const endRestModMember = await getGuildMember(endRestMod, guild);
+        if (isGuildMember(endRestModMember)) {
           endRestMod = endRestModMember.displayName;
         }
       }

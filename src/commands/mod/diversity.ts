@@ -22,14 +22,20 @@
 import { Args, container, RegisterBehavior } from '@sapphire/framework';
 import { Subcommand } from '@sapphire/plugin-subcommands';
 import {
-  ChannelType,
   GuildMember,
   Message,
   MessageFlagsBitField,
   PermissionsBitField,
 } from 'discord.js';
-import type { TextChannel, Snowflake } from 'discord.js';
+import type { Snowflake } from 'discord.js';
 import IDs from '#utils/ids';
+import { getGuildMember, getRole, getTextBasedChannel } from '#utils/fetcher';
+import {
+  isGuildMember,
+  isTextChannel,
+  isThreadChannel,
+} from '@sapphire/discord.js-utilities';
+import { isRole } from '#utils/typeChecking';
 
 export class DiversityCommand extends Subcommand {
   public constructor(
@@ -90,30 +96,11 @@ export class DiversityCommand extends Subcommand {
 
   // Command run
   public async toggleOpen(interaction: Subcommand.ChatInputCommandInteraction) {
-    // Check if guild is not null
-    if (interaction.guild === null) {
-      await interaction.reply({
-        content: 'Guild not found!',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-        withResponse: true,
-      });
-      return;
-    }
-
     // Get the channel
-    const channel = interaction.guild.channels.cache.get(interaction.channelId);
-    // Check if channel is not undefined
-    if (channel === undefined) {
-      await interaction.reply({
-        content: 'Channel not found!',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-        withResponse: true,
-      });
-      return;
-    }
+    const channel = await getTextBasedChannel(interaction.channelId);
 
     // Check if channel is text
-    if (channel.type !== ChannelType.GuildText) {
+    if (!isTextChannel(channel)) {
       await interaction.reply({
         content: 'Channel is not a text channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -121,9 +108,6 @@ export class DiversityCommand extends Subcommand {
       });
       return;
     }
-
-    // Converts GuildBasedChannel to TextChannel
-    const channelText = channel as TextChannel;
 
     // Check if the command was run in the diversity section
     if (channel.parentId !== IDs.categories.diversity) {
@@ -141,7 +125,7 @@ export class DiversityCommand extends Subcommand {
       .has([PermissionsBitField.Flags.SendMessages]);
 
     // Toggle send message in channel
-    await channelText.permissionOverwrites.edit(IDs.roles.vegan.vegan, {
+    await channel.permissionOverwrites.edit(IDs.roles.vegan.vegan, {
       SendMessages: !open,
     });
 
@@ -156,28 +140,46 @@ export class DiversityCommand extends Subcommand {
   ) {
     // TODO add database updates
     // Get the arguments
-    const user = interaction.options.getUser('user');
+    const user = interaction.options.getUser('user', true);
     const mod = interaction.member;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
-    if (user === null || guild === null || mod === null) {
+    if (guild === null) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching the guild!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
         withResponse: true,
       });
       return;
     }
 
-    // Gets guildMember whilst removing the ability of each other variables being null
-    const guildMember = guild.members.cache.get(user.id);
-    const diversity = guild.roles.cache.get(IDs.roles.staff.diversity);
-
-    // Checks if guildMember is null
-    if (guildMember === undefined || diversity === undefined) {
+    if (!isGuildMember(mod)) {
       await interaction.reply({
-        content: 'Error fetching user!',
+        content: 'Error fetching your user!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
+      });
+      return;
+    }
+
+    const member = await getGuildMember(user.id, guild);
+    const diversity = await getRole(IDs.roles.staff.diversity, guild);
+
+    // Checks if the member was found
+    if (!isGuildMember(member)) {
+      await interaction.reply({
+        content: 'Error fetching the user!',
+        flags: MessageFlagsBitField.Flags.Ephemeral,
+        withResponse: true,
+      });
+      return;
+    }
+
+    // Checks if the role was found
+    if (!isRole(diversity)) {
+      await interaction.reply({
+        content: 'Error fetching the diversity role!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
         withResponse: true,
       });
@@ -185,10 +187,10 @@ export class DiversityCommand extends Subcommand {
     }
 
     // Checks if the user has Diversity and to give them or remove them based on if they have it
-    if (guildMember.roles.cache.has(IDs.roles.staff.diversity)) {
+    if (member.roles.cache.has(IDs.roles.staff.diversity)) {
       // Remove the Diversity role from the user
-      await guildMember.roles.remove(diversity);
-      await this.threadManager(guildMember.id, false);
+      await member.roles.remove(diversity);
+      await this.threadManager(member.id, false);
       await interaction.reply({
         content: `Removed the ${diversity.name} role from ${user}`,
         withResponse: true,
@@ -196,8 +198,8 @@ export class DiversityCommand extends Subcommand {
       return;
     }
     // Add Diversity Team role to the user
-    await guildMember.roles.add(diversity);
-    await this.threadManager(guildMember.id, true);
+    await member.roles.add(diversity);
+    await this.threadManager(member.id, true);
     await interaction.reply({
       content: `Gave ${user} the ${diversity.name} role!`,
       withResponse: true,
@@ -220,7 +222,7 @@ export class DiversityCommand extends Subcommand {
 
     const mod = message.member;
 
-    if (mod === null) {
+    if (!isGuildMember(mod)) {
       await message.react('❌');
       await message.reply(
         'Diversity coordinator not found! Try again or contact a developer!',
@@ -236,9 +238,9 @@ export class DiversityCommand extends Subcommand {
       return;
     }
 
-    const diversity = guild.roles.cache.get(IDs.roles.staff.diversity);
+    const diversity = await getRole(IDs.roles.staff.diversity, guild);
 
-    if (diversity === undefined) {
+    if (!isRole(diversity)) {
       await message.react('❌');
       await message.reply('Role not found! Try again or contact a developer!');
       return;
@@ -271,11 +273,8 @@ export class DiversityCommand extends Subcommand {
     const thread = await container.client.channels.fetch(
       IDs.channels.diversity.diversity,
     );
-    if (thread === null) {
-      return;
-    }
 
-    if (!thread.isThread()) {
+    if (!isThreadChannel(thread)) {
       return;
     }
 

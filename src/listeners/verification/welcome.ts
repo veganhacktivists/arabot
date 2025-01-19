@@ -20,8 +20,9 @@
 import { Listener } from '@sapphire/framework';
 import { ButtonStyle, ActionRowBuilder, ButtonBuilder } from 'discord.js';
 
-import type { Client, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class VerificationReady extends Listener {
   public constructor(
@@ -35,19 +36,13 @@ export class VerificationReady extends Listener {
     });
   }
 
-  public async run(client: Client) {
+  public async run() {
     // Get verification category
-    let welcome = client.channels.cache.get(IDs.channels.welcome) as
-      | TextChannel
-      | undefined;
-    if (welcome === undefined) {
-      welcome = (await client.channels.fetch(IDs.channels.welcome)) as
-        | TextChannel
-        | undefined;
-      if (welcome === undefined) {
-        this.container.logger.error('verifyStart: Welcome not found');
-        return;
-      }
+    const welcome = await getTextBasedChannel(IDs.channels.welcome);
+
+    if (!isTextBasedChannel(welcome)) {
+      this.container.logger.error('verifyStart: Welcome not found');
+      return;
     }
 
     const botId = this.container.client.id;

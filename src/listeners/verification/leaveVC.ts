@@ -18,13 +18,8 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import type {
-  VoiceState,
-  CategoryChannel,
-  VoiceChannel,
-  TextChannel,
-} from 'discord.js';
-import { time, ChannelType } from 'discord.js';
+import type { VoiceState } from 'discord.js';
+import { time } from 'discord.js';
 import { createVerificationVoice } from '#utils/verification';
 import { maxVCs, leaveBan } from '#utils/verificationConfig';
 import {
@@ -35,6 +30,13 @@ import {
 import { fetchRoles } from '#utils/database/dbExistingUser';
 import { fibonacci } from '#utils/maths';
 import IDs from '#utils/ids';
+import {
+  isCategoryChannel,
+  isGuildMember,
+  isTextChannel,
+  isVoiceChannel,
+} from '@sapphire/discord.js-utilities';
+import { getCategoryChannel, getGuildMember } from '#utils/fetcher';
 
 export class VerificationLeaveVCListener extends Listener {
   public constructor(
@@ -63,46 +65,44 @@ export class VerificationLeaveVCListener extends Listener {
     const { channel } = oldState;
     const { guild } = newState;
 
-    if (channel === null || guild === undefined) {
+    if (!isVoiceChannel(channel) || guild === undefined) {
       this.container.logger.error('Verification channel not found');
       return;
     }
 
     // Get the category
-    const categoryGuild = guild.channels.cache.get(IDs.categories.verification);
-    if (categoryGuild === null) {
+    const category = await getCategoryChannel(IDs.categories.verification);
+    if (!isCategoryChannel(category)) {
       this.container.logger.error('Verification channel not found');
       return;
     }
-    const category = categoryGuild as CategoryChannel;
 
     // Get the user that was being verified
     const userSnowflake = await getUser(channel.id);
     if (userSnowflake === null) {
       verifier = true;
-    }
-
-    // Allow more people to join VC if there are less than 10 VCs
-
-    if (!verifier) {
-      const user = guild.members.cache.get(userSnowflake!);
+    } else {
+      // Allow more people to join VC if there are less than 10 VCs
+      const member = await getGuildMember(userSnowflake, guild);
 
       // Remove verify as vegan and give non vegan role
-      if (!(await checkFinish(channel.id)) && user !== undefined) {
+      if (!(await checkFinish(channel.id)) && isGuildMember(member)) {
         // Get roles to give back to the user
-        const roles = await fetchRoles(user.id);
+        const roles = await fetchRoles(member.id);
         roles.push(IDs.roles.verifyBlock);
-        await user.roles
+
+        await member.roles
           .add(roles)
           .catch(() =>
             this.container.logger.error(
               'Verification: User left but bot still tried to add roles',
             ),
           );
+
         // Create timeout block for user
         // Counts the recent times they have incomplete verifications
         const incompleteCount =
-          (await countIncomplete(user.id)) % (leaveBan + 1);
+          (await countIncomplete(member.id)) % (leaveBan + 1);
         // Creates the length of the time for the ban
         const banLength = fibonacci(incompleteCount) * 3600_000;
 
@@ -110,14 +110,14 @@ export class VerificationLeaveVCListener extends Listener {
           {
             name: 'verifyUnblock',
             payload: {
-              userId: user.id,
+              userId: member.id,
               guildId: guild.id,
             },
           },
           banLength,
         );
 
-        await user.user
+        await member.user
           .send(
             'You have been timed out as a verifier had not joined for 15 minutes or you disconnected from verification.\n\n' +
               `You can verify again at: ${time(
@@ -129,8 +129,8 @@ export class VerificationLeaveVCListener extends Listener {
     }
 
     // Check how many voice channels there are
-    const listVoiceChannels = category.children.cache.filter(
-      (c) => c.type === ChannelType.GuildVoice,
+    const listVoiceChannels = category.children.cache.filter((channel) =>
+      isVoiceChannel(channel),
     );
 
     // Check that it is not deleting the 'Verification' channel (in case bot crashes)
@@ -142,19 +142,22 @@ export class VerificationLeaveVCListener extends Listener {
     // Delete text channel
     if (!verifier) {
       // Gets a list of all the text channels in the verification category
-      const listTextChannels = category.children.cache.filter(
-        (c) => c.type === ChannelType.GuildText,
+      const listTextChannels = category.children.cache.filter((channel) =>
+        isTextChannel(channel),
       );
-      listTextChannels.forEach((c) => {
-        const textChannel = c as TextChannel;
-        // Checks if the channel topic has the user's snowflake
-        if (
-          textChannel.topic !== null &&
-          textChannel.topic.includes(userSnowflake!)
-        ) {
-          textChannel.delete();
+
+      for (const c of listTextChannels) {
+        const channel = c[1];
+
+        if (!isTextChannel(channel)) {
+          continue;
         }
-      });
+
+        // Checks if the channel topic has the user's snowflake
+        if (channel.topic !== null && channel.topic.includes(userSnowflake!)) {
+          await channel.delete();
+        }
+      }
     }
 
     // If there are no VCs left in verification after having the channel deleted
@@ -168,9 +171,9 @@ export class VerificationLeaveVCListener extends Listener {
       return;
     }
 
-    const verification = listVoiceChannels.last() as VoiceChannel | undefined;
+    const verification = listVoiceChannels.last();
 
-    if (verification === undefined) {
+    if (!isVoiceChannel(verification)) {
       this.container.logger.error(
         'Verification: Verification channel not found.',
       );

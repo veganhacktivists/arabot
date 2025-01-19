@@ -19,6 +19,8 @@
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
 import IDs from '#utils/ids';
+import { getGuild, getGuildMember } from '#utils/fetcher';
+import { isGuildMember } from '@sapphire/discord.js-utilities';
 
 export class VerifyUnblock extends ScheduledTask {
   public constructor(
@@ -30,29 +32,23 @@ export class VerifyUnblock extends ScheduledTask {
 
   public async run(payload: { userId: string; guildId: string }) {
     // Get the guild where the user is in
-    let guild = this.container.client.guilds.cache.get(payload.guildId);
+    const guild = await getGuild(payload.guildId);
+
     if (guild === undefined) {
-      guild = await this.container.client.guilds
-        .fetch(payload.guildId)
-        .catch(() => undefined);
-      if (guild === undefined) {
-        this.container.logger.error('verifyUnblock: Guild not found!');
-        return;
-      }
+      this.container.logger.error('verifyUnblock: Guild not found!');
+      return;
     }
 
     // Find GuildMember for the user
-    let user = guild.members.cache.get(payload.userId);
-    if (user === undefined) {
-      user = await guild.members.fetch(payload.userId).catch(() => undefined);
-      if (user === undefined) {
-        this.container.logger.error('verifyUnblock: GuildMember not found!');
-        return;
-      }
+    const member = await getGuildMember(payload.userId, guild);
+
+    if (!isGuildMember(member)) {
+      this.container.logger.error('verifyUnblock: GuildMember not found!');
+      return;
     }
 
     // Remove the 'verify block' role
-    await user.roles.remove(IDs.roles.verifyBlock);
+    await member.roles.remove(IDs.roles.verifyBlock);
   }
 }
 

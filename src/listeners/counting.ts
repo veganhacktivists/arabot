@@ -44,19 +44,22 @@ export class XpListener extends Listener {
       return;
     }
 
+    if (!message.channel.isSendable()) {
+      this.container.logger.error(
+        'Counting: The bot does not have permission to send messages in the counting chat!',
+      );
+      return;
+    }
+
     let lastCount = await getLastCount();
 
     // If no counts exist on the database, then create the first count from the bot
     if (lastCount === null) {
       if (this.container.client.id === null) {
-        if (!message.channel.isSendable()) {
-          // TODO manage logging/errors properly
-          return;
-        }
-
         message.channel.send(
           'An unexpected error occurred trying to set up the counting channel, please contact a developer!',
         );
+
         return;
       }
 
@@ -68,14 +71,10 @@ export class XpListener extends Listener {
 
       lastCount = await getLastCount();
       if (lastCount === null) {
-        if (!message.channel.isSendable()) {
-          // TODO manage logging/errors properly
-          return;
-        }
-
         message.channel.send(
           'An unexpected error occurred, please contact a developer!',
         );
+
         return;
       }
     }

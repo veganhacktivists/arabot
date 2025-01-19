@@ -41,6 +41,11 @@ import {
 } from '#utils/database/outreach';
 import IDs from '#utils/ids';
 import { EmbedBuilder } from 'discord.js';
+import {
+  isGuildMember,
+  isTextBasedChannel,
+} from '@sapphire/discord.js-utilities';
+import { getGuildMember, getTextBasedChannel } from '#utils/fetcher';
 
 export class OutreachCommand extends Subcommand {
   public constructor(
@@ -189,7 +194,7 @@ export class OutreachCommand extends Subcommand {
     interaction: Subcommand.ChatInputCommandInteraction,
   ) {
     // const start = interaction.options.getBoolean('start');
-    const modUser = interaction.user;
+    const mod = interaction.member;
     const { guild } = interaction;
 
     if (guild === null) {
@@ -200,9 +205,7 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    const mod = guild.members.cache.get(modUser.id);
-
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       await interaction.reply({
         content: 'Outreach Leader was not found!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -228,7 +231,7 @@ export class OutreachCommand extends Subcommand {
 
     await updateUser(mod);
 
-    await createEvent(modUser.id);
+    await createEvent(mod.id);
 
     await interaction.reply({
       content: 'Created the event!',
@@ -237,7 +240,7 @@ export class OutreachCommand extends Subcommand {
   }
 
   public async eventEnd(interaction: Subcommand.ChatInputCommandInteraction) {
-    const modUser = interaction.user;
+    const mod = interaction.member;
     const { guild } = interaction;
 
     if (guild === null) {
@@ -248,9 +251,7 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    const mod = guild.members.cache.get(modUser.id);
-
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       await interaction.reply({
         content: 'Your guild member was not found!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -306,9 +307,9 @@ export class OutreachCommand extends Subcommand {
       educated += group.educated;
     });
 
-    const activist = guild.channels.cache.get(IDs.channels.activism.activism);
+    const activist = await getTextBasedChannel(IDs.channels.activism.activism);
 
-    if (activist === undefined || !activist.isTextBased()) {
+    if (!isTextBasedChannel(activist)) {
       await interaction.editReply(
         'Event has now ended, but could not post statistics!',
       );
@@ -386,9 +387,9 @@ export class OutreachCommand extends Subcommand {
     const statGroups = await getStatGroups(event.id);
     const groupNo = statGroups.length + 1;
 
-    const leaderMember = await guild.members.cache.get(leader.id);
+    const leaderMember = await getGuildMember(leader.id, guild);
 
-    if (leaderMember === undefined) {
+    if (!isGuildMember(leaderMember)) {
       await interaction.editReply({
         content: `Could not find ${leader}'s guild member.`,
       });
@@ -465,13 +466,20 @@ export class OutreachCommand extends Subcommand {
   public async groupAdd(interaction: Subcommand.ChatInputCommandInteraction) {
     const user = interaction.options.getUser('user', true);
     const group = interaction.options.getRole('group');
-    const leader = interaction.user;
+    const leader = interaction.member;
     const { guild } = interaction;
 
     if (guild === null) {
       await interaction.reply({
         content: 'Could not find guild!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
+      });
+      return;
+    }
+
+    if (!isGuildMember(leader)) {
+      await interaction.editReply({
+        content: 'Could not find your GuildMember!',
       });
       return;
     }
@@ -494,18 +502,9 @@ export class OutreachCommand extends Subcommand {
         return;
       }
 
-      const leaderMember = guild.members.cache.get(leader.id);
-
-      if (leaderMember === undefined) {
-        await interaction.editReply({
-          content: 'Could not find your GuildMember in cache!',
-        });
-        return;
-      }
-
       if (
         leader.id !== stat.stat.leaderId &&
-        !leaderMember.roles.cache.has(IDs.roles.staff.outreachLeader)
+        !leader.roles.cache.has(IDs.roles.staff.outreachLeader)
       ) {
         await interaction.editReply({
           content: `You are not the leader for ${group}`,
@@ -537,9 +536,9 @@ export class OutreachCommand extends Subcommand {
       return;
     }
 
-    const member = guild.members.cache.get(user.id);
+    const member = await getGuildMember(user.id, guild);
 
-    if (member === undefined) {
+    if (!isGuildMember(member)) {
       await interaction.editReply({
         content: 'Could not fetch the member!',
       });
@@ -578,14 +577,6 @@ export class OutreachCommand extends Subcommand {
       documentary: documentary !== null ? documentary : 0,
       educated: educated !== null ? educated : 0,
     };
-
-    if (leader === null) {
-      await interaction.reply({
-        content: 'Could not find your user!',
-        flags: MessageFlagsBitField.Flags.Ephemeral,
-      });
-      return;
-    }
 
     await interaction.deferReply({
       flags: MessageFlagsBitField.Flags.Ephemeral,

@@ -19,6 +19,7 @@
 
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Message, MessageFlagsBitField } from 'discord.js';
+import { isGuildBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class ClearCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -57,7 +58,7 @@ export class ClearCommand extends Command {
     const messages = interaction.options.getInteger('messages', true);
     const { channel } = interaction;
 
-    if (channel === null || channel.isDMBased()) {
+    if (!isGuildBasedChannel(channel)) {
       await interaction.reply({
         content: 'Could not fetch channel!',
         flags: MessageFlagsBitField.Flags.Ephemeral,
@@ -92,7 +93,7 @@ export class ClearCommand extends Command {
 
     const { channel } = message;
 
-    if (!channel.isTextBased() || channel.isDMBased()) {
+    if (!isGuildBasedChannel(channel)) {
       await message.react('❌');
       await message.reply('Unsupported channel type!');
       return;

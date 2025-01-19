@@ -18,9 +18,9 @@
 */
 
 import { ScheduledTask } from '@sapphire/plugin-scheduled-tasks';
-import { container } from '@sapphire/framework';
-import type { TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class DiversityMonMessageTask extends ScheduledTask {
   public constructor(
@@ -34,8 +34,6 @@ export class DiversityMonMessageTask extends ScheduledTask {
   }
 
   public async run() {
-    const { client } = container;
-
     const message =
       '**📌 Diversity Section Code of Conduct**\n\n' +
       '❤️  Be *Kind*\n' +
@@ -47,12 +45,16 @@ export class DiversityMonMessageTask extends ScheduledTask {
       '❤️  Respect the creativity of others.\n' +
       '🧡  Actively seek to include others, especially moderators, in heated discourse for the purpose of de-escalation.';
 
-    const lgbtqia = client.channels.cache.get(
-      IDs.channels.diversity.lgbtqia,
-    ) as TextChannel;
-    const potgm = client.channels.cache.get(
-      IDs.channels.diversity.potgm,
-    ) as TextChannel;
+    const lgbtqia = await getTextBasedChannel(IDs.channels.diversity.lgbtqia);
+    const potgm = await getTextBasedChannel(IDs.channels.diversity.potgm);
+
+    if (!isTextBasedChannel(lgbtqia) || !isTextBasedChannel(potgm)) {
+      this.container.logger.error(
+        'Diversity Monday: The bot could not find both of the channels!',
+      );
+
+      return;
+    }
 
     await lgbtqia.send(message);
     await potgm.send(message);

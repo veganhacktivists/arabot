@@ -23,6 +23,8 @@
 import { Listener } from '@sapphire/framework';
 import type { Client } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class ReadyListener extends Listener {
   public constructor(
@@ -40,9 +42,9 @@ export class ReadyListener extends Listener {
     const { username, id } = client.user!;
     this.container.logger.info(`Successfully logged in as ${username} (${id})`);
 
-    const botLogChannel = await client.channels.fetch(IDs.channels.logs.bot);
+    const botLogChannel = await getTextBasedChannel(IDs.channels.logs.bot);
 
-    if (botLogChannel === null) {
+    if (!isTextBasedChannel(botLogChannel)) {
       this.container.logger.error(
         'ReadyListener: Could not find the channel for bot logs.',
       );

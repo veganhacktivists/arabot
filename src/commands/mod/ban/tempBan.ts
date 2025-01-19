@@ -24,6 +24,12 @@ import { EmbedBuilder, Message } from 'discord.js';
 import IDs from '#utils/ids';
 import { addTempBan, checkTempBan } from '#utils/database/moderation/tempBan';
 import { addEmptyUser, updateUser } from '#utils/database/dbExistingUser';
+import { getGuildMember, getTextBasedChannel, getUser } from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
+import {
+  isGuildMember,
+  isTextBasedChannel,
+} from '@sapphire/discord.js-utilities';
 
 export class TempBanCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -203,17 +209,19 @@ export class TempBanCommand extends Command {
 
     const banLength = new DurationFormatter().format(time.offset);
 
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = (await guild.client.users.fetch(userId)) as User;
+    if (!isUser(user)) {
+      info.message =
+        'The user does not exist! (The user provided is probably wrong, or their account has been deleted.)';
+      return info;
     }
 
     // Gets mod's GuildMember
-    const mod = guild.members.cache.get(modId);
+    const mod = await getGuildMember(modId, guild);
 
     // Checks if guildMember is null
-    if (mod === undefined) {
+    if (!isGuildMember(mod)) {
       info.message = 'Error fetching mod!';
       return info;
     }
@@ -227,13 +235,9 @@ export class TempBanCommand extends Command {
     await updateUser(mod);
 
     // Gets guildMember
-    let member = guild.members.cache.get(userId);
+    const member = await getGuildMember(userId, guild);
 
-    if (member === undefined) {
-      member = await guild.members.fetch(userId).catch(() => undefined);
-    }
-
-    if (member !== undefined) {
+    if (isGuildMember(member)) {
       // Checks if the user is not restricted
       if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
         info.message = 'You need to restrict the user first!';
@@ -275,27 +279,17 @@ export class TempBanCommand extends Command {
     info.success = true;
 
     // Log the ban
-    let logChannel = guild.channels.cache.get(IDs.channels.logs.restricted);
+    const logChannel = await getTextBasedChannel(IDs.channels.logs.restricted);
 
-    if (logChannel === undefined) {
-      const fetchLogChannel = await guild.channels.fetch(
-        IDs.channels.logs.restricted,
-      );
+    if (!isTextBasedChannel(logChannel)) {
+      this.container.logger.error('Temp Ban: Could not fetch log channel');
 
-      if (fetchLogChannel === null || fetchLogChannel === undefined) {
-        this.container.logger.error('Temp Ban: Could not fetch log channel');
+      info.message =
+        `${user} has been temporarily banned for ${banLength}. ` +
+        "This hasn't been logged in a text channel as log channel could not be found";
 
-        info.message =
-          `${user} has been temporarily banned for ${banLength}. ` +
-          "This hasn't been logged in a text channel as log channel could not be found";
-
-        return info;
-      } else {
-        logChannel = fetchLogChannel;
-      }
-    }
-
-    if (!logChannel.isSendable()) {
+      return info;
+    } else if (!logChannel.isSendable()) {
       this.container.logger.error(
         'Temp Ban: The bot does not have permission to send in the logs channel!',
       );

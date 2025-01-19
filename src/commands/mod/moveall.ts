@@ -23,6 +23,11 @@
 import { Args, Command, RegisterBehavior } from '@sapphire/framework';
 import { Message, MessageFlagsBitField } from 'discord.js';
 import { ChannelType } from 'discord.js';
+import {
+  isGuildMember,
+  isVoiceBasedChannel,
+} from '@sapphire/discord.js-utilities';
+import { getVoiceBasedChannel } from '#utils/fetcher';
 
 export class MoveAllCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
@@ -83,40 +88,31 @@ export class MoveAllCommand extends Command {
       return;
     }
 
-    if (member === null) {
+    if (!isGuildMember(member)) {
       await interaction.editReply({
         content: 'Error fetching your user',
       });
       return;
     }
 
-    const mod = guild.members.cache.get(member.user.id);
-
-    if (mod === undefined) {
-      await interaction.editReply({
-        content: 'Error fetching user from guild',
-      });
-      return;
-    }
-
-    if (mod.voice.channelId === null) {
+    if (member.voice.channelId === null) {
       await interaction.editReply({
         content: 'You need to be in a voice channel to run this command!',
       });
       return;
     }
 
-    const voice = guild.channels.cache.get(mod.voice.channelId);
+    const voice = await getVoiceBasedChannel(member.voice.channelId);
 
-    if (voice === undefined || !voice.isVoiceBased()) {
+    if (!isVoiceBasedChannel(voice)) {
       await interaction.editReply({
         content: 'Error fetching your current voice channel!',
       });
       return;
     }
 
-    voice.members.forEach((memberVC) => {
-      memberVC.voice.setChannel(channel.id);
+    voice.members.forEach((vcMember) => {
+      vcMember.voice.setChannel(channel.id);
     });
 
     await interaction.editReply({
@@ -137,7 +133,7 @@ export class MoveAllCommand extends Command {
     const mod = message.member;
     const { guild } = message;
 
-    if (mod === null) {
+    if (!isGuildMember(mod)) {
       await message.react('❌');
       await message.reply('Could not find your user!');
       return;
@@ -157,9 +153,9 @@ export class MoveAllCommand extends Command {
       return;
     }
 
-    const voice = guild.channels.cache.get(mod.voice.channelId);
+    const voice = await getVoiceBasedChannel(mod.voice.channelId);
 
-    if (voice === undefined || !voice.isVoiceBased()) {
+    if (!isVoiceBasedChannel(voice)) {
       await message.react('❌');
       await message.reply('Could not fetch current voice channel!');
       return;

@@ -18,7 +18,6 @@
 */
 
 import { Listener } from '@sapphire/framework';
-import { ChannelType } from 'discord.js';
 import type { GuildChannel, EmbedBuilder } from 'discord.js';
 import { setTimeout } from 'timers/promises';
 import IDs from '#utils/ids';
@@ -33,6 +32,9 @@ import {
   createWarningsEmbed,
 } from '#utils/embeds';
 import { fetchWarnings } from '#utils/database/moderation/warnings';
+import { isTextChannel } from '@sapphire/discord.js-utilities';
+import { getUser } from '#utils/fetcher';
+import { isUser } from '#utils/typeChecking';
 
 export class ModMailCreateListener extends Listener {
   public constructor(
@@ -50,8 +52,7 @@ export class ModMailCreateListener extends Listener {
     if (channel.parentId !== IDs.categories.modMail) return;
 
     // Checks if the channel is not a text channel
-    if (!channel.isTextBased()) return;
-    if (channel.type !== ChannelType.GuildText) return;
+    if (!isTextChannel(channel)) return;
 
     // Gets the guild
     const { guild } = channel;
@@ -64,13 +65,10 @@ export class ModMailCreateListener extends Listener {
     const userId = topic[2];
 
     // Gets user who created ModMail
-    let user = guild.client.users.cache.get(userId);
+    const user = await getUser(userId);
 
-    if (user === undefined) {
-      user = await guild.client.users.fetch(userId);
-      if (user === undefined) {
-        return;
-      }
+    if (!isUser(user)) {
+      return;
     }
 
     // Check if the user is currently restricted on the database

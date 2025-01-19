@@ -20,8 +20,9 @@
 import { Listener } from '@sapphire/framework';
 import { ButtonStyle, ActionRowBuilder, ButtonBuilder } from 'discord.js';
 
-import type { Client, TextChannel } from 'discord.js';
 import IDs from '#utils/ids';
+import { getTextBasedChannel } from '#utils/fetcher';
+import { isTextBasedChannel } from '@sapphire/discord.js-utilities';
 
 export class NonVeganAccessReady extends Listener {
   public constructor(
@@ -35,18 +36,12 @@ export class NonVeganAccessReady extends Listener {
     });
   }
 
-  public async run(client: Client) {
-    let roles = client.channels.cache.get(IDs.channels.information.roles) as
-      | TextChannel
-      | undefined;
-    if (roles === undefined) {
-      roles = (await client.channels.fetch(IDs.channels.information.roles)) as
-        | TextChannel
-        | undefined;
-      if (roles === undefined) {
-        this.container.logger.error('nonVeganAccess: Roles not found');
-        return;
-      }
+  public async run() {
+    const roles = await getTextBasedChannel(IDs.channels.information.roles);
+
+    if (!isTextBasedChannel(roles)) {
+      this.container.logger.error('nonVeganAccess: Roles not found');
+      return;
     }
 
     const botId = this.container.client.id;
