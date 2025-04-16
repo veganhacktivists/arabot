@@ -102,7 +102,8 @@ export class VerificationReady extends Listener {
     });
 
     if (!verification) {
-      await createVerificationVoice(category);
+      // temporarily disabling verification voice channels creation
+      //await createVerificationVoice(category);
     }
   }
 }
