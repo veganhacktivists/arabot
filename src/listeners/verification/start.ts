@@ -35,6 +35,7 @@ export class VerificationReady extends Listener {
   ) {
     super(context, {
       ...options,
+      enabled: false,
       once: true,
       event: 'ready',
     });
@@ -102,8 +103,7 @@ export class VerificationReady extends Listener {
     });
 
     if (!verification) {
-      // temporarily disabling verification voice channels creation
-      //await createVerificationVoice(category);
+      await createVerificationVoice(category);
     }
   }
 }
