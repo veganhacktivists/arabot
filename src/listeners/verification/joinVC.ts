@@ -69,6 +69,7 @@ export class VerificationJoinVCListener extends Listener {
   ) {
     super(context, {
       ...options,
+      enabled: false,
       event: 'voiceStateUpdate',
     });
   }
