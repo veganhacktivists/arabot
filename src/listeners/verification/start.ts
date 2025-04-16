@@ -35,6 +35,7 @@ export class VerificationReady extends Listener {
   ) {
     super(context, {
       ...options,
+      enabled: false,
       once: true,
       event: 'ready',
     });

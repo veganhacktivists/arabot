@@ -45,6 +45,7 @@ export class VerificationLeaveVCListener extends Listener {
   ) {
     super(context, {
       ...options,
+      enabled: false,
       event: 'voiceStateUpdate',
     });
   }
