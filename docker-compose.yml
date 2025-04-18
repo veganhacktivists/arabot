@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:16
     container_name: postgres
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
@@ -14,7 +14,7 @@ services:
   redis:
     image: redis:7
     container_name: redis
-    restart: always
+    restart: unless-stopped
     env_file:
       - .env
     volumes:
@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: arabot
-    restart: always
+    restart: unless-stopped
     depends_on:
       - postgres
       - redis
