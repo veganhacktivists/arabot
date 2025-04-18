@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2022, 2025  Anthony Berg, Euphemus333
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,9 +35,9 @@ export class ActivismMonMessageTask extends ScheduledTask {
 
   public async run() {
     const message =
-      '**Looking for tips to meet local vegans or activism events? **\n' +
-      '🔹Try searching for vegan Facebook groups for your closet major city or area. \n' +
-      '🔹Get in contact with an animal rights organization like [PETA](<https://www.peta.org/>), [Direct Action Everywhere](<https://www.directactioneverywhere.com/>), [Mercy for Animals](<https://mercyforanimals.org/>), [Humane Society of the US](<https://www.humanesociety.org/>), [Vegan Outreach](<https://veganoutreach.org/>), etc in your area. Try searching for an organization promoting plant-based eating as well! \n' +
+      '**Looking for tips to meet local vegans or activism events?**\n' +
+      '🔹Try searching for vegan Facebook groups for your closet major city or area.\n' +
+      '🔹Get in contact with an animal rights organization like [PETA](<https://www.peta.org/>), [Direct Action Everywhere](<https://www.directactioneverywhere.com/>), [Mercy for Animals](<https://mercyforanimals.org/>), [Humane Society of the US](<https://www.humanesociety.org/>), [Vegan Outreach](<https://veganoutreach.org/>), etc in your area. Try searching for an organization promoting plant-based eating as well!\n' +
       '🔹You can also search in [Meetup](<https://www.meetup.com/home/>), a social media platform for organizing events and activities. \n' +
       '🔹Volunteering at animal sanctuaries.\n' +
       '🔹Start a Facebook or [Meetup](<https://www.meetup.com/home/>) group yourself!';
