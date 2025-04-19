@@ -184,7 +184,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
     '🔹[Thee Burger Dude](<https://theeburgerdude.com/>) - Popular fast food recipes veganized',
     
     '**Need a comprehensive source on vegan nutrition?**' +
-    '[Vegan Health](<https://veganhealth.org/>) is a website with sources and studies'+
+    '[Vegan Health](<https://veganhealth.org/>) is a website with sources and studies' +
     'by registered dieticians on evidence-based nutrient recommendations.',
     
     '**Looking for activism opportunities and events near you?**' +
