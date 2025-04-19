@@ -146,7 +146,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
     '**In the US?** Get into legislation activism! Find state and local representatives' +
     'to send letters about animal rights, meat subsidies, ag gag laws, environmental impacts,' +
     'or increased food disease risks to by using' +
-    '[CommonCause.org](<https://www.commoncause.org/find-your-representative/>)'+
+    '[CommonCause.org](<https://www.commoncause.org/find-your-representative/>)' +
     'by entering your street address.',
     
     '**In the US :flag_us:?** Get connected with' +
