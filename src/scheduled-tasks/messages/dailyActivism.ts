@@ -52,7 +52,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
     '🔹Write a Google or Yelp review with the keyword "vegan" about your experience and what foods you had.\n' +
     '🔹Share your opinion on the restaurant on Instagram or Facebook,' +
     'bonus if you post in vegan/vegetarian Facebook groups.\n' +
-    '🔹Sign up for the **[Happy Cow](<https://www.happycow.net/>)** 🐮 💜 app'+
+    '🔹Sign up for the **[Happy Cow](<https://www.happycow.net/>)** 🐮 💜 app' +
     'to list the restaurant and leave a review to help others easily access veg options too.',
     
     'Sign up for the **[Happy Cow](<https://www.happycow.net/>)** :cow: :purple_heart: app,' +
