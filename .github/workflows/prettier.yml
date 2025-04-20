@@ -1,4 +1,4 @@
-name: Prettier Autofix
+name: autofix.ci # Needed for security reasons
 
 on:
   pull_request:
