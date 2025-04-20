@@ -40,10 +40,12 @@ jobs:
 
       - name: Install ESLint
         run: |
-          pnpm i
-          pnpm add -D @microsoft/eslint-formatter-sarif
+          pnpm add eslint@8.10.0
+          pnpm add @microsoft/eslint-formatter-sarif@3.1.0
 
       - name: Run ESLint
+        env:
+          SARIF_ESLINT_IGNORE_SUPPRESSED: "true"
         run: pnpm dlx eslint .
           --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
