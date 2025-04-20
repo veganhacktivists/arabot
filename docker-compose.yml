@@ -8,8 +8,6 @@ services:
       - .env
     volumes:
       - postgres:/var/lib/postgresql/data
-    networks:
-      - arabot
 
   redis:
     image: redis:7
@@ -19,8 +17,6 @@ services:
       - .env
     volumes:
       - redis:/data
-    networks:
-      - arabot
 
   arabot:
     build:
@@ -33,8 +29,6 @@ services:
       - redis
     env_file:
       - .env
-    networks:
-      - arabot
 
 volumes:
   postgres:
@@ -42,5 +36,3 @@ volumes:
   redis:
     name: arabot-redis
 
-networks:
-  arabot:
