@@ -35,4 +35,3 @@ volumes:
     name: arabot-db
   redis:
     name: arabot-redis
-
