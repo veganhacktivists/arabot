@@ -216,6 +216,9 @@ export class DailyActivismMessageTask extends ScheduledTask {
     }
 
     await activism.send(message);
+
+    // Reset the total message counter to 0
+    await this.container.redis.set(redisKey, 0);
   }
 }
 
@@ -223,4 +226,4 @@ declare module '@sapphire/plugin-scheduled-tasks' {
   interface ScheduledTasks {
     pattern: never;
   }
-} 
+}
