@@ -1,10 +1,10 @@
-name: autofix.ci # Needed for security reasons
+name: Prettier Check # Needed for security reasons
 
 on:
   pull_request:
   push:
     branches:
-      - "main"
+      - 'main'
 
 permissions: {}
 
@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-          node-version: [ 22 ]
+        node-version: [22]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,9 +31,4 @@ jobs:
       - name: Run Prettier
         run: |
           pnpm i
-          pnpm prettier . --write
-
-      - name: Commit changes
-        uses: autofix-ci/action@v1
-        with:
-          commit-message: "refactor: apply prettier format"
+          pnpm prettier . --check
