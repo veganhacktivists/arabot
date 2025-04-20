@@ -12,8 +12,9 @@ jobs:
   prettier:
     name: Run Prettier
     runs-on: ubuntu-latest
-    matrix:
-        node-version: [ 22 ]
+    strategy:
+      matrix:
+          node-version: [ 22 ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
