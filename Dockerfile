@@ -20,7 +20,7 @@ COPY --from=prod-deps /app/node_modules /app/node_modules
 COPY --from=build /app/node_modules/.prisma /app/node_modules/.prisma
 COPY --from=build /app/dist /app/dist
 
-RUN chown node:node .
+RUN chown -R node:node .
 
 USER node
 CMD [ "pnpm", "run", "start:migrate"]
