@@ -199,7 +199,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
     const messageCount = await this.container.redis.get(redisKey);
 
     // Do not send if messages count is less than 100
-    if (!messageCount || +messageCount < 1) return;
+    // if (!messageCount || +messageCount < 10) return;
 
     // Randomly select a message from the array
     const randomIndex = Math.floor(Math.random() * this.messages.length);
