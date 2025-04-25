@@ -196,7 +196,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
     // Get the total messages sent in non-vegan general since last message
     const redisKey = 'dailyActivismMessageCounter';
 
-    const messageCount = await this.container.redis.get(redisKey);
+    // const messageCount = await this.container.redis.get(redisKey);
 
     // Do not send if messages count is less than 100
     // if (!messageCount || +messageCount < 10) return;
