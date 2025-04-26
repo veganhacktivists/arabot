@@ -15,6 +15,18 @@ jobs:
     strategy:
       matrix:
         node-version: [22]
+    services:
+      # Required to build Prisma
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: user
+          POSTGRES_PASSWORD: password
+          POSTGRES_DB: db
+        ports:
+          - 5432:5432
+    env:
+      DATABASE_URL: postgresql://user:password@localhost:5432/db
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -31,4 +43,5 @@ jobs:
       - name: Build ARABot
         run: |
           pnpm i
+          pnpm dlx prisma migrate deploy
           pnpm run cleanBuild
