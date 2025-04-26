@@ -43,5 +43,6 @@ jobs:
       - name: Build ARABot
         run: |
           pnpm i
+          pnpm exec prisma generate
           pnpm dlx prisma migrate deploy
           pnpm run cleanBuild
