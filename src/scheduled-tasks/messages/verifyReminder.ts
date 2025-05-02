@@ -54,7 +54,7 @@ export class VerifyReminder extends ScheduledTask {
     }
 
     await channel.send(
-      `If you are vegan use \`/apply\` with the Appy bot in <#${IDs.channels.nonVegan.vcText}> to be verifierd and gain and gain access to more channels`,
+      `If you are vegan use \`/apply\` with the Appy bot in <#${IDs.channels.nonVegan.vcText}> to be verifierd and gain and gain access to more channels.`,
     );
 
     // Reset the total message counter to 0
