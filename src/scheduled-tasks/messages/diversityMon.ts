@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2022, 2025  Anthony Berg, Euphemus1
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -56,15 +56,13 @@ export class DiversityMonMessageTask extends ScheduledTask {
       return;
     }
 
-    // Get the message counts from Redis
     const lgbtqiaKey = 'diversityMon:lgbtqia:messageCounter';
     const potgmKey = 'diversityMon:potgm:messageCounter';
 
     const lgbtqiaCount = await this.container.redis.get(lgbtqiaKey);
     const potgmCount = await this.container.redis.get(potgmKey);
 
-    // Only send messages if the count is between 5-10
-    const minMessages = 5;
+    const minMessages = 7;
 
     if (lgbtqiaCount && +lgbtqiaCount >= minMessages) {
       await lgbtqia.send(message);

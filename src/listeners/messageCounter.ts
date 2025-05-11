@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2023, 2025  Anthony Berg
+    Copyright (C) 2022, 2025  Anthony Berg, Euphemus1
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,6 +40,11 @@ export class ChannelMessageCounter extends Listener {
       [IDs.channels.activism.activism, 'dailyActivismMessageCounter'],
       [IDs.channels.diversity.lgbtqia, 'diversityMon:lgbtqia:messageCounter'],
       [IDs.channels.diversity.potgm, 'diversityMon:potgm:messageCounter'],
+      [IDs.channels.diversity.women, 'diversityWed:women:messageCounter'],
+      [
+        IDs.channels.diversity.disabilities,
+        'diversityWed:disabilities:messageCounter',
+      ],
     ]);
 
     const redisKey = channels.get(message.channelId);
