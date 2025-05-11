@@ -56,8 +56,25 @@ export class DiversityMonMessageTask extends ScheduledTask {
       return;
     }
 
-    await lgbtqia.send(message);
-    await potgm.send(message);
+    // Get the message counts from Redis
+    const lgbtqiaKey = 'diversityMon:lgbtqia:messageCounter';
+    const potgmKey = 'diversityMon:potgm:messageCounter';
+
+    const lgbtqiaCount = await this.container.redis.get(lgbtqiaKey);
+    const potgmCount = await this.container.redis.get(potgmKey);
+
+    // Only send messages if the count is between 5-10
+    const minMessages = 5;
+
+    if (lgbtqiaCount && +lgbtqiaCount >= minMessages) {
+      await lgbtqia.send(message);
+      await this.container.redis.set(lgbtqiaKey, 0);
+    }
+
+    if (potgmCount && +potgmCount >= minMessages) {
+      await potgm.send(message);
+      await this.container.redis.set(potgmKey, 0);
+    }
   }
 }
 

@@ -38,6 +38,8 @@ export class ChannelMessageCounter extends Listener {
     const channels: Map<string, string> = new Map([
       [IDs.channels.nonVegan.general, 'verifyReminderMessageCounter'],
       [IDs.channels.activism.activism, 'dailyActivismMessageCounter'],
+      [IDs.channels.diversity.lgbtqia, 'diversityMon:lgbtqia:messageCounter'],
+      [IDs.channels.diversity.potgm, 'diversityMon:potgm:messageCounter'],
     ]);
 
     const redisKey = channels.get(message.channelId);
