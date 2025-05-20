@@ -190,6 +190,17 @@ export class DailyActivismMessageTask extends ScheduledTask {
     '**Looking for activism opportunities and events near you?** ' +
       'Try [Animal Rights Calendar](<https://animalrightscalendar.com/>)! ' +
       'Not finding an organization or event? Contact email: *person@animalrightscalendar.com*',
+
+    '📚 **Book Recommendation:** ' +
+      '**The Joyful Vegan: How to Stay Vegan in a World That Wants You to Eat Meat, Dairy, and Egg** ' +
+      'by Colleen Patrick-Goudreau\n' +
+      'In these pages, Colleen shares her wisdom for managing these challenges and arms readers—both vegan and ' +
+      'plant-based—with solutions and strategies for "coming out vegan" to family, friends, and colleagues; ' +
+      'cultivating healthy relationships (with vegans and non-vegans); communicating effectively; ' +
+      'sharing enthusiasm without proselytizing; finding like-minded community; and experiencing peace of mind ' +
+      'as a vegan in a non-vegan world.\n' +
+      'By implementing the tools provided in this book, readers will find they can live ethically, ' +
+      'eat healthfully, engage socially—and remain a joyful vegan.',
   ];
 
   public async run() {
