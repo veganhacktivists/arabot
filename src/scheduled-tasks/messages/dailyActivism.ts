@@ -193,14 +193,67 @@ export class DailyActivismMessageTask extends ScheduledTask {
 
     '📚 **Book Recommendation:** ' +
       '**The Joyful Vegan: How to Stay Vegan in a World That Wants You to Eat Meat, Dairy, and Egg** ' +
-      'by Colleen Patrick-Goudreau\n' +
-      'In these pages, Colleen shares her wisdom for managing these challenges and arms readers—both vegan and ' +
+      'by Colleen Patrick-Goudreau**\n' +
+      '*In these pages, Colleen shares her wisdom for managing these challenges and arms readers—both vegan and ' +
       'plant-based—with solutions and strategies for "coming out vegan" to family, friends, and colleagues; ' +
       'cultivating healthy relationships (with vegans and non-vegans); communicating effectively; ' +
       'sharing enthusiasm without proselytizing; finding like-minded community; and experiencing peace of mind ' +
       'as a vegan in a non-vegan world.\n' +
       'By implementing the tools provided in this book, readers will find they can live ethically, ' +
-      'eat healthfully, engage socially—and remain a joyful vegan.',
+      'eat healthfully, engage socially—and remain a joyful vegan.*',
+
+    '**Need a database of stock animal rights images and videos for activism?** ' +
+      'Try [stock.weanimals.org](<https://stock.weanimals.org/>)',
+
+    '📚 **Book Recommendation:** ' +
+      "**Riding On the Power of Others: A Horsewoman's Path to Unconditional Love** " +
+      'by Ren Hurst**\n' +
+      "*Ren Hurst's memoir explores her journey of self-discovery and healing through her relationships with horses, " +
+      'learning to let go of control and embrace unconditional love and acceptance that leads her to walk away ' +
+      'completely from riding and training horses and into a world where relationship is all that matters...\n' +
+      'Through her experiences, Hurst reveals the transformative power of horses and the natural world to teach humans ' +
+      'about empathy, compassion, and the interconnectedness of all beings.*',
+
+    '**Self-care as a Vegan Activist:**\n' +
+      '🔹*Find a community* - Speaking to like-minded people will help to remind you that ' +
+      'you most certainly are not alone - you are an important part of a growing movement for global change.\n' +
+      '🔹*Take a break* - Make some time to do things you love, purely for your own enjoyment.\n' +
+      '🔹*We are not gods* - You are not responsible for the whole world.\n' +
+      '🔹*Celebrate small achievements* - All little wins add up to a make big difference.\n' +
+      '🔹*Spend time with animals* - Farm animal sanctuaries often have open days where you can pay a visit ' +
+      'to well-cared for ex-farm animals who are able to live in comfort and security.',
+
+    '**Are you an experienced vegan who wants to help others adopt this compassionate lifestyle?**\n' +
+      'Sign up as a mentor to be matched with a new vegan near you in the ' +
+      '[Vegan Mentor Program](<https://veganoutreach.org/vegan-mentorship-program/>)! 🐣\n' +
+      'Recent research suggests many vegans backslide into eating animals and animal products. ' +
+      'Vegan Outreach has set out to help prevent this through their Vegan Mentor Program.\n' +
+      'New and aspiring vegetarians and vegans—and established vegans who are feeling alone in a world ' +
+      'of meat eaters—are paired with vegan mentors who can provide guidance and support.',
+
+    '**Sarina Farb** is a Midwest-based science educator, speaker, and vegan advocate who has been vegan ' +
+      'since birth *(March 11, 1994)*\n' +
+      'https://www.instagram.com/bornvegan1/',
+
+    '**Need assistance in finding a career to help the animal advocacy movement?**\n' +
+      'Start here: <https://animaladvocacycareers.org/>\n' +
+      'Animal Advocacy Careers (AAC) helps advocates find and transition into meaningful opportunities ' +
+      'that make the world better for animals. Alongside this, AAC closely monitors the skills and roles ' +
+      'that are hardest to hire for, and areas outside nonprofits where mission-aligned candidates are most ' +
+      'needed to accelerate change for animals. This enables us to guide and match candidates to roles where ' +
+      'they can achieve the highest impact for animals and best align with their skills and career goals.',
+
+    '**List of Medical Literature on Vegan Diets:**\n' +
+      '[American Dietetics Association (Academy of Nutrition and Dietetics)](<https://pubmed.ncbi.nlm.nih.gov/19562864/>)\n' +
+      '[National Health Service UK](<https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/>)\n' +
+      '[British Nutrition Foundation](<https://www.nutrition.org.uk/putting-it-into-practice/plant-based-diets/healthy-eating-for-vegetarians-and-vegans/>)\n' +
+      '[British Dietetics Association](<https://www.nutrition.org.uk/putting-it-into-practice/plant-based-diets/healthy-eating-for-vegetarians-and-vegans/>)\n' +
+      '[Dietitians of Canada](<https://www.unlockfood.ca/en/Articles/Vegetarian-and-Vegan-Diets/What-You-Need-to-Know-About-Following-a-Vegan-Eati.aspx>)\n' +
+      '[Heart and Stroke Foundation of Canada](<https://www.heartandstroke.ca/get-healthy/healthy-eating/specific-diets/for-vegetarians>)\n' +
+      '[Dietitians Association of Australia](<https://dietitiansaustralia.org.au/diet-and-nutrition-health-advice>)\n' +
+      '[World Health Organisation](<https://www.who.int/europe/publications/i/item/WHO-EURO-2021-4007-43766-61591>)\n' +
+      '[Harvard Medical School](<https://www.health.harvard.edu/staying-healthy/becoming-a-vegetarian>)\n' +
+      '[The Mayo Clinic](<https://www.mayoclinic.org/healthy-lifestyle/nutrition-and-healthy-eating/in-depth/vegetarian-diet/art-20046446>)',
   ];
 
   public async run() {
