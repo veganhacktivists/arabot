@@ -30,6 +30,7 @@ export class StandupTask extends ScheduledTask {
     super(context, {
       ...options,
       pattern: '0 12 * * 1',
+      enabled: false,
     });
   }
 
