@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2022  Anthony Berg
+    Copyright (C) 2022, 2025  Anthony Berg, Euphemus1
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,8 +58,23 @@ export class DiversityWedMessageTask extends ScheduledTask {
       return;
     }
 
-    await women.send(message);
-    await disabilities.send(message);
+    const womenKey = 'diversityWed:women:messageCounter';
+    const disabilitiesKey = 'diversityWed:disabilities:messageCounter';
+
+    const womenCount = await this.container.redis.get(womenKey);
+    const disabilitiesCount = await this.container.redis.get(disabilitiesKey);
+
+    const minMessages = 7;
+
+    if (womenCount && +womenCount >= minMessages) {
+      await women.send(message);
+      await this.container.redis.set(womenKey, 0);
+    }
+
+    if (disabilitiesCount && +disabilitiesCount >= minMessages) {
+      await disabilities.send(message);
+      await this.container.redis.set(disabilitiesKey, 0);
+    }
   }
 }
 
