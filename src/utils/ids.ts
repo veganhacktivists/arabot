@@ -112,6 +112,10 @@ let IDs = {
     activism: {
       activism: '730907954877956179',
     },
+    plus: {
+      general: '919073752552181760',
+      selfies: '804797057947795476',
+    },
     diversity: {
       diversity: '1062703409398026250',
       women: '938808963544285324',
