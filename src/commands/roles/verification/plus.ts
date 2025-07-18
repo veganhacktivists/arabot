@@ -147,7 +147,15 @@ export class PlusCommand extends Command {
     info.message = `Gave ${user} the ${plus.name} role!`;
 
     await user
-      .send(`You have been given the ${plus.name} role by ${mod}!`)
+      .send(
+        `You have been given the ${plus.name} role by ${mod}! ` +
+          'This allows you to access:' +
+          `\n- <#${IDs.channels.plus.general}>` +
+          `\n- <#${IDs.channels.plus.selfies}>` +
+          '\nThis section is still to be kept SFW (so no explicit images). ' +
+          'However, you can post or talk about more adult subjects here than ' +
+          'in the channels that are not age-restricted.',
+      )
       .catch(() => {});
     info.success = true;
     return info;

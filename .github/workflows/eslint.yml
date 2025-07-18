@@ -11,17 +11,17 @@ name: ESLint
 
 on:
   push:
-    branches: ['main']
+    branches:
+      - 'main'
   pull_request:
-    # The branches below must be a subset of the branches above
-    branches: ['main']
-  schedule:
-    - cron: '27 13 * * 1'
 
 jobs:
   eslint:
     name: Run eslint scanning
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [22]
     permissions:
       contents: read
       security-events: write
@@ -29,13 +29,24 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
+
       - name: Install ESLint
         run: |
-          npm install eslint@8.10.0
-          npm install @microsoft/eslint-formatter-sarif@2.1.7
+          pnpm add eslint@8.10.0
+          pnpm add @microsoft/eslint-formatter-sarif@3.1.0
 
       - name: Run ESLint
-        run: npx eslint .
+        env:
+          SARIF_ESLINT_IGNORE_SUPPRESSED: 'true'
+        run: pnpm dlx eslint .
           --config .eslintrc.json
           --ext .js,.jsx,.ts,.tsx
           --format @microsoft/eslint-formatter-sarif

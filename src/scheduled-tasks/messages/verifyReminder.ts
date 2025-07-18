@@ -54,11 +54,8 @@ export class VerifyReminder extends ScheduledTask {
     }
 
     await channel.send(
-      "If you want to have the vegan or activist role, you'll need to do a voice verification. " +
-        "To do this, hop into the 'Verification' voice channel." +
-        "\n\nIf there aren't any verifiers available, you'll be disconnected, and you can rejoin later." +
-        `\nAlternatively if you would like text verification, you can use \`/apply\` in <#${IDs.channels.nonVegan.vcText}> ` +
-        'to be able fill out a Vegan Verification form through the Appy Bot.',
+      `🌱 **To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.nonVegan.vcText}> and ` +
+        `select the *Vegan Verification* form with the Appy bot to be verified and gain access to more channels.`,
     );
 
     // Reset the total message counter to 0

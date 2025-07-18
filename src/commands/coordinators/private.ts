@@ -61,7 +61,7 @@ export class PrivateCommand extends Subcommand {
         },
       ],
       description: 'Creates/deletes private channels for a user',
-      preconditions: ['CoordinatorOnly'],
+      preconditions: ['ModOnly', 'CoordinatorOnly'],
     });
   }
 
@@ -382,6 +382,9 @@ export class PrivateCommand extends Subcommand {
     } else if (user.roles.cache.has(IDs.roles.staff.hrCoordinator)) {
       name = 'hr';
       id = IDs.roles.staff.hrCoordinator;
+    } else if (user.roles.cache.has(IDs.roles.staff.moderator)) {
+      name = 'moderators';
+      id = IDs.roles.staff.moderator;
     } else {
       name = 'coordinator';
       id = IDs.roles.staff.coordinator;

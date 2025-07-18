@@ -107,6 +107,10 @@ const devIDs = {
     vegan: {
       general: '999431677535338575',
     },
+    plus: {
+      general: '999431677795389541',
+      selfies: '999431678214807612',
+    },
     activism: {
       activism: '999431678214807604',
     },

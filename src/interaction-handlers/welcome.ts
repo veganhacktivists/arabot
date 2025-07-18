@@ -57,7 +57,7 @@ export class WelcomeButtonHandler extends InteractionHandler {
       `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussions and debates.` +
       `\n\nIf you are vegan use \`/apply\` with the Appy bot in <#${IDs.channels.nonVegan.vcText}>, ` +
       'to be verified and gain access to more channels.';
-      //, you can join the 'Verification' voice channel, or
+    //, you can join the 'Verification' voice channel, or
 
     // Checks if general is not in the cache
     if (!isTextChannel(general)) {
