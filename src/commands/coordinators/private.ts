@@ -61,7 +61,7 @@ export class PrivateCommand extends Subcommand {
         },
       ],
       description: 'Creates/deletes private channels for a user',
-      preconditions: ['ModOnly', 'CoordinatorOnly'],
+      preconditions: [['ModOnly', 'CoordinatorOnly']],
     });
   }
 
