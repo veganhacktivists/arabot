@@ -55,7 +55,7 @@ export class WelcomeButtonHandler extends InteractionHandler {
     const welcomeMessage =
       `${member} Welcome to ARA! :D Please check <#${IDs.channels.information.roles}> ` +
       `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussions and debates.` +
-      `\n\n**🌱 To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.nonVegan.vcText}> and select, ` +
+      `\n\n**🌱 To apply for the Vegan role:** Use the \`/apply\` command in <#${IDs.channels.nonVegan.vcText}> and select ` +
       'the *Vegan Verification* form with the Appy bot to be verified and gain access to more channels.';
     //, you can join the 'Verification' voice channel, or
 
