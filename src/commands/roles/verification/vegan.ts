@@ -33,7 +33,12 @@ export class VeganCommand extends Command {
       aliases: ['v'],
       description: 'Gives the vegan role',
       preconditions: [
-        ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
+        [
+          'ModCoordinatorOnly',
+          'VerifierCoordinatorOnly',
+          'VerifierOnly',
+          'ModOnly',
+        ],
       ],
     });
   }
@@ -141,10 +146,11 @@ export class VeganCommand extends Command {
         !modMember.roles.cache.hasAny(
           IDs.roles.staff.verifierCoordinator,
           IDs.roles.staff.modCoordinator,
+          IDs.roles.staff.moderator,
         )
       ) {
         info.message =
-          'You need to be a verifier coordinator to remove these roles!';
+          'You need to be a verifier coordinator, mod coordinator, or moderator to remove these roles!';
         return info;
       }
 
