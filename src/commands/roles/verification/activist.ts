@@ -33,7 +33,12 @@ export class ActivistCommand extends Command {
       aliases: ['a'],
       description: 'Gives the activist role',
       preconditions: [
-        ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
+        [
+          'ModCoordinatorOnly',
+          'VerifierCoordinatorOnly',
+          'VerifierOnly',
+          'ModOnly',
+        ],
       ],
     });
   }
@@ -141,10 +146,11 @@ export class ActivistCommand extends Command {
         !modMember.roles.cache.hasAny(
           IDs.roles.staff.verifierCoordinator,
           IDs.roles.staff.modCoordinator,
+          IDs.roles.staff.moderator,
         )
       ) {
         info.message =
-          'You need to be a verifier coordinator to remove this role!';
+          'You need to be a verifier coordinator, mod coordinator, or moderator to remove this role!';
         return info;
       }
 
