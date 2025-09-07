@@ -72,9 +72,7 @@ export class TrustedCommand extends Command {
       return;
     }
 
-    await interaction.deferReply({
-      flags: MessageFlagsBitField.Flags.Ephemeral,
-    });
+    await interaction.deferReply();
 
     const info = await this.manageTrusted(user, mod, guild);
 
@@ -148,7 +146,10 @@ export class TrustedCommand extends Command {
           '\nMake sure that you follow the rules, especially by **not** posting anything **NSFW**, and **no animal products or consumption of animal products**.' +
           `\n\nNot following these rules will result in the **immediate removal** of the ${trusted.name} role.`,
       )
-      .catch(() => {});
+      .catch(() => {
+        info.message +=
+          ' And just a friendly reminder of the rules, do not post anything NSFW or animal products.';
+      });
     info.success = true;
     return info;
   }
