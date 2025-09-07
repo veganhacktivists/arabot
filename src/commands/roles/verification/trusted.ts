@@ -139,7 +139,7 @@ export class TrustedCommand extends Command {
     // Add Trusted role to the user
     await member.roles.add(trusted);
     await roleAddLog(user.id, mod.id, trusted);
-    info.message = `Gave ${user} the ${trusted.name} role!`;
+    info.message = `Gave ${user} the ${trusted.name} role! No posts of nsfw or animal products.`;
 
     await user
       .send(
