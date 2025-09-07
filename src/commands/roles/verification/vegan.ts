@@ -141,10 +141,11 @@ export class VeganCommand extends Command {
         !modMember.roles.cache.hasAny(
           IDs.roles.staff.verifierCoordinator,
           IDs.roles.staff.modCoordinator,
+          IDs.roles.staff.verifier,
         )
       ) {
         info.message =
-          'You need to be a verifier coordinator to remove these roles!';
+          'You need to be a verifier coordinator, mod coordinator, or verifier to remove these roles!';
         return info;
       }
 

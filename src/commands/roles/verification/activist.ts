@@ -141,10 +141,11 @@ export class ActivistCommand extends Command {
         !modMember.roles.cache.hasAny(
           IDs.roles.staff.verifierCoordinator,
           IDs.roles.staff.modCoordinator,
+          IDs.roles.staff.verifier,
         )
       ) {
         info.message =
-          'You need to be a verifier coordinator to remove this role!';
+          'You need to be a verifier coordinator, mod coordinator, or verifier to remove this role!';
         return info;
       }
 
