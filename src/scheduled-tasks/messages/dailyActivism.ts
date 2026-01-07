@@ -255,7 +255,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
       '[American Dietetics Association (Academy of Nutrition and Dietetics)](<https://pubmed.ncbi.nlm.nih.gov/19562864/>)\n' +
       '[National Health Service UK](<https://www.nhs.uk/live-well/eat-well/how-to-eat-a-balanced-diet/the-vegan-diet/>)\n' +
       '[British Nutrition Foundation](<https://www.nutrition.org.uk/putting-it-into-practice/plant-based-diets/healthy-eating-for-vegetarians-and-vegans/>)\n' +
-      '[British Dietetics Association](<https://www.nutrition.org.uk/putting-it-into-practice/plant-based-diets/healthy-eating-for-vegetarians-and-vegans/>)\n' +
+      '[British Dietetics Association](<https://www.bda.uk.com/resource/vegetarian-vegan-plant-based-diet.html>)\n' +
       '[Dietitians of Canada](<https://www.unlockfood.ca/en/Articles/Vegetarian-and-Vegan-Diets/What-You-Need-to-Know-About-Following-a-Vegan-Eati.aspx>)\n' +
       '[Heart and Stroke Foundation of Canada](<https://www.heartandstroke.ca/get-healthy/healthy-eating/specific-diets/for-vegetarians>)\n' +
       '[Dietitians Association of Australia](<https://dietitiansaustralia.org.au/diet-and-nutrition-health-advice>)\n' +
