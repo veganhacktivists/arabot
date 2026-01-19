@@ -147,7 +147,7 @@ export class DailyActivismMessageTask extends ScheduledTask {
       '[Direct Action Everywhere](<https://www.directactioneverywhere.com/>), ' +
       '[Animal Rebellion](<https://animalrebellion.org/about/>), ' +
       '[PETA](<https://www.peta.org/action/campaigns/>), and ' +
-      '[Animal Liberation Front](<https://animalliberationfrontline.com/>)\n' +
+      '[Animal Liberation Front](<https://animalliberationfrontline.com/>).\n' +
       '🔹**[Video](<https://www.youtube.com/watch?v=LHyqJxSeUFc>)** on the importance of pressure campaigns ' +
       'by [The Cranky Vegan](<https://www.instagram.com/the.cranky.vegan>) on ' +
       '[VeganFTA](<https://veganfta.com/>).',
