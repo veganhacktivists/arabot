@@ -145,9 +145,8 @@ export class DailyActivismMessageTask extends ScheduledTask {
       '[Animal Save Movement](<https://thesavemovement.org/>), or get involved in pressure campaigns.\n' +
       '🔹Get in contact with organizations such as ' +
       '[Direct Action Everywhere](<https://www.directactioneverywhere.com/>), ' +
-      '[Animal Rebellion](<https://animalrebellion.org/about/>), ' +
-      '[PETA](<https://www.peta.org/action/campaigns/>), and ' +
-      '[Animal Liberation Front](<https://animalliberationfrontline.com/>)\n' +
+      '[Animal Rebellion](<https://animalrebellion.org/about/>), and ' +
+      '[PETA](<https://www.peta.org/action/campaigns/>)\n' +
       '🔹**[Video](<https://www.youtube.com/watch?v=LHyqJxSeUFc>)** on the importance of pressure campaigns ' +
       'by [The Cranky Vegan](<https://www.instagram.com/the.cranky.vegan>) on ' +
       '[VeganFTA](<https://veganfta.com/>).',
