@@ -29,6 +29,7 @@ export class RestrictToleranceCommand extends Command {
       aliases: ['rt'],
       description: 'Restricts a user for bigoted reasons',
       preconditions: ['ModOnly'],
+      enabled: false,
     });
   }
 
