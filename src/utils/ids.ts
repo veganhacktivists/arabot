@@ -97,6 +97,7 @@ let IDs = {
       verifiers: '873215538627756072',
     },
     welcome: '992027842906955888',
+    verification: '1466808544018956444',
     dietSupport: {
       info: '993891104346873888',
       introduction: '993272252743286874',

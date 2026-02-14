@@ -95,6 +95,7 @@ const devIDs = {
       verifiers: '999431677006860411',
     },
     welcome: '999431677006860410',
+    verification: '1472287087683309762',
     dietSupport: {
       info: '999431677006860417',
       introduction: '999431677325615184',

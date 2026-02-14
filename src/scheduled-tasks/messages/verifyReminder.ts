@@ -54,7 +54,7 @@ export class VerifyReminder extends ScheduledTask {
     }
 
     await channel.send(
-      `🌱 **To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.nonVegan.vcText}> and ` +
+      `🌱 **To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.verification}> and ` +
         `select the *Vegan Verification* form with the Appy bot to be verified and gain access to more channels.`,
     );
 
