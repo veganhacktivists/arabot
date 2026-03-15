@@ -36,6 +36,7 @@ export class TrustedListener extends Listener {
     super(context, {
       ...options,
       event: 'xpLevelUp',
+      enabled: false,
     });
   }
 
