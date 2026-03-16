@@ -90,7 +90,7 @@ export class InfoCommand extends Command {
         break;
       case 'verification':
         message =
-          `🌱 **To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.nonVegan.vcText}> and ` +
+          `🌱 **To apply for the Vegan role:** Use the \`/apply\` command in the <#${IDs.channels.verification}> and ` +
           `select the *Vegan Verification* form with the Appy bot to be verified and gain access to more channels.`;
         break;
       case 'modMail':
