@@ -33,6 +33,7 @@ export async function manualVerification(
     araVegan: boolean;
     trusted: boolean;
     vegCurious: boolean;
+    veg: boolean;
     convinced: boolean;
   },
 ) {
@@ -59,6 +60,7 @@ export async function manualVerification(
       serverVegan: roles.araVegan,
       trusted: roles.trusted,
       vegCurious: roles.vegCurious,
+      veg: roles.veg,
       convinced: roles.convinced,
     },
   });
@@ -133,6 +135,7 @@ export async function finishVerification(
       araVegan: boolean;
       trusted: boolean;
       vegCurious: boolean;
+      veg: boolean;
       convinced: boolean;
     };
   },
@@ -155,6 +158,7 @@ export async function finishVerification(
       serverVegan: info.roles.araVegan,
       trusted: info.roles.trusted,
       vegCurious: info.roles.vegCurious,
+      veg: info.roles.veg,
       convinced: info.roles.convinced,
       // Statistics
       reason: info.find.reason,

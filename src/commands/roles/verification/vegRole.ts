@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /*
     Animal Rights Advocates Discord Bot
-    Copyright (C) 2023  Anthony Berg
+    Copyright (C) 2026  Anthony Berg
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ import { getGuildMember, getRole } from '#utils/fetcher';
 import { isGuildMember } from '@sapphire/discord.js-utilities';
 import { isRole } from '#utils/typeChecking';
 
-export class VeganCommand extends Command {
+export class VegRoleCommand extends Command {
   public constructor(context: Command.LoaderContext, options: Command.Options) {
     super(context, {
       ...options,
-      name: 'vegan',
-      aliases: ['v'],
-      description: 'Gives the vegan role',
+      name: 'vegrole',
+      aliases: ['pb'],
+      description: 'Gives/removes the Veg role',
       preconditions: [
         ['ModCoordinatorOnly', 'VerifierCoordinatorOnly', 'VerifierOnly'],
       ],
@@ -48,7 +48,7 @@ export class VeganCommand extends Command {
           .addUserOption((option) =>
             option
               .setName('user')
-              .setDescription('User to give vegan role to')
+              .setDescription('User to give Veg role to')
               .setRequired(true),
           ),
       {
@@ -61,7 +61,7 @@ export class VeganCommand extends Command {
   public async chatInputRun(interaction: Command.ChatInputCommandInteraction) {
     // Get the arguments
     const user = interaction.options.getUser('user', true);
-    const mod = interaction.user;
+    const staff = interaction.user;
     const { guild } = interaction;
 
     // Checks if all the variables are of the right type
@@ -78,7 +78,7 @@ export class VeganCommand extends Command {
       flags: MessageFlagsBitField.Flags.Ephemeral,
     });
 
-    const info = await this.manageVegan(user, mod, guild);
+    const info = await this.manageVeg(user, staff, guild);
 
     await interaction.editReply(info.message);
   }
@@ -94,7 +94,7 @@ export class VeganCommand extends Command {
       return;
     }
 
-    const mod = message.author;
+    const staff = message.author;
 
     const { guild } = message;
 
@@ -104,20 +104,19 @@ export class VeganCommand extends Command {
       return;
     }
 
-    const info = await this.manageVegan(user, mod, guild);
+    const info = await this.manageVeg(user, staff, guild);
 
     await message.reply(info.message);
     await message.react(info.success ? '✅' : '❌');
   }
 
-  private async manageVegan(user: User, mod: User, guild: Guild) {
+  private async manageVeg(user: User, staff: User, guild: Guild) {
     const info = {
       message: '',
       success: false,
     };
     const member = await getGuildMember(user.id, guild);
-    const modMember = await getGuildMember(mod.id, guild);
-    const vegan = await getRole(IDs.roles.vegan.vegan, guild);
+    const veg = await getRole(IDs.roles.nonvegan.veg, guild);
 
     // Checks if user's GuildMember was found in cache
     if (!isGuildMember(member)) {
@@ -125,56 +124,36 @@ export class VeganCommand extends Command {
       return info;
     }
 
-    if (!isGuildMember(modMember)) {
-      info.message = "Error fetching the staff's guild member!";
+    if (!isRole(veg)) {
+      info.message = 'Error fetching Veg role from cache!';
       return info;
     }
 
-    if (!isRole(vegan)) {
-      info.message = 'Error fetching vegan role from cache!';
-      return info;
-    }
-
-    // Checks if the user is Vegan and to give them or remove them based on if they have it
-    if (member.roles.cache.has(IDs.roles.vegan.vegan)) {
-      if (
-        !modMember.roles.cache.hasAny(
-          IDs.roles.staff.verifierCoordinator,
-          IDs.roles.staff.modCoordinator,
-          IDs.roles.staff.verifier,
-        )
-      ) {
-        info.message =
-          'You need to be a verifier coordinator, mod coordinator, or verifier to remove these roles!';
-        return info;
-      }
-
-      // Remove the Vegan role from the user
-      await member.roles.add(IDs.roles.nonvegan.nonvegan);
-      await member.roles.remove([
-        vegan,
-        IDs.roles.vegan.activist,
-        IDs.roles.vegan.nvAccess,
-      ]);
-      await roleRemoveLog(user.id, mod.id, vegan);
-      info.message = `Removed the ${vegan.name} role from ${user}`;
+    // Checks if the user has Veg and to give them or remove them based on if they have it
+    if (member.roles.cache.has(IDs.roles.nonvegan.veg)) {
+      // Remove the Veg role from the user
+      await member.roles.remove(veg);
+      await roleRemoveLog(user.id, staff.id, veg);
+      info.message = `Removed the ${veg.name} role from ${user}`;
       info.success = true;
       return info;
     }
 
-    // Add Vegan role to the user
-    await member.roles.add([vegan, IDs.roles.vegan.nvAccess]);
+    // Add Veg role to the user
+    await member.roles.add([veg, IDs.roles.nonvegan.nonvegan]);
     await member.roles.remove([
-      IDs.roles.nonvegan.nonvegan,
-      IDs.roles.nonvegan.convinced,
-      IDs.roles.nonvegan.vegCurious,
-      IDs.roles.nonvegan.veg,
+      IDs.roles.vegan.vegan,
+      IDs.roles.vegan.activist,
+      IDs.roles.vegan.nvAccess,
     ]);
-    await roleAddLog(user.id, mod.id, vegan);
-    info.message = `Gave ${user} the ${vegan.name} role!`;
+    await roleAddLog(user.id, staff.id, veg);
+    info.message = `Gave ${user} the ${veg.name} role!`;
 
     await user
-      .send(`You have been given the ${vegan.name} role by ${mod}!`)
+      .send(
+        `You have been given the ${veg.name} role by ${staff} ` +
+          'which gives you access to the diet support section',
+      )
       .catch(() => {});
     info.success = true;
     return info;

@@ -158,6 +158,7 @@ export class VerificationJoinVCListener extends Listener {
         IDs.roles.nonvegan.nonvegan,
         IDs.roles.nonvegan.convinced,
         IDs.roles.nonvegan.vegCurious,
+        IDs.roles.nonvegan.veg,
       ]);
 
       // Start 15-minute timer if verifier does not join
@@ -350,6 +351,7 @@ export class VerificationJoinVCListener extends Listener {
         araVegan: false,
         trusted: false,
         vegCurious: false,
+        veg: false,
         convinced: false,
       },
     };
@@ -547,6 +549,7 @@ export class VerificationJoinVCListener extends Listener {
         info.roles.activist = false;
         info.roles.trusted = false;
         info.roles.vegCurious = false;
+        info.roles.veg = false;
         info.roles.convinced = false;
         embed = await this.createEmbed(
           questionInfo[info.page].question,
@@ -599,6 +602,7 @@ export class VerificationJoinVCListener extends Listener {
     activist: boolean;
     trusted: boolean;
     vegCurious: boolean;
+    veg: boolean;
     convinced: boolean;
   }) {
     let rolesText = '';
@@ -619,6 +623,9 @@ export class VerificationJoinVCListener extends Listener {
     }
     if (roles.vegCurious) {
       rolesText += `<@&${IDs.roles.nonvegan.vegCurious}>`;
+    }
+    if (roles.veg) {
+      rolesText += `<@&${IDs.roles.nonvegan.veg}>`;
     }
     return rolesText;
   }

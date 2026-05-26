@@ -37,6 +37,7 @@
 ## Verification Team
 
 - `/vegan <user>`/`?v <user>` - Gives/removes the Vegan role from the user.
+- `/vegrole <user>`/`?pb <user>` - Gives/removes the Veg role from the user.
 - `/activist <user>`/`?a <user>` - Gives/removes the Activist role from the user.
 - `/verifier <user>`/`?verifier <user>` - Gives/removes the Verifier role from the user.
 - `/trialverifier <user>`/`?trialverifier <user>` - Gives/removes the Trial Verifier role from the user.

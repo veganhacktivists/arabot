@@ -164,6 +164,7 @@ export class VerifyCommand extends Command {
       araVegan: false,
       trusted: false,
       vegCurious: false,
+      veg: false,
       convinced: false,
     };
 
@@ -209,6 +210,9 @@ export class VerifyCommand extends Command {
         case 'veg':
           roles.vegCurious = true;
           break;
+        case 'pb':
+          roles.veg = true;
+          break;
         case 'conv':
           roles.convinced = true;
           break;
@@ -231,7 +235,7 @@ export class VerifyCommand extends Command {
     }
 
     if (
-      roleArgs.includes('nv') &&
+      (roleArgs.includes('nv') || roles.veg) &&
       (roles.vegan || roles.activist || roles.araVegan)
     ) {
       info.message = "Can't give vegan roles to a non-vegan";
@@ -240,20 +244,34 @@ export class VerifyCommand extends Command {
 
     await giveVerificationRoles(member, roles, true);
 
-    await finishVerifyMessages(user, roles, true);
-
-    await manualVerification(messageId, member, verifier, roles);
+    if (roles.veg && member.roles.cache.has(IDs.roles.vegan.vegan)) {
+      await member.roles.remove([
+        IDs.roles.vegan.vegan,
+        IDs.roles.vegan.activist,
+        IDs.roles.vegan.nvAccess,
+      ]);
+    }
 
     if (
-      member.roles.cache.has(IDs.roles.nonvegan.nonvegan) &&
-      (roles.vegan || roles.activist || roles.araVegan)
+      (roles.vegan || roles.activist || roles.araVegan) &&
+      member.roles.cache.hasAny(
+        IDs.roles.nonvegan.nonvegan,
+        IDs.roles.nonvegan.vegCurious,
+        IDs.roles.nonvegan.veg,
+        IDs.roles.nonvegan.convinced,
+      )
     ) {
       await member.roles.remove([
         IDs.roles.nonvegan.nonvegan,
         IDs.roles.nonvegan.vegCurious,
+        IDs.roles.nonvegan.veg,
         IDs.roles.nonvegan.convinced,
       ]);
     }
+
+    await finishVerifyMessages(user, roles, true);
+
+    await manualVerification(messageId, member, verifier, roles);
 
     info.success = true;
     info.message = `Verified ${user}`;

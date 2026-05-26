@@ -164,6 +164,7 @@ export async function giveVerificationRoles(
     araVegan: boolean;
     trusted: boolean;
     vegCurious: boolean;
+    veg: boolean;
     convinced: boolean;
   },
   manual: boolean = false,
@@ -192,6 +193,9 @@ export async function giveVerificationRoles(
   if (roles.vegCurious) {
     rolesAdd.push(IDs.roles.nonvegan.vegCurious);
   }
+  if (roles.veg) {
+    rolesAdd.push(IDs.roles.nonvegan.veg);
+  }
   await member.roles.add(rolesAdd);
 }
 
@@ -204,6 +208,7 @@ export async function finishDM(
     araVegan: boolean;
     trusted: boolean;
     vegCurious: boolean;
+    veg: boolean;
     convinced: boolean;
   },
 ) {
@@ -243,6 +248,7 @@ export async function finishVerifyMessages(
     araVegan: boolean;
     trusted: boolean;
     vegCurious: boolean;
+    veg: boolean;
     convinced: boolean;
   },
   manual: boolean = false,
@@ -269,8 +275,8 @@ export async function finishVerifyMessages(
     let msg =
       `${user}, you have been verified! Please check <#${IDs.channels.information.roles}> ` +
       `and remember to follow the <#${IDs.channels.information.conduct}> and to respect ongoing discussion and debates.`;
-    // Add extra info if the user got veg curious or convinced.
-    if (roles.vegCurious || roles.convinced) {
+    // Add extra info if the user got Veg Curious, Veg, or Convinced.
+    if (roles.vegCurious || roles.veg || roles.convinced) {
       msg += `\n\nYou also have access to <#${IDs.channels.dietSupport.main}> for help on going vegan.`;
     }
     await general.send(msg);
