@@ -33,6 +33,7 @@ model User {
   plus                  Boolean           @default(false)
   notVegan              Boolean           @default(false)
   vegCurious            Boolean           @default(false)
+  veg                   Boolean           @default(false)
   convinced             Boolean           @default(false)
   muted                 Boolean           @default(false)
   VerifyUser            Verify[]          @relation("verUser")
@@ -85,6 +86,7 @@ model Verify {
   activist    Boolean   @default(false) // If they got the activist role when they verified
   trusted     Boolean   @default(false) // If they got the trusted role when they verified
   vegCurious  Boolean   @default(false) // If they got the Veg Curious role
+  veg         Boolean   @default(false) // If they got the Veg role
   convinced   Boolean   @default(false)
   text        Boolean   @default(false) // If they used text verification
   serverVegan Boolean   @default(false) // People that went vegan on the server
