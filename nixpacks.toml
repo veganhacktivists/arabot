@@ -1,5 +1,6 @@
 [phases.setup]
-# nixOverlays = ['...', 'https://github.com/veganhacktivists/nixpkgs-nodejs-overlay/archive/33c296f2db75e4405a5e17b09999f23f53cc45e8.tar.gz']
+aptPkgs = ['...', 'libssl3']
+nixOverlays = ['...', 'https://github.com/veganhacktivists/nixpkgs-nodejs-overlay/archive/5e89683d2ae72be2bb6747a695fff42ffde6e524.tar.gz']
 
 
 [phases.build]
