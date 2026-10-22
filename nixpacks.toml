@@ -1,5 +1,5 @@
 [phases.setup]
-nixOverlays = ['...', 'https://github.com/veganhacktivists/nixpkgs-nodejs-overlay/archive/6b365cacf381f9cf9e46dcc0c92578240a756d22.tar.gz']
+nixOverlays = ['...', 'https://github.com/veganhacktivists/nixpkgs-nodejs-overlay/archive/afd15658f2296281a00d355dcd5d2b47a2847f1c.tar.gz']
 
 
 [phases.build]
