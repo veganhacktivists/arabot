@@ -1,3 +1,7 @@
+[phases.setup]
+nixOverlays = ['...', 'https://github.com/veganhacktivists/nixpkgs-nodejs-overlay/archive/2c16ee03195b342979007e547baff65381d2ee91.tar.gz']
+
+
 [phases.build]
 cmds = ["pnpm prisma generate", "..."]
 
