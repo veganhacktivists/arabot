@@ -56,6 +56,7 @@ function getRoles(roles: GuildMemberRoleManager) {
     plus: roles.cache.has(IDs.roles.vegan.plus),
     notVegan: roles.cache.has(IDs.roles.nonvegan.nonvegan),
     vegCurious: roles.cache.has(IDs.roles.nonvegan.vegCurious),
+    veg: roles.cache.has(IDs.roles.nonvegan.veg),
     convinced: roles.cache.has(IDs.roles.nonvegan.convinced),
     trusted: roles.cache.has(IDs.roles.trusted),
     muted: roles.cache.has(IDs.roles.restrictions.muted),
@@ -107,6 +108,7 @@ export async function addExistingUser(member: GuildMember) {
       plus: roles.plus,
       notVegan: roles.notVegan,
       vegCurious: roles.vegCurious,
+      veg: roles.veg,
       convinced: roles.convinced,
       muted: roles.muted,
     },
@@ -153,6 +155,7 @@ export async function updateUser(member: GuildMember) {
       plus: roles.plus,
       notVegan: roles.notVegan,
       vegCurious: roles.vegCurious,
+      veg: roles.veg,
       convinced: roles.convinced,
       muted: roles.muted,
     },
@@ -164,6 +167,7 @@ export async function updateUser(member: GuildMember) {
       plus: roles.plus,
       notVegan: roles.notVegan,
       vegCurious: roles.vegCurious,
+      veg: roles.veg,
       convinced: roles.convinced,
       muted: roles.muted,
     },
@@ -188,6 +192,7 @@ export async function fetchRoles(userId: Snowflake): Promise<Snowflake[]> {
       plus: true,
       notVegan: true,
       vegCurious: true,
+      veg: true,
       convinced: true,
     },
   });
@@ -216,6 +221,9 @@ export async function fetchRoles(userId: Snowflake): Promise<Snowflake[]> {
   }
   if (roleQuery.vegCurious) {
     roles.push(IDs.roles.nonvegan.vegCurious);
+  }
+  if (roleQuery.veg) {
+    roles.push(IDs.roles.nonvegan.veg);
   }
   if (roleQuery.convinced) {
     roles.push(IDs.roles.nonvegan.convinced);

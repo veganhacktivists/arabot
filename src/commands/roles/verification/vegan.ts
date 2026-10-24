@@ -168,6 +168,7 @@ export class VeganCommand extends Command {
       IDs.roles.nonvegan.nonvegan,
       IDs.roles.nonvegan.convinced,
       IDs.roles.nonvegan.vegCurious,
+      IDs.roles.nonvegan.veg,
     ]);
     await roleAddLog(user.id, mod.id, vegan);
     info.message = `Gave ${user} the ${vegan.name} role!`;

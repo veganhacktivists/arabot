@@ -13,6 +13,7 @@
   - `nv` - Not Vegan
   - `conv` - Convinced
   - `veg` - Veg Curious
+  - `pb` - Veg
 
 - `/verifytimeoutremove <user>` - Removes a verification timeout if the user has been timed out as a verifier was not
   available. This cannot be used for users that have been verified.
@@ -23,6 +24,7 @@ These are roles you can give/take away from users.
 
 - `/trusted <user>`/`?t <user>` - Gives/removes the Trusted role from the user.
 - `/vegcurious <user>`/`?veg <user>` - Gives/removes the Veg Curious role from the user (only usable on non-vegans).
+- `/vegrole <user>`/`?pb <user>` - Gives/removes the Veg role from the user.
 - `/convinced <user>`/`?conv <user>` - Gives/removes the Convinced role from the user.
 
 ### Roles you can only give

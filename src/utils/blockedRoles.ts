@@ -41,4 +41,5 @@ export const blockedRolesAfterRestricted = [
   IDs.roles.nonvegan.nonvegan,
   IDs.roles.nonvegan.convinced,
   IDs.roles.nonvegan.vegCurious,
+  IDs.roles.nonvegan.veg,
 ];

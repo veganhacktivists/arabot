@@ -25,6 +25,7 @@ const devIDs = {
     nonvegan: {
       nonvegan: '999431675081666598',
       vegCurious: '999431675098447932',
+      veg: '',
       convinced: '999431675098447933',
     },
     vegan: {
